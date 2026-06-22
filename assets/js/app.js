@@ -32,7 +32,7 @@
       "groupCount", "groupingList", "legendItems", "addLegendBtn", "csvFile", "previewCsvBtn", "applyCsvBtn", "csvPreview",
       "saveProjectBtn", "openProjectBtn", "projectFile", "clearProjectBtn", "autosaveStatus",
       "exportRatio", "exportLabels", "transparentBg", "pngSize", "exportSvgBtn", "exportPngBtn",
-      "fitIndonesiaBtn", "loadingIndicator", "errorArea"
+      "fitIndonesiaBtn", "loadingIndicator", "errorArea", "appShell", "controlPanel", "sidebarToggleBtn", "floatingExportBtn"
     ].forEach((id) => { el[id] = document.getElementById(id); });
     mapApi = IndonesiaMap.createMap("map", { onSelect: handleFeatureSelected });
     setupEvents();
@@ -60,8 +60,23 @@
     el.clearProjectBtn.addEventListener("click", clearProject);
     el.exportSvgBtn.addEventListener("click", exportSvg);
     el.exportPngBtn.addEventListener("click", exportPng);
+    el.sidebarToggleBtn.addEventListener("click", toggleSidebar);
+    el.floatingExportBtn.addEventListener("click", exportPng);
     el.fitIndonesiaBtn.addEventListener("click", () => mapApi.fitIndonesia());
     window.addEventListener("resize", () => mapApi.invalidate());
+  }
+
+  function toggleSidebar() {
+    setSidebarCollapsed(!el.appShell.classList.contains("sidebar-collapsed"));
+  }
+
+  function setSidebarCollapsed(collapsed) {
+    el.appShell.classList.toggle("sidebar-collapsed", collapsed);
+    el.sidebarToggleBtn.setAttribute("aria-expanded", String(!collapsed));
+    el.controlPanel.setAttribute("aria-hidden", String(collapsed));
+    el.floatingExportBtn.hidden = !collapsed;
+    // Leaflet needs a size refresh after the grid column changes.
+    setTimeout(() => mapApi.invalidate(), 220);
   }
 
   function setupColors() {
