@@ -8,8 +8,9 @@
   <link rel="stylesheet" href="./assets/css/app.css">
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="control-panel" aria-label="Panel kontrol">
+  <div id="appShell" class="app-shell">
+    <button id="sidebarToggleBtn" class="sidebar-toggle" type="button" aria-controls="controlPanel" aria-expanded="true" title="Buka/tutup menu">☰</button>
+    <aside id="controlPanel" class="control-panel" aria-label="Panel kontrol">
       <header class="app-header">
         <h1>Peta Warna Wilayah Indonesia</h1>
         <p>Batas administrasi bersifat referensi visual.</p>
@@ -153,6 +154,7 @@
       <div id="errorArea" class="error-area" role="alert"></div>
       <div id="map" aria-label="Peta Indonesia"></div>
     </main>
+    <button id="floatingExportBtn" class="floating-export-btn" type="button" hidden>Ekspor PNG</button>
   </div>
 
   <script src="./assets/vendor/leaflet/leaflet.js"></script>
