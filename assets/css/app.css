@@ -181,13 +181,19 @@ label {
   text-align: left;
 }
 
-.highlight-list, .legend-editor, .import-preview {
+.highlight-list, .legend-editor, .import-preview, .grouping-list {
   display: grid;
   gap: 8px;
   margin-top: 8px;
 }
 
-.highlight-item, .legend-item, .preview-block {
+.highlight-list {
+  max-height: 246px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.highlight-item, .legend-item, .preview-block, .grouping-item {
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 8px;
@@ -213,6 +219,23 @@ label {
   grid-template-columns: 44px 1fr auto auto;
   gap: 6px;
   align-items: center;
+}
+
+.grouping-item {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.grouping-item input {
+  margin-top: 5px;
+}
+
+.grouping-meta {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .legend-item input[type="color"] {
