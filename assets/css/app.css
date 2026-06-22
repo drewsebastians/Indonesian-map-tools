@@ -101,6 +101,7 @@ label {
 
 .app-shell.sidebar-collapsed .sidebar-toggle {
   left: 12px;
+  top: 88px;
 }
 
 .floating-export-btn {
@@ -456,6 +457,7 @@ summary {
   .app-shell.sidebar-collapsed .sidebar-toggle {
     left: 12px;
     right: auto;
+    top: 88px;
   }
 
   .map-toolbar {
