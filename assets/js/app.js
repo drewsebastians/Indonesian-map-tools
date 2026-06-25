@@ -122,7 +122,7 @@
       refreshMapLegend();
       el.loadingIndicator.textContent = merged.matched > 450
         ? `${state.features.length} wilayah dimuat dengan geometri detail.`
-        : `${state.features.length} wilayah dimuat. Geometri detail belum tersedia; upload data/indonesia-adm2-detailed.geojson untuk peta lebih rapi.`;
+        : `${state.features.length} wilayah dimuat. Geometri detail cocok ${merged.matched}/${state.features.length}.`;
     } catch (error) {
       showError(error.message);
       el.loadingIndicator.textContent = "Gagal memuat peta.";
@@ -172,15 +172,18 @@
   }
 
   function mergeDetailedGeometry(baseCollection, detailedCollection) {
-    const detailedById = new Map();
+    const detailedByKey = new Map();
     (detailedCollection.features || []).forEach((feature) => {
-      const id = geometrySourceId(feature.properties || {});
-      if (id && feature.geometry) detailedById.set(id, feature.geometry);
+      if (!feature.geometry) return;
+      geometryMatchKeys(feature.properties || {}).forEach((key) => {
+        if (!detailedByKey.has(key)) detailedByKey.set(key, feature.geometry);
+      });
     });
     let matched = 0;
     const features = (baseCollection.features || []).map((feature) => {
-      const id = geometrySourceId(feature.properties || {});
-      const geometry = detailedById.get(id);
+      const geometry = geometryMatchKeys(feature.properties || {})
+        .map((key) => detailedByKey.get(key))
+        .find(Boolean);
       if (!geometry) return feature;
       matched += 1;
       return Object.assign({}, feature, { geometry });
@@ -191,9 +194,38 @@
     };
   }
 
-  function geometrySourceId(properties) {
-    const raw = properties.geometry_source_id || properties.shapeID || properties.shapeId || properties.shape_id || properties.ShapeID || properties.id || "";
-    return String(raw).replace(/^gb-/i, "").trim();
+  function geometryMatchKeys(properties) {
+    const keys = [];
+    addKey(keys, "region:" + (properties.region_id || properties.id || properties.ID || ""));
+    addKey(keys, "shape:" + (properties.geometry_source_id || properties.shapeID || properties.shapeId || properties.shape_id || properties.ShapeID || ""));
+    addKey(keys, "code:" + normalizeCode(properties.official_code || properties.official_code_normalized || properties.ADM2_PCODE || properties.ADM2_CODE || properties.kode || properties.KODE || ""));
+    const province = properties.province_name || properties.ADM1_EN || properties.ADM1_ID || properties.PROVINSI || properties.Province || properties.province || "";
+    const region = properties.region_name || properties.display_name || properties.ADM2_EN || properties.ADM2_ID || properties.KAB_KOTA || properties.NAME_2 || properties.name || "";
+    addKey(keys, "name:" + normalizeText(province) + "|" + normalizeText(region));
+    return keys;
+  }
+
+  function addKey(keys, value) {
+    const key = String(value || "").replace(/^shape:gb-/i, "shape:").trim();
+    if (!key || key.endsWith(":") || keys.includes(key)) return;
+    keys.push(key);
+  }
+
+  function normalizeCode(value) {
+    const text = String(value || "").trim().toUpperCase().replace(/^ID/, "").replace(/\./g, "");
+    if (/^\d{4}$/.test(text)) return text.slice(0, 2) + "." + text.slice(2);
+    return String(value || "").trim().toUpperCase();
+  }
+
+  function normalizeText(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toUpperCase()
+      .replace(/\b(KABUPATEN|KAB\.?|KOTA|CITY|REGENCY)\b/g, " ")
+      .replace(/[^A-Z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   function restoreAutosave() {
