@@ -122,7 +122,7 @@
       refreshMapLegend();
       el.loadingIndicator.textContent = merged.matched > 450
         ? `${state.features.length} wilayah dimuat dengan geometri detail.`
-        : `${state.features.length} wilayah dimuat.`;
+        : `${state.features.length} wilayah dimuat. Geometri detail belum tersedia; upload data/indonesia-adm2-detailed.geojson untuk peta lebih rapi.`;
     } catch (error) {
       showError(error.message);
       el.loadingIndicator.textContent = "Gagal memuat peta.";
