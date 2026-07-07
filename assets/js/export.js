@@ -123,7 +123,7 @@
     const boundsWidth = Math.max(bounds.maxX - bounds.minX, 0.001);
     const boundsHeight = Math.max(bounds.maxY - bounds.minY, 0.001);
     const scale = Math.min((size.width - margin * 2) / boundsWidth, (size.height - margin * 2 - legendAreaHeight) / boundsHeight);
-    const labelSize = getLabelSize(boundsWidth);
+    const labelSize = getLabelSize(boundsWidth, boundsHeight, features.length, size);
     const mapWidth = (bounds.maxX - bounds.minX) * scale;
     const mapHeight = (bounds.maxY - bounds.minY) * scale;
     const offsetX = (size.width - mapWidth) / 2;
@@ -139,7 +139,7 @@
     }).join("\n");
     const labelPlacements = options.labels ? placeLabels(features, state, project, size, labelSize) : [];
     const labels = labelPlacements.map((item) => {
-      return `<text x="${item.x.toFixed(1)}" y="${item.y.toFixed(1)}" text-anchor="middle" font-size="${labelSize}" paint-order="stroke" stroke="#ffffff" stroke-width="${(labelSize / 4).toFixed(1)}" stroke-linejoin="round" fill="#1e2933">${escapeXml(labelText(item.feature, state))}</text>`;
+      return `<text x="${item.x.toFixed(1)}" y="${item.y.toFixed(1)}" text-anchor="middle" font-size="${item.fontSize}" paint-order="stroke" stroke="#ffffff" stroke-width="${(item.fontSize / 4).toFixed(1)}" stroke-linejoin="round" fill="#1e2933">${escapeXml(labelText(item.feature, state))}</text>`;
     }).join("\n");
     const legend = state.legendVisible ? buildLegend(state, size, options.legendFeatures || features) : "";
     const title = buildTitle(state.title, size);
@@ -153,43 +153,67 @@
     return `<g><rect x="${x.toFixed(1)}" y="17" width="${width.toFixed(1)}" height="42" rx="6" fill="rgba(255,255,255,0.92)" stroke="#d8dee6"/><text x="${size.width / 2}" y="44" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#1e2933">${escapeXml(text)}</text></g>`;
   }
 
-  function getLabelSize(boundsWidth) {
-    return Math.round(clamp(18 + (16 - boundsWidth) * 1.4, 18, 32));
+  function getLabelSize(boundsWidth, boundsHeight, labelCount, size) {
+    const zoomSize = clamp(13 + (18 - boundsWidth) * 0.45, 10, 18);
+    const densitySize = Math.sqrt((size.width * Math.max(1, size.height - 160)) / Math.max(1, labelCount * 15000));
+    const aspectPenalty = clamp(boundsWidth / Math.max(boundsHeight, 0.1), 1, 2.4);
+    return Math.round(clamp(zoomSize * Math.min(1, densitySize) / Math.sqrt(aspectPenalty), 9, 18));
   }
 
   function placeLabels(features, state, project, size, labelSize) {
     const placed = [];
+    const hasHighlight = (feature) => Boolean(state.highlights && state.highlights[feature.properties.region_id]);
     return features.slice().sort((a, b) => {
-      const ah = Boolean(state.highlights && state.highlights[a.properties.region_id]);
-      const bh = Boolean(state.highlights && state.highlights[b.properties.region_id]);
+      const ah = hasHighlight(a);
+      const bh = hasHighlight(b);
       return Number(bh) - Number(ah);
     }).map((feature) => {
       const c = centroid(feature);
       const p = project(c[0], c[1]);
       const text = labelText(feature, state);
-      const width = Math.max(labelSize * 3, text.length * labelSize * 0.58);
-      const height = labelSize * 1.25;
-      const offsets = [
-        [0, 0], [0, -26], [0, 26], [-60, 0], [60, 0],
-        [-60, -26], [60, -26], [-60, 26], [60, 26],
-        [0, -52], [0, 52], [-120, 0], [120, 0],
-        [-120, -52], [120, -52], [-120, 52], [120, 52]
-      ];
-      let best = null;
-      offsets.forEach((offset) => {
-        const x = clamp(p.x + offset[0], 18 + width / 2, size.width - 18 - width / 2);
-        const y = clamp(p.y + offset[1], 74 + height / 2, size.height - 48 - height / 2);
+      const highlighted = hasHighlight(feature);
+      const preferredSize = highlighted ? Math.min(18, labelSize + 2) : labelSize;
+      const minSize = highlighted ? 10 : 8;
+      const best = findLabelPlacement(feature, p, text, size, placed, preferredSize, minSize);
+      if (!best || (!highlighted && best.overlap > 0)) return null;
+      placed.push(best.box);
+      return best;
+    }).filter(Boolean);
+  }
+
+  function findLabelPlacement(feature, point, text, size, placed, preferredSize, minSize) {
+    let best = null;
+    for (let fontSize = preferredSize; fontSize >= minSize; fontSize -= 1) {
+      const width = Math.max(fontSize * 3, text.length * fontSize * 0.54);
+      const height = fontSize * 1.2;
+      const offsets = labelOffsets(fontSize);
+      for (let i = 0; i < offsets.length; i += 1) {
+        const offset = offsets[i];
+        const x = clamp(point.x + offset[0], 18 + width / 2, size.width - 18 - width / 2);
+        const y = clamp(point.y + offset[1], 74 + height / 2, size.height - 48 - height / 2);
         const box = labelBox(x, y, width, height);
         const overlap = placed.reduce((total, item) => total + overlapArea(box, item), 0);
         const distance = Math.abs(offset[0]) + Math.abs(offset[1]);
-        const candidate = { feature, x, y, box, overlap, distance };
-        if (!best || candidate.overlap < best.overlap || (candidate.overlap === best.overlap && candidate.distance < best.distance)) {
+        const candidate = { feature, x, y, box, fontSize, overlap, distance };
+        if (!overlap) return candidate;
+        if (!best || candidate.overlap < best.overlap || (candidate.overlap === best.overlap && candidate.fontSize > best.fontSize) || (candidate.overlap === best.overlap && candidate.fontSize === best.fontSize && candidate.distance < best.distance)) {
           best = candidate;
         }
-      });
-      placed.push(best.box);
-      return best;
-    });
+      }
+    }
+    return best;
+  }
+
+  function labelOffsets(fontSize) {
+    const horizontal = fontSize * 4.2;
+    const vertical = fontSize * 1.8;
+    return [
+      [0, 0], [0, -vertical], [0, vertical], [-horizontal, 0], [horizontal, 0],
+      [-horizontal, -vertical], [horizontal, -vertical], [-horizontal, vertical], [horizontal, vertical],
+      [0, -vertical * 2], [0, vertical * 2], [-horizontal * 2, 0], [horizontal * 2, 0],
+      [-horizontal * 2, -vertical], [horizontal * 2, -vertical], [-horizontal * 2, vertical], [horizontal * 2, vertical],
+      [-horizontal, -vertical * 2], [horizontal, -vertical * 2], [-horizontal, vertical * 2], [horizontal, vertical * 2]
+    ];
   }
 
   function boxesOverlap(a, b, padding) {
