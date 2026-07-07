@@ -136,11 +136,9 @@
       const stroke = item ? "#49535d" : "#aeb8c2";
       return `<path d="${pathForGeometry(feature.geometry, project)}" fill="${fill}" stroke="${stroke}" stroke-width="0.75" vector-effect="non-scaling-stroke"><title>${escapeXml(feature.properties.display_name)}</title></path>`;
     }).join("\n");
-    const labelFeatures = options.labels ? avoidLabelCollisions(features, state, project) : [];
-    const labels = labelFeatures.map((feature) => {
-      const c = centroid(feature);
-      const p = project(c[0], c[1]);
-      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="middle" font-size="18" paint-order="stroke" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round" fill="#1e2933">${escapeXml(labelText(feature, state))}</text>`;
+    const labelPlacements = options.labels ? placeLabels(features, state, project, size) : [];
+    const labels = labelPlacements.map((item) => {
+      return `<text x="${item.x.toFixed(1)}" y="${item.y.toFixed(1)}" text-anchor="middle" font-size="18" paint-order="stroke" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round" fill="#1e2933">${escapeXml(labelText(item.feature, state))}</text>`;
     }).join("\n");
     const legend = state.legendVisible ? buildLegend(state, size, options.legendFeatures || features) : "";
     const title = buildTitle(state.title, size);
@@ -154,26 +152,59 @@
     return `<g><rect x="${x.toFixed(1)}" y="17" width="${width.toFixed(1)}" height="42" rx="6" fill="rgba(255,255,255,0.92)" stroke="#d8dee6"/><text x="${size.width / 2}" y="44" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#1e2933">${escapeXml(text)}</text></g>`;
   }
 
-  function avoidLabelCollisions(features, state, project) {
+  function placeLabels(features, state, project, size) {
     const placed = [];
     return features.slice().sort((a, b) => {
       const ah = Boolean(state.highlights && state.highlights[a.properties.region_id]);
       const bh = Boolean(state.highlights && state.highlights[b.properties.region_id]);
       return Number(bh) - Number(ah);
-    }).filter((feature) => {
+    }).map((feature) => {
       const c = centroid(feature);
       const p = project(c[0], c[1]);
       const text = labelText(feature, state);
       const width = Math.max(54, text.length * 10.5);
-      const box = { left: p.x - width / 2, right: p.x + width / 2, top: p.y - 14, bottom: p.y + 8 };
-      const collides = placed.some((item) => boxesOverlap(box, item, 5));
-      if (!collides) placed.push(box);
-      return !collides;
+      const height = 22;
+      const offsets = [
+        [0, 0], [0, -26], [0, 26], [-60, 0], [60, 0],
+        [-60, -26], [60, -26], [-60, 26], [60, 26],
+        [0, -52], [0, 52], [-120, 0], [120, 0],
+        [-120, -52], [120, -52], [-120, 52], [120, 52]
+      ];
+      let best = null;
+      offsets.forEach((offset) => {
+        const x = clamp(p.x + offset[0], 18 + width / 2, size.width - 18 - width / 2);
+        const y = clamp(p.y + offset[1], 74 + height / 2, size.height - 48 - height / 2);
+        const box = labelBox(x, y, width, height);
+        const overlap = placed.reduce((total, item) => total + overlapArea(box, item), 0);
+        const distance = Math.abs(offset[0]) + Math.abs(offset[1]);
+        const candidate = { feature, x, y, box, overlap, distance };
+        if (!best || candidate.overlap < best.overlap || (candidate.overlap === best.overlap && candidate.distance < best.distance)) {
+          best = candidate;
+        }
+      });
+      placed.push(best.box);
+      return best;
     });
   }
 
   function boxesOverlap(a, b, padding) {
     return !(a.right + padding < b.left || a.left - padding > b.right || a.bottom + padding < b.top || a.top - padding > b.bottom);
+  }
+
+  function labelBox(x, y, width, height) {
+    return { left: x - width / 2, right: x + width / 2, top: y - height / 2, bottom: y + height / 2 };
+  }
+
+  function overlapArea(a, b) {
+    const left = Math.max(a.left, b.left);
+    const right = Math.min(a.right, b.right);
+    const top = Math.max(a.top, b.top);
+    const bottom = Math.min(a.bottom, b.bottom);
+    return Math.max(0, right - left + 5) * Math.max(0, bottom - top + 5);
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
   }
 
   function buildLegend(state, size, features) {
