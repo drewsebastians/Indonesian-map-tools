@@ -8,13 +8,17 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "dev": "node scripts/serve-static.js . 8000",
+    "dev": "node scripts/wrangler-command.js dev",
+    "dev:static": "node scripts/serve-static.js . 8000",
     "test:data": "python tests/run_data_tests.py",
     "test:unit": "node --test --test-isolation=none tests/unit/*.test.js",
     "test:e2e:smoke": "playwright test tests/e2e/smoke.spec.js",
     "test:a11y": "playwright test tests/e2e/a11y.spec.js",
     "measure": "node scripts/measure.js",
-    "check": "node scripts/check.js"
+    "check": "node scripts/check.js",
+    "deploy": "node scripts/wrangler-command.js deploy",
+    "deploy:ci": "wrangler deploy",
+    "verify:staging": "node scripts/verify-staging.js https://mapnesia.andrew-sebastian91.workers.dev"
   },
   "devDependencies": {
     "@playwright/test": "1.61.1",

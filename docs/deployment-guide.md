@@ -1,19 +1,115 @@
 # Deployment Guide
 
-The app is ready for GitHub Pages from the repository root.
+The staging deployment target is Cloudflare Workers Static Assets:
 
-Manual steps:
+```text
+https://mapnesia.andrew-sebastian91.workers.dev
+```
 
-1. Push these files to the public repository.
-2. Open repository Settings.
-3. Open Pages.
-4. Under Build and deployment, select Deploy from a branch.
-5. Select `main`.
-6. Select `/ (root)`.
-7. Save.
-8. Enable HTTPS if GitHub does not enable it automatically.
-9. Open the generated Pages URL.
-10. Smoke test search, coloring, sample CSV import, project save/open, SVG export, and PNG export.
+This staging URL is intentionally non-indexable until a future custom domain is ready.
 
-No build command is required.
+## Requirements
+
+- Node.js 24.x
+- npm
+- Python 3.12 or newer
+- Cloudflare account access for the `andrew-sebastian91` workers.dev subdomain
+- Repository secrets:
+  - `CLOUDFLARE_ACCOUNT_ID`
+  - `CLOUDFLARE_API_TOKEN`
+
+Do not commit Cloudflare credentials to the repository, workflow files, logs, screenshots, or artifacts.
+
+## Local Checks
+
+```text
+npm ci
+npm run check
+npm run build
+```
+
+The build output is `dist/`. Wrangler must deploy `dist/`, not the repository root.
+
+## Local Cloudflare Preview
+
+```text
+npm run dev
+```
+
+This command rebuilds `dist/` and starts `wrangler dev` using `wrangler.jsonc`.
+
+If you only need a plain static server for debugging:
+
+```text
+npm run dev:static
+```
+
+## Manual Staging Deploy
+
+After credentials are available in the shell:
+
+```text
+npm run deploy
+npm run verify:staging
+```
+
+Then run the smoke workflow against the live staging URL:
+
+```text
+PLAYWRIGHT_BASE_URL=https://mapnesia.andrew-sebastian91.workers.dev npm run test:e2e:smoke
+```
+
+On Windows PowerShell:
+
+```text
+$env:PLAYWRIGHT_BASE_URL = "https://mapnesia.andrew-sebastian91.workers.dev"
+npm run test:e2e:smoke
+Remove-Item Env:PLAYWRIGHT_BASE_URL
+```
+
+## GitHub Actions Deploy
+
+`.github/workflows/deploy-cloudflare.yml` deploys only from `main`. It runs the quality gate before deployment and uses the official Cloudflare Wrangler action with:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
+
+The workflow records the staging URL in the job summary. It does not contain credential values.
+
+## Verification Checklist
+
+- `npm run check` passes.
+- `npm run build` produces `dist/`.
+- `wrangler deploy` deploys Worker `mapnesia`.
+- `https://mapnesia.andrew-sebastian91.workers.dev` returns HTTP 200.
+- Required CSS, JS, Leaflet, GeoJSON, and sample assets return HTTP 200.
+- Unknown paths return HTTP 404.
+- Responses include `X-Robots-Tag: noindex, nofollow, noarchive`.
+- `robots.txt` contains `Disallow: /`.
+- The Playwright smoke flow passes against the live staging URL.
+
+## Noindex Rule
+
+Staging includes three layers of noindex protection:
+
+- `robots.txt` blocks crawling.
+- `_headers` sends `X-Robots-Tag: noindex, nofollow, noarchive`.
+- `index.html` includes a robots meta tag.
+
+Do not add a canonical URL pointing to workers.dev. Content Security Policy is deferred until the runtime external geoBoundaries fallback is removed.
+
+## Rollback
+
+1. Open the Cloudflare dashboard for Worker `mapnesia`.
+2. Review the Worker deployment/version history.
+3. Select the last known-good deployment.
+4. Roll back to that deployment.
+5. Run `npm run verify:staging`.
+6. Run the live smoke test with `PLAYWRIGHT_BASE_URL` set to the staging URL.
+
+Do not re-enable GitHub Pages as part of rollback. Keep rollback on Cloudflare so the staging path remains consistent.
+
+## GitHub Pages
+
+GitHub Pages is not a deployment path for this repository. If Pages is ever found enabled again, disable it in repository Settings -> Pages before treating the Cloudflare migration as complete.
 

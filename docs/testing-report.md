@@ -77,4 +77,4 @@ Observed in the in-app browser:
 
 ## Current limitations
 
-GitHub Pages smoke testing still needs to be run after deployment. Cross-browser checks in Edge, Chrome, and Firefox were not completed in this environment.
+Cloudflare Workers smoke testing still needs to be run after deployment. Cross-browser checks in Edge, Chrome, and Firefox were not completed in this environment.

@@ -6,7 +6,7 @@ Research date: 2026-06-18
 
 Recommended production geometry: geoBoundaries Indonesia ADM2 simplified GeoJSON, enriched with HDX COD-AB tabular metadata where matching is unambiguous.
 
-Reason: it is openly published, downloadable as GeoJSON, carries an explicit CC BY-IGO lineage, works in a static GitHub Pages app, and avoids committing official Indonesian government data whose redistribution terms were not confirmed in this session.
+Reason: it is openly published, downloadable as GeoJSON, carries an explicit CC BY-IGO lineage, works in a static Cloudflare Workers app, and avoids committing official Indonesian government data whose redistribution terms were not confirmed in this session.
 
 ## Comparison
 

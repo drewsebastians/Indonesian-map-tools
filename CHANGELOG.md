@@ -8,4 +8,4 @@
 - Added unit coverage for project JSON sanitization and rejection paths.
 - Added Playwright smoke and axe accessibility checks.
 - Added a least-privilege GitHub Actions CI workflow for non-deployment quality gates.
-
+- Added Cloudflare Workers Static Assets staging configuration, noindex headers, robots.txt, and deployment workflow.

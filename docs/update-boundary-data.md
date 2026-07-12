@@ -1,7 +1,7 @@
 # Update Boundary Data
 
 1. Find a newer authoritative reference from Kemendagri, BPS, BIG, Ina-Geoportal, Satu Data Indonesia, HDX, or geoBoundaries.
-2. Confirm the license explicitly permits public redistribution, modification/simplification, and GitHub Pages hosting.
+2. Confirm the license explicitly permits public redistribution, modification/simplification, and Cloudflare Workers hosting.
 3. Download the source data without bypassing authentication, CAPTCHA, or access controls.
 4. Inspect format, fields, CRS, feature count, geometry types, and province/ADM2 code fields.
 5. Convert SHP, KML, geodatabase, WFS, or FeatureServer output to EPSG:4326 GeoJSON.

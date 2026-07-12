@@ -20,7 +20,13 @@ npm ci
 npm run dev
 ```
 
-Serves the repository root at `http://127.0.0.1:8000/` for manual development checks.
+Builds `dist/` and serves it through `wrangler dev`, matching the Cloudflare Workers Static Assets staging shape.
+
+```text
+npm run dev:static
+```
+
+Serves the repository root at `http://127.0.0.1:8000/` for simple static debugging.
 
 ```text
 npm run build
@@ -68,5 +74,4 @@ Runs the non-deployment local gate: build, data tests, unit tests, smoke tests, 
 
 - The application remains static and client-side.
 - Do not add runtime AI, account systems, analytics, trackers, or unreviewed datasets.
-- Cloudflare deployment changes are intentionally not part of this Batch 1 prompt.
-
+- Cloudflare Workers is the staging deployment path for Batch 1.

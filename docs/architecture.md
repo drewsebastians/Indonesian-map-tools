@@ -1,6 +1,6 @@
 # Architecture
 
-Peta Warna Wilayah Indonesia is a static GitHub Pages application.
+Peta Warna Wilayah Indonesia is a static Cloudflare Workers Static Assets application.
 
 ## Runtime
 
@@ -28,5 +28,5 @@ No backend, database, API key, external tiles, analytics, or CDN dependency is r
 4. CSV and project files are processed locally by File APIs.
 5. SVG/PNG export is generated in-browser.
 
-All paths are relative so the app works under a GitHub Pages project subpath.
+All paths are relative so the app works from the Cloudflare Workers staging host and future custom domain.
 

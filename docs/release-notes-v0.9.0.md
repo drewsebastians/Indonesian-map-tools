@@ -2,7 +2,7 @@
 
 ## Features
 
-- Static GitHub Pages-ready map application.
+- Static Cloudflare Workers-ready map application.
 - Indonesia ADM2 polygon rendering without external basemap tiles.
 - Search, province filter, region dropdown, click selection, and fit-to-Indonesia.
 - Manual region coloring with multiple colors.
@@ -25,5 +25,5 @@
 
 ## Prerelease reason
 
-This is marked as `v0.9.0` rather than `v1.0.0` because live GitHub Pages deployment, cross-browser manual testing, and full topology validation were not completed in this environment.
+This is marked as `v0.9.0` rather than `v1.0.0` because live Cloudflare Workers deployment, cross-browser manual testing, and full topology validation were not completed in this environment.
 

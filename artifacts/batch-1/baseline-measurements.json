@@ -1,15 +1,21 @@
 {
-  "generatedAt": "2026-07-12T15:20:27.158Z",
+  "generatedAt": "2026-07-12T15:29:06.510Z",
   "environment": {
     "node": "v24.14.0",
     "platform": "win32"
   },
   "git": {
-    "commit": "a6d644f97af21a7cad43250b5b2c3df5454605d7",
+    "commit": "dbbcbc3ed536360571483e46a42c8b3f2b3e689e",
     "branch": "main",
     "status": "Use `git status --short` for working tree state; this script avoids spawning git."
   },
   "files": [
+    {
+      "path": "_headers",
+      "bytes": 430,
+      "gzipBytes": 276,
+      "sha256": "793ed67b4376f29b1fbdf8c3bb1b144eb0e9b7a87adb7fc7f56d41b5b2f14921"
+    },
     {
       "path": ".nojekyll",
       "bytes": 2,
@@ -18,9 +24,15 @@
     },
     {
       "path": "index.html",
-      "bytes": 7732,
-      "gzipBytes": 2221,
-      "sha256": "65cae174ef4a5b0e7bef4928847496636e4fa0273d6ccfd5885d7906d33f66a8"
+      "bytes": 7789,
+      "gzipBytes": 2252,
+      "sha256": "4fcf93e2a5de67856675da413c2af07530485265aff787bf66173cf21e8f6f20"
+    },
+    {
+      "path": "robots.txt",
+      "bytes": 27,
+      "gzipBytes": 47,
+      "sha256": "32403248dc764535c87140955fc9451f9ebc9702f3e298d1c24fe84e558a53a9"
     },
     {
       "path": "assets/css/app.css",
@@ -134,9 +146,15 @@
   "runtimeInitialAssets": [
     {
       "path": "index.html",
-      "bytes": 7732,
-      "gzipBytes": 2221,
-      "sha256": "65cae174ef4a5b0e7bef4928847496636e4fa0273d6ccfd5885d7906d33f66a8"
+      "bytes": 7789,
+      "gzipBytes": 2252,
+      "sha256": "4fcf93e2a5de67856675da413c2af07530485265aff787bf66173cf21e8f6f20"
+    },
+    {
+      "path": "robots.txt",
+      "bytes": 27,
+      "gzipBytes": 47,
+      "sha256": "32403248dc764535c87140955fc9451f9ebc9702f3e298d1c24fe84e558a53a9"
     },
     {
       "path": "assets/css/app.css",
@@ -281,6 +299,7 @@
     ],
     "initialRuntimeAssetUrls": [
       "index.html",
+      "robots.txt",
       "assets/css/app.css",
       "assets/js/project-storage.js",
       "assets/js/csv-import.js",
@@ -298,6 +317,6 @@
   "deployment": {
     "workflowDirectoryExists": true,
     "nojekyllExists": true,
-    "docsMentionGitHubPages": true
+    "docsMentionGitHubPages": false
   }
 }

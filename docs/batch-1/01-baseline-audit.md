@@ -1,7 +1,7 @@
 # Batch 1 Baseline Audit
 
-Generated: 2026-07-12T15:20:27.158Z
-Repository commit: `a6d644f97af21a7cad43250b5b2c3df5454605d7`
+Generated: 2026-07-12T15:29:06.510Z
+Repository commit: `dbbcbc3ed536360571483e46a42c8b3f2b3e689e`
 Branch: `main`
 
 ## Runtime entry points
@@ -15,8 +15,10 @@ Branch: `main`
 
 | File | Raw bytes | Gzip bytes | SHA-256 |
 |---|---:|---:|---|
+| `_headers` | 430 | 276 | `793ed67b4376f29b1fbdf8c3bb1b144eb0e9b7a87adb7fc7f56d41b5b2f14921` |
 | `.nojekyll` | 2 | 22 | `7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6` |
-| `index.html` | 7732 | 2221 | `65cae174ef4a5b0e7bef4928847496636e4fa0273d6ccfd5885d7906d33f66a8` |
+| `index.html` | 7789 | 2252 | `4fcf93e2a5de67856675da413c2af07530485265aff787bf66173cf21e8f6f20` |
+| `robots.txt` | 27 | 47 | `32403248dc764535c87140955fc9451f9ebc9702f3e298d1c24fe84e558a53a9` |
 | `assets/css/app.css` | 8424 | 2171 | `50099a53fc3ed912337bfad50bf9a5650ad67bdf241cb31a6acaa8a5699e4454` |
 | `assets/js/project-storage.js` | 4247 | 1378 | `561ca805bb12d5f571cd71571fd960472160832c2d1b8702919ef6d104d05039` |
 | `assets/js/csv-import.js` | 4562 | 1505 | `faab595b42460b0ad7335f6dfae15515fb862244b56d9c41ede1200d920243c8` |
@@ -59,7 +61,7 @@ Branch: `main`
 - Browser smoke testing records runtime requests under `artifacts/batch-1/smoke-network.json` when `npm run test:e2e:smoke` is run.
 - GitHub workflow directory currently exists: true.
 - `.nojekyll` currently exists: true.
-- README currently mentions GitHub Pages: true.
+- README currently mentions GitHub Pages: false.
 
 ## Current checks
 

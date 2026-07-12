@@ -2,7 +2,7 @@
 
 Peta Warna Wilayah Indonesia is a static browser app for coloring Indonesia kabupaten/kota regions for reports, presentations, and planning notes. It is designed for non-GIS users: select a region, choose a color, review highlights, then export the map.
 
-Live demo: enable GitHub Pages from the repository root, then add the generated URL here.
+Target staging URL: `https://mapnesia.andrew-sebastian91.workers.dev` (Cloudflare Workers; must remain noindex before migration is considered complete).
 
 ## Features
 
@@ -19,7 +19,7 @@ Live demo: enable GitHub Pages from the repository root, then add the generated 
 
 ## Screenshot
 
-Screenshot capture should be added after running the app locally or on GitHub Pages:
+Screenshot capture should be added after running the app locally or on the Cloudflare staging URL:
 
 ```text
 docs/screenshots/app.png
@@ -88,7 +88,7 @@ Use Node.js 24.x and npm, then install dependencies:
 npm ci
 ```
 
-Serve the repository root locally:
+Serve the Cloudflare Workers static-assets build locally:
 
 ```text
 npm run dev
@@ -97,7 +97,7 @@ npm run dev
 Then open:
 
 ```text
-http://127.0.0.1:8000/
+Wrangler will print the local preview URL.
 ```
 
 Create the deployable static build:
@@ -108,9 +108,9 @@ npm run build
 
 The build copies only allowlisted production files into `dist/`.
 
-## GitHub Pages deployment
+## Cloudflare Workers deployment
 
-The app is ready to deploy from the repository root. See `docs/deployment-guide.md`.
+The staging target is Cloudflare Workers Static Assets at `https://mapnesia.andrew-sebastian91.workers.dev`. See `docs/deployment-guide.md`.
 
 ## Testing
 

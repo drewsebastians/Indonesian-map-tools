@@ -9,6 +9,6 @@
 - Small islands are preserved in the GeoJSON where present, but clickability depends on browser zoom and screen size.
 - SVG/PNG export uses a browser-side projection intended for presentation maps, not survey or legal mapping.
 - Very large PNG exports may fail on memory-constrained browsers.
-- Offline/PWA support is deferred; the app is currently an online static GitHub Pages app.
+- Offline/PWA support is deferred; the app is currently an online static Cloudflare Workers app.
 - This map is not a legal boundary determination.
 

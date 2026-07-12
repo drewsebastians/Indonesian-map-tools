@@ -9,6 +9,7 @@ const docsDir = path.join(root, "docs", "batch-1");
 
 const runtimeFiles = [
   "index.html",
+  "robots.txt",
   "assets/css/app.css",
   "assets/js/project-storage.js",
   "assets/js/csv-import.js",
@@ -24,6 +25,7 @@ const runtimeFiles = [
 ];
 
 const productionFiles = [
+  "_headers",
   ".nojekyll",
   ...runtimeFiles,
   "assets/vendor/leaflet/images/layers-2x.png",

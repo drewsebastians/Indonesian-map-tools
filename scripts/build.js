@@ -5,8 +5,10 @@ const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
 
 const requiredFiles = [
+  "_headers",
   ".nojekyll",
   "index.html",
+  "robots.txt",
   "assets/css/app.css",
   "assets/js/app.js",
   "assets/js/csv-import.js",
@@ -56,4 +58,3 @@ if (!produced) {
 }
 
 console.log(`Built dist with ${requiredFiles.length} allowlisted files.`);
-

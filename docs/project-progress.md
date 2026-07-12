@@ -14,7 +14,7 @@ Files created or changed:
 - `docs/project-progress.md`
 
 Decisions made:
-- Build a plain static GitHub Pages application with no backend.
+- Build a plain static Cloudflare Workers application with no backend.
 - Use relative paths for all assets and data.
 - Keep all imported user data in the browser.
 - Use MIT for original project code unless a future repository owner chooses otherwise.
@@ -25,7 +25,7 @@ Problems found:
 
 Remaining work:
 - Manual Git commit/PR once Git is available.
-- Manual GitHub Pages enablement and deployed smoke test.
+- Cloudflare Workers deployment and deployed smoke test.
 - Optional full topology validation with GIS tooling.
 
 Blocking issues:
@@ -46,7 +46,7 @@ Files created or changed:
 - `data/README.md`
 
 Decisions made:
-- Use CC BY-IGO / CC BY 3.0 IGO source lineage for public GitHub Pages use.
+- Use CC BY-IGO / CC BY 3.0 IGO source lineage for public Cloudflare Workers use.
 - Do not commit unverified official-government spatial data.
 
 ## Data preparation and validation
@@ -104,7 +104,7 @@ Files created or changed:
 - `docs/release-notes-v0.9.0.md`
 
 Remaining work:
-- Enable GitHub Pages in repository settings.
+- Deploy staging to Cloudflare Workers.
 - Verify the live URL.
 - Run cross-browser manual tests.
 - Create Git commits, branch, PR, and release tag in an environment with Git.
