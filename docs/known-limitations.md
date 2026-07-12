@@ -21,4 +21,6 @@
 - The 519 number is a geometry feature count. It should not be described as the current number of autonomous kabupaten/kota.
 - Official province codes are intentionally blank in registry v1 until row-level lampiran evidence is committed.
 - Project files may contain `unresolvedHighlights` after migration if a saved region cannot be applied to the active geometry.
+- The deterministic pipeline validates parseability, rings, coordinates, joins, source checksums, license records, and reproducibility, but legal-grade topology overlap/gap review remains a manual/native-GIS release gate.
+- `data:refresh` is not a normal build or CI step. New upstream data must stop for source, checksum, license, diff, versioning, and migration review before production use.
 

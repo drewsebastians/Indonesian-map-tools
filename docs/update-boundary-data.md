@@ -1,5 +1,20 @@
 # Update Boundary Data
 
+## Reproducible release gate
+
+Do not replace production data directly from a live `/current/` endpoint. A future update must start as an explicit source-review task and must pass the offline pipeline:
+
+1. Pin the exact source artifact, source identifier, version/effective period, retrieved date, media type, and SHA-256 in `data/sources/source-inventory-v1.json`.
+2. Record license, commercial-use, modification, redistribution, attribution, reviewer, and production approval status in `data/license-manifest-v1.json`.
+3. Run `npm run data:verify-sources`.
+4. Run `npm run data:diff` and review added, removed, changed, ID, name/code/province, ambiguity, checksum, license, and project compatibility impact.
+5. Update boundary/registry versions, migration notes, and user-project fixtures before approval.
+6. Run `npm run data:reproduce`, `npm run test:data`, and the full quality gate.
+
+`npm run data:refresh` intentionally fails closed. It is a reminder that refresh is a reviewed workflow, not a normal build step.
+
+See `docs/data-release-policy.md` for ownership cadence, stale-data triggers, migration policy, and the license-review checklist.
+
 1. Find a newer authoritative reference from Kemendagri, BPS, BIG, Ina-Geoportal, Satu Data Indonesia, HDX, or geoBoundaries.
 2. Confirm the license explicitly permits public redistribution, modification/simplification, and Cloudflare Workers hosting.
 3. Download the source data without bypassing authentication, CAPTCHA, or access controls.

@@ -1,5 +1,6 @@
 import csv
 import json
+import math
 from collections import Counter
 from pathlib import Path
 
@@ -26,6 +27,25 @@ def walk_coords(geometry):
             for ring in polygon:
                 for point in ring:
                     yield point[0], point[1]
+
+
+def walk_rings(geometry):
+    if geometry["type"] == "Polygon":
+        for ring in geometry["coordinates"]:
+            yield ring
+    elif geometry["type"] == "MultiPolygon":
+        for polygon in geometry["coordinates"]:
+            for ring in polygon:
+                yield ring
+
+
+def ring_area(ring):
+    area = 0
+    for index in range(len(ring) - 1):
+        x1, y1 = ring[index]
+        x2, y2 = ring[index + 1]
+        area += x1 * y2 - x2 * y1
+    return area / 2
 
 
 def main():
@@ -60,8 +80,26 @@ def main():
         coords = list(walk_coords(geometry))
         if not coords:
             failures.append(f"Empty coordinates on {props.get('region_id')}")
-        if any(not (-180 <= x <= 180 and -90 <= y <= 90) for x, y in coords):
+        if any(not (math.isfinite(x) and math.isfinite(y)) for x, y in coords):
+            failures.append(f"Non-finite coordinate on {props.get('region_id')}")
+        if any(not (95 <= x <= 142 and -12 <= y <= 7) for x, y in coords):
             failures.append(f"Out-of-range coordinate on {props.get('region_id')}")
+        ring_count = 0
+        positive_area_rings = 0
+        for ring in walk_rings(geometry):
+            ring_count += 1
+            if len(ring) < 4:
+                failures.append(f"Ring with too few points on {props.get('region_id')}")
+                break
+            if ring[0] != ring[-1]:
+                failures.append(f"Unclosed ring on {props.get('region_id')}")
+                break
+            if abs(ring_area(ring)) > 0:
+                positive_area_rings += 1
+        if ring_count == 0:
+            failures.append(f"No rings on {props.get('region_id')}")
+        if positive_area_rings == 0:
+            failures.append(f"No positive-area rings on {props.get('region_id')}")
 
     registry_rows = list(csv.DictReader(REGISTRY.open(encoding="utf-8")))
     if len(registry_rows) != len(features):
@@ -145,6 +183,10 @@ def main():
 
     sample_rows = list(csv.DictReader(SAMPLE_CSV.open(encoding="utf-8")))
     code_index = {row["official_code"] for row in registry_rows if row["official_code"]}
+    official_code_counts = Counter(row["official_code"] for row in registry_rows if row["official_code"])
+    duplicate_official_codes = [code for code, count in official_code_counts.items() if count > 1]
+    if duplicate_official_codes:
+        failures.append(f"Duplicate non-empty official codes: {duplicate_official_codes[:5]}")
     missing_sample = [row["Official_Code"] for row in sample_rows if row["Official_Code"] not in code_index]
     if missing_sample:
         failures.append(f"Sample CSV codes do not match registry: {missing_sample}")
@@ -153,6 +195,26 @@ def main():
     unknown_project_ids = [key for key in project["highlights"] if key not in set(ids)]
     if unknown_project_ids:
         failures.append(f"Sample project contains unknown IDs: {unknown_project_ids}")
+
+    small_island_fixture_ids = {
+        "gb-22746128B63742079715926",  # Kepulauan Seribu
+        "gb-22746128B32199422560180",  # Simeulue
+        "gb-22746128B67076907647447",  # Sabu Raijua
+        "gb-22746128B45484540858108",  # Kepulauan Talaud
+    }
+    missing_island_fixtures = sorted(small_island_fixture_ids - set(ids))
+    if missing_island_fixtures:
+        failures.append(f"Representative small-island fixtures vanished: {missing_island_fixtures}")
+
+    summary = json.loads((ROOT / "data" / "boundary-validation-summary.json").read_text(encoding="utf-8"))
+    if summary["feature_count"] != len(features):
+        failures.append("Boundary validation summary feature count drifted")
+    if summary["sha256"] != manifest["fileHashesSha256"]["data/indonesia-adm2-simplified.geojson"]:
+        failures.append("Boundary validation summary simplified checksum drifted")
+    if summary.get("vertex_count_after_app_simplification", 0) <= 0:
+        failures.append("Simplification vertex count summary is missing")
+    if not any("Full topology validation" in note for note in summary.get("notes", [])):
+        failures.append("Topology limitation/review gate note is missing")
 
     if failures:
         print("FAILED")

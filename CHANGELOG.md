@@ -14,3 +14,4 @@
 - Added canonical registry v1 with 38 provinces, 519 canonical geometry rows, complete old-ID crosswalk, stable-ID fixtures, and source/version manifest.
 - Added project schema 1.1 with boundary/registry/source version fields, canonical region references, migration reports, unresolved highlight preservation, and prototype-pollution rejection.
 - Added a compact source/version badge and export metadata that distinguish the 2020 boundary snapshot from current administrative metadata.
+- Added deterministic offline data pipeline commands, immutable source inventory, machine-readable license manifest/schema, reproducibility and diff reports, expanded geometry validation, and CI data/license gates.

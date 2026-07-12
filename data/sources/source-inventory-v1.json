@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "1.0",
+  "inventoryVersion": "IDN-DATA-SOURCES-v1-2026-07-12",
+  "policy": {
+    "normalBuildNetworkAccess": "forbidden",
+    "normalTestNetworkAccess": "forbidden",
+    "refreshMode": "explicit review only",
+    "approvalRule": "Each production input must have its own source, checksum, license, reviewer, and approval record."
+  },
+  "records": [
+    {
+      "id": "source-geoboundaries-idn-adm2-22746128-raw",
+      "datasetId": "IDN-ADM2-22746128",
+      "title": "geoBoundaries Indonesia ADM2 raw GeoJSON snapshot",
+      "publisherOwner": "geoBoundaries / HDX OCHA COD-AB lineage",
+      "sourceUrl": "https://www.geoboundaries.org/api/current/gbOpen/IDN/ADM2/",
+      "retrievedAccessDate": "2026-07-12",
+      "effectivePeriodVersion": "2020 boundary snapshot, geoBoundaries boundary ID IDN-ADM2-22746128",
+      "localSnapshotPath": "data/indonesia-adm2.geojson",
+      "sha256": "b379b52fab7f2ac1ca85ccb670877785a3bc6f55534f7268868f8cdede72cd4f",
+      "mediaType": "application/geo+json",
+      "licenseId": "CC-BY-3.0-IGO",
+      "commercialUseStatus": "allowed_with_attribution_per_source_metadata",
+      "modificationStatus": "modified into browser production geometry",
+      "redistributionStatus": "approved_with_attribution",
+      "attributionRequirementText": "Boundary data based on geoBoundaries and HDX/OCHA COD-AB Indonesia ADM2, CC BY 3.0 IGO / CC BY-IGO as reported by source metadata.",
+      "transformationList": [
+        "validated as FeatureCollection",
+        "matched to HDX tabular ADM2 metadata where unambiguous",
+        "kept 2020 geometry IDs for project compatibility",
+        "simplified into browser production copy"
+      ],
+      "reviewerStatusDate": "Batch 1 data review, reviewed, 2026-07-12",
+      "productionApprovalStatus": "approved"
+    },
+    {
+      "id": "source-hdx-cod-ab-idn-admin-tabular-2020",
+      "datasetId": "HDX-COD-AB-IDN-Admin123Boundaries-TabularData",
+      "title": "Indonesia Admin 1/2/3 Boundaries tabular metadata workbook",
+      "publisherOwner": "HDX/OCHA COD-AB Indonesia lineage",
+      "sourceUrl": "https://data.humdata.org/dataset/cod-ab-idn",
+      "retrievedAccessDate": "2026-07-12",
+      "effectivePeriodVersion": "2020 COD-AB workbook snapshot",
+      "localSnapshotPath": "data/IDN_Admin123Boundaries_TabularData.xlsx",
+      "sha256": "7364c65a1c9e4fcafd6b065765b8799d901193d448e0825da4ffdea5eab33d5f",
+      "mediaType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "licenseId": "CC-BY-IGO",
+      "commercialUseStatus": "allowed_with_attribution_per_source_metadata",
+      "modificationStatus": "metadata matched into registry where unambiguous",
+      "redistributionStatus": "not_shipped_in_production_app",
+      "attributionRequirementText": "HDX/OCHA COD-AB Indonesia tabular metadata, CC BY-IGO as reported by source metadata.",
+      "transformationList": [
+        "used for unique-name registry enrichment",
+        "ambiguous same-name rows left unresolved"
+      ],
+      "reviewerStatusDate": "Batch 1 data review, reviewed, 2026-07-12",
+      "productionApprovalStatus": "approved_as_non_runtime_input"
+    },
+    {
+      "id": "source-kemendagri-300-2-2-2138-2025",
+      "datasetId": "Kepmendagri-300.2.2-2138-2025",
+      "title": "Keputusan Mendagri Nomor 300.2.2-2138 Tahun 2025 metadata reference",
+      "publisherOwner": "Kementerian Dalam Negeri / JDIH via BPK",
+      "sourceUrl": "https://peraturan.bpk.go.id/Details/322942/keputusan-mendagri-no-nomor-30022-2138-tahun",
+      "retrievedAccessDate": "2026-07-12",
+      "effectivePeriodVersion": "effective 2025-04-25, amended by Kepmendagri 300.2.2-2430/2025",
+      "localSnapshotPath": "",
+      "sha256": "not-redistributed-reference-only",
+      "mediaType": "text/html reference page",
+      "licenseId": "official-reference-not-redistributed",
+      "commercialUseStatus": "not_applicable_reference_only",
+      "modificationStatus": "not redistributed; cited for versioning only",
+      "redistributionStatus": "not_redistributed",
+      "attributionRequirementText": "Cited as official metadata reference; no lampiran rows redistributed in the app.",
+      "transformationList": [
+        "used to define current province registry version",
+        "official code fields remain blank until row-level lampiran audit"
+      ],
+      "reviewerStatusDate": "Batch 1 data review, reviewed with limitations, 2026-07-12",
+      "productionApprovalStatus": "approved_as_reference_only"
+    },
+    {
+      "id": "source-kemendagri-300-2-2-2430-2025",
+      "datasetId": "Kepmendagri-300.2.2-2430-2025",
+      "title": "Keputusan Mendagri Nomor 300.2.2-2430 Tahun 2025 amendment metadata reference",
+      "publisherOwner": "Kementerian Dalam Negeri / JDIH via BPK",
+      "sourceUrl": "https://peraturan.bpk.go.id/Details/322912/keputusan-mendagri-no-30022-2430-tahun-2025",
+      "retrievedAccessDate": "2026-07-12",
+      "effectivePeriodVersion": "effective 2025-06-23",
+      "localSnapshotPath": "",
+      "sha256": "not-redistributed-reference-only",
+      "mediaType": "text/html reference page",
+      "licenseId": "official-reference-not-redistributed",
+      "commercialUseStatus": "not_applicable_reference_only",
+      "modificationStatus": "not redistributed; cited for versioning only",
+      "redistributionStatus": "not_redistributed",
+      "attributionRequirementText": "Cited as official metadata amendment reference; no lampiran rows redistributed in the app.",
+      "transformationList": [
+        "used to define current registry source version",
+        "official code fields remain blank until row-level lampiran audit"
+      ],
+      "reviewerStatusDate": "Batch 1 data review, reviewed with limitations, 2026-07-12",
+      "productionApprovalStatus": "approved_as_reference_only"
+    },
+    {
+      "id": "input-canonical-provinces-v1",
+      "datasetId": "IDN-CANONICAL-PROVINCES-v1",
+      "title": "Manual canonical province registry v1",
+      "publisherOwner": "Project-maintained curation from cited official metadata references",
+      "sourceUrl": "https://peraturan.bpk.go.id/Details/322942/keputusan-mendagri-no-nomor-30022-2138-tahun; https://peraturan.bpk.go.id/Details/322912/keputusan-mendagri-no-30022-2430-tahun-2025",
+      "retrievedAccessDate": "2026-07-12",
+      "effectivePeriodVersion": "IDN-ADM-REGISTRY-v1-2025-06-23",
+      "localSnapshotPath": "data/canonical-provinces-v1.csv",
+      "sha256": "d0b8c535fb52dd14ab1bce61f2f8d2ff01f955cbd4fe773edf4a134c0fab78f6",
+      "mediaType": "text/csv",
+      "licenseId": "project-curation-with-official-reference-citations",
+      "commercialUseStatus": "approved_project_metadata_with_reference_limitations",
+      "modificationStatus": "manual curation input with reviewer notes",
+      "redistributionStatus": "approved_with_limitations",
+      "attributionRequirementText": "Current province registry cites Kemendagri/JDIH references; official codes intentionally blank pending row-level audit.",
+      "transformationList": [
+        "generated from explicit province rows in scripts/generate-canonical-registry.js",
+        "reviewed as registry input"
+      ],
+      "reviewerStatusDate": "Batch 1 data review, reviewed with limitations, 2026-07-12",
+      "productionApprovalStatus": "approved"
+    },
+    {
+      "id": "input-canonical-regions-v1",
+      "datasetId": "IDN-CANONICAL-REGIONS-v1",
+      "title": "Canonical ADM2/geometry registry v1",
+      "publisherOwner": "Project-maintained curation from geometry and cited metadata references",
+      "sourceUrl": "data/indonesia-adm2-registry.csv; data/canonical-provinces-v1.csv",
+      "retrievedAccessDate": "2026-07-12",
+      "effectivePeriodVersion": "IDN-ADM-REGISTRY-v1-2025-06-23",
+      "localSnapshotPath": "data/canonical-regions-v1.csv",
+      "sha256": "fa96c08734f0eee7a77cb57d5af66271aedcf760db078b7e629c786bcf9156e6",
+      "mediaType": "text/csv",
+      "licenseId": "project-curation-with-third-party-data-attribution",
+      "commercialUseStatus": "approved_project_metadata_with_source_attribution",
+      "modificationStatus": "generated from committed curation logic",
+      "redistributionStatus": "approved_with_attribution",
+      "attributionRequirementText": "Registry derives from geoBoundaries/HDX geometry metadata plus project review notes.",
+      "transformationList": [
+        "stable canonical IDs assigned",
+        "53 ambiguous rows preserved as unresolved"
+      ],
+      "reviewerStatusDate": "Batch 1 data review, reviewed, 2026-07-12",
+      "productionApprovalStatus": "approved"
+    }
+  ]
+}

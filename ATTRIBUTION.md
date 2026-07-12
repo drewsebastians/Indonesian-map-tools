@@ -4,6 +4,14 @@
 
 Original application code in this repository is licensed under the MIT License.
 
+Machine-readable source and license review records are maintained in:
+
+- `data/sources/source-inventory-v1.json`
+- `data/license-manifest-v1.json`
+- `data/license-manifest-schema-v1.json`
+
+Production data or third-party assets must not be treated as approved unless the matching manifest record includes exact source, checksum, license, commercial-use status, redistribution status, attribution text where required, reviewer/date, and production approval.
+
 ## Boundary data
 
 Production geometry is based on the Indonesia ADM2 dataset made available through geoBoundaries and the HDX COD-AB Indonesia package.

@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "simplified": {
+    "path": "data/indonesia-adm2-simplified.geojson",
+    "featureCount": 519,
+    "uniqueRegionIds": 519,
+    "geometryTypes": {
+      "Polygon": 287,
+      "MultiPolygon": 232
+    },
+    "vertexCount": 44950,
+    "sha256": "6d735512fb7cab04ac7ca6048aa41437eba4f53595b83d8da4f25c198ba01f91"
+  },
+  "detailed": {
+    "path": "data/indonesia-adm2-detailed.geojson",
+    "featureCount": 519,
+    "uniqueRegionIds": 519,
+    "geometryTypes": {
+      "Polygon": 287,
+      "MultiPolygon": 232
+    },
+    "vertexCount": 260746,
+    "sha256": "5a5cc09736dea030b30536cec6958c8f9aaad4b61f71b1c45500db95bcc360e8"
+  },
+  "errors": []
+}

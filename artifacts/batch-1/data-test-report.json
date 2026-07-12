@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "sourceResult": {
+    "status": "passed",
+    "sourceRecords": 6,
+    "licenseAssets": 17,
+    "productionThirdPartyFiles": 9,
+    "errors": []
+  },
+  "simplifyResult": "passed",
+  "manifestHash": "12ecf1b81140a2f66d684bde44b43d1f99a4622ed5b3f95c8873dc98bac28c79",
+  "reproducibilityHash": "a9f6c8612e79d6325dd9415d329851313637c4cf998b54d787f6811637cd13e8",
+  "dataDiffStatus": "no_drift"
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0",
+  "status": "passed",
+  "tempRoot": "temporary",
+  "comparedOutputCount": 10,
+  "runAHash": "a9f6c8612e79d6325dd9415d329851313637c4cf998b54d787f6811637cd13e8",
+  "runBHash": "a9f6c8612e79d6325dd9415d329851313637c4cf998b54d787f6811637cd13e8",
+  "mismatches": [],
+  "trackedMismatches": []
+}

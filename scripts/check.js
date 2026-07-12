@@ -5,6 +5,7 @@ const npmCommand = process.env.npm_execpath
   : ["npm", []];
 
 const commands = [
+  ["data:test"],
   ["build"],
   ["test:data"],
   ["test:unit"],

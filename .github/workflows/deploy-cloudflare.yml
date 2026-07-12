@@ -37,6 +37,9 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
+      - name: Run data and license gate
+        run: npm run data:test
+
       - name: Run quality gate
         run: npm run check
 
@@ -52,4 +55,3 @@ jobs:
 
       - name: Record staging URL
         run: echo "Deployed staging URL: https://mapnesia.andrew-sebastian91.workers.dev" >> "$GITHUB_STEP_SUMMARY"
-

@@ -10,10 +10,31 @@
 - `crosswalk-region-ids-v1.csv`: complete legacy `region_id` to canonical region ID crosswalk.
 - `boundary-version-crosswalk-v1.json`: future migration structure for boundary replacements, splits, merges, and retirements.
 - `registry-manifest-v1.json`: source URLs, versions, access dates, counts, and SHA-256 hashes.
+- `license-manifest-v1.json`: machine-readable data/library/asset license gate.
+- `license-manifest-schema-v1.json`: schema contract for the license manifest.
+- `sources/source-inventory-v1.json`: immutable production source inventory with per-source checksums and review status.
 - `stable-id-fixtures.json`: representative stable-ID and project migration cases.
 - `region-aliases.csv`: starter alias table for future manual matching.
 - `unmatched-and-extra-regions.csv`: unresolved geometry and official-reference matching issues.
 - `boundary-validation-summary.json`: machine-readable validation summary.
+
+## Deterministic pipeline
+
+Normal runtime, build, and CI do not fetch boundary data from live endpoints. The current offline data pipeline is:
+
+1. `npm run data:verify-sources`
+2. `npm run data:normalize`
+3. `npm run data:match`
+4. `npm run data:simplify`
+5. `npm run data:build-registry`
+6. `npm run data:build-manifest`
+7. `npm run data:test`
+8. `npm run data:diff`
+9. `npm run data:reproduce`
+
+`npm run data:refresh` is an explicit review-only placeholder and fails closed by default. A changed upstream artifact must be pinned, checksummed, diffed, licensed, versioned, and reviewed before it can replace production data.
+
+Release ownership, stale-data triggers, versioning, migration policy, and the license-review checklist are documented in `docs/data-release-policy.md`.
 
 ## Source
 

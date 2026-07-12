@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "status": "no_drift",
+  "reviewed": false,
+  "versioningRequiredIfChanged": true,
+  "migrationReviewRequiredIfChanged": true,
+  "summary": {
+    "addedFeatures": 0,
+    "removedFeatures": 0,
+    "changedFeatureHashes": 0,
+    "geometrySizeOrVertexChanges": 0,
+    "idChanges": 0,
+    "nameCodeProvinceChanges": 0,
+    "ambiguityChanges": 0,
+    "projectCompatibilityImpact": "none",
+    "licenseSourceChanges": 0,
+    "checksumChanges": 0
+  },
+  "hashChanges": [],
+  "geometryChanges": []
+}
