@@ -98,6 +98,15 @@ Staging includes three layers of noindex protection:
 
 Do not add a canonical URL pointing to workers.dev. Content Security Policy is deferred until the runtime external geoBoundaries fallback is removed.
 
+## Cache Behavior
+
+The staging `_headers` file keeps deployment updates conservative:
+
+- `/`, `/index.html`, `robots.txt`, and JSON control files use `Cache-Control: no-cache`.
+- `/assets/*` uses short browser caching.
+- `/data/*.geojson` uses one-day caching because current data filenames are not content-hashed.
+- Year-long immutable browser caching is deferred until heavy assets have versioned filenames.
+
 ## Rollback
 
 1. Open the Cloudflare dashboard for Worker `mapnesia`.
@@ -112,4 +121,3 @@ Do not re-enable GitHub Pages as part of rollback. Keep rollback on Cloudflare s
 ## GitHub Pages
 
 GitHub Pages is not a deployment path for this repository. If Pages is ever found enabled again, disable it in repository Settings -> Pages before treating the Cloudflare migration as complete.
-

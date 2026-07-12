@@ -9,3 +9,5 @@
 - Added Playwright smoke and axe accessibility checks.
 - Added a least-privilege GitHub Actions CI workflow for non-deployment quality gates.
 - Added Cloudflare Workers Static Assets staging configuration, noindex headers, robots.txt, and deployment workflow.
+- Removed automatic detailed-geometry startup loading and external boundary fallback.
+- Added explicit opt-in high-detail export, tiered runtime labels, PNG memory fallback, and automated performance budgets.

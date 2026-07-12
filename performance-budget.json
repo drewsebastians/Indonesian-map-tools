@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "hard": {
+    "initialCompressedBytes": 1100000,
+    "simplifiedGeometryGzipBytes": 600000,
+    "shellJavaScriptGzipBytes": 150000,
+    "initialRequestCount": 12
+  },
+  "preferred": {
+    "initialCompressedBytes": 1000000,
+    "simplifiedGeometryGzipBytes": 600000,
+    "shellJavaScriptGzipBytes": 150000
+  },
+  "forbiddenStartupUrlPatterns": [
+    "indonesia-adm2-detailed.geojson",
+    "geoboundaries.org",
+    "data.humdata.org",
+    "hdx"
+  ],
+  "initialRuntimePaths": [
+    "index.html",
+    "assets/vendor/leaflet/leaflet.css",
+    "assets/css/app.css",
+    "assets/vendor/leaflet/leaflet.js",
+    "assets/js/project-storage.js",
+    "assets/js/csv-import.js",
+    "assets/js/export.js",
+    "assets/js/map.js",
+    "assets/js/app.js",
+    "data/indonesia-adm2-simplified.geojson"
+  ]
+}
+

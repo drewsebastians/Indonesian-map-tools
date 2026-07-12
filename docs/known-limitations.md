@@ -8,7 +8,9 @@
 - DKI Jakarta administrative cities and Kepulauan Seribu are for visual reference, not legal boundary determination.
 - Small islands are preserved in the GeoJSON where present, but clickability depends on browser zoom and screen size.
 - SVG/PNG export uses a browser-side projection intended for presentation maps, not survey or legal mapping.
-- Very large PNG exports may fail on memory-constrained browsers.
+- Very large PNG exports may warn or fall back to 1920 x 1080 on memory-constrained browsers.
+- High-detail export is opt-in and loads an additional local file of about 10.5 MB only after user confirmation.
+- General map labels are intentionally tiered for performance; selected and highlighted labels remain prioritized, and all-label export remains available.
 - Offline/PWA support is deferred; the app is currently an online static Cloudflare Workers app.
 - This map is not a legal boundary determination.
 

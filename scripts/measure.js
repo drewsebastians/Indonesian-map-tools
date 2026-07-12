@@ -19,15 +19,19 @@ const runtimeFiles = [
   "assets/vendor/leaflet/leaflet.css",
   "assets/vendor/leaflet/leaflet.js",
   "data/indonesia-adm2-simplified.geojson",
-  "data/indonesia-adm2-detailed.geojson",
   "sample/sample-project.json",
   "sample/sample-region-colors.csv"
+];
+
+const onDemandFiles = [
+  "data/indonesia-adm2-detailed.geojson"
 ];
 
 const productionFiles = [
   "_headers",
   ".nojekyll",
   ...runtimeFiles,
+  ...onDemandFiles,
   "assets/vendor/leaflet/images/layers-2x.png",
   "assets/vendor/leaflet/images/layers.png",
   "assets/vendor/leaflet/images/marker-icon-2x.png",
@@ -151,7 +155,7 @@ function writeMarkdown(measurements) {
     "## Runtime entry points",
     "",
     "- `index.html` loads local Leaflet, application CSS, and five browser scripts.",
-    "- `assets/js/app.js` starts on `DOMContentLoaded`, fetches simplified geometry, then tries detailed geometry.",
+    "- `assets/js/app.js` starts on `DOMContentLoaded` and fetches only the simplified geometry snapshot.",
     "- `assets/js/project-storage.js` defines project schema validation, autosave, and JSON download.",
     "- `assets/js/export.js` creates SVG and PNG files in the browser.",
     "",
@@ -180,6 +184,7 @@ function writeMarkdown(measurements) {
     "## Network and deployment baseline",
     "",
     "- Initial app files are local relative URLs.",
+    "- Detailed geometry is an on-demand export asset, not a startup asset.",
     `- External URLs visible in source: ${measurements.network.externalUrls.length ? measurements.network.externalUrls.map((url) => `\`${url}\``).join(", ") : "none"}.`,
     "- Browser smoke testing records runtime requests under `artifacts/batch-1/smoke-network.json` when `npm run test:e2e:smoke` is run.",
     `- GitHub workflow directory currently exists: ${measurements.deployment.workflowDirectoryExists}.`,
@@ -200,7 +205,7 @@ function writeMarkdown(measurements) {
     "",
     "## Baseline load, color, save, and export behavior",
     "",
-    "- Load: fetch local simplified geometry and then local detailed geometry; external geoBoundaries fallback is only attempted if local detailed geometry fails.",
+    "- Load: fetch local simplified geometry only; detailed geometry is loaded only after explicit high-detail export selection.",
     "- Color: users select a region, choose a color, and apply it to the in-browser highlight state.",
     "- Save: project JSON is built in the browser and downloaded locally; autosave uses browser localStorage.",
     "- Export: SVG and PNG are generated in-browser without uploading project contents.",
@@ -227,6 +232,7 @@ const measurements = {
   git: gitInfo(),
   files: productionFiles.filter((file) => fs.existsSync(path.join(root, file))).map(fileMetric),
   runtimeInitialAssets: runtimeFiles.map(fileMetric),
+  runtimeOnDemandAssets: onDemandFiles.map(fileMetric),
   geometryFiles: {
     simplified: fileMetric("data/indonesia-adm2-simplified.geojson"),
     detailed: fileMetric("data/indonesia-adm2-detailed.geojson")

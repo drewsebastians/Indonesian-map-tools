@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-12T15:29:06.510Z",
+  "generatedAt": "2026-07-12T15:48:46.009Z",
   "environment": {
     "node": "v24.14.0",
     "platform": "win32"
   },
   "git": {
-    "commit": "dbbcbc3ed536360571483e46a42c8b3f2b3e689e",
+    "commit": "cbb517dd9f14f6fee4b7dfa6d9df3786b3b2bc2f",
     "branch": "main",
     "status": "Use `git status --short` for working tree state; this script avoids spawning git."
   },
   "files": [
     {
       "path": "_headers",
-      "bytes": 430,
-      "gzipBytes": 276,
-      "sha256": "793ed67b4376f29b1fbdf8c3bb1b144eb0e9b7a87adb7fc7f56d41b5b2f14921"
+      "bytes": 676,
+      "gzipBytes": 363,
+      "sha256": "06374fb74831906e2911c6dc1d6965ec063e08baa219535e9b6fa5545b7f82df"
     },
     {
       "path": ".nojekyll",
@@ -24,9 +24,9 @@
     },
     {
       "path": "index.html",
-      "bytes": 7789,
-      "gzipBytes": 2252,
-      "sha256": "4fcf93e2a5de67856675da413c2af07530485265aff787bf66173cf21e8f6f20"
+      "bytes": 8054,
+      "gzipBytes": 2344,
+      "sha256": "64e6a644f119828c9f40d59edea131b9504f1ab9f13d19d62ab3c922104ede65"
     },
     {
       "path": "robots.txt",
@@ -54,21 +54,21 @@
     },
     {
       "path": "assets/js/export.js",
-      "bytes": 15330,
-      "gzipBytes": 4609,
-      "sha256": "830b1665a6886ac955d9a3d1d6622a26a4e0bf5aa26831b8def77f495c84d0c3"
+      "bytes": 16990,
+      "gzipBytes": 5120,
+      "sha256": "1adca20529411b3ae56ddd413ddb0c321db83bdc7ba2e00e015c4738ec483fcf"
     },
     {
       "path": "assets/js/map.js",
-      "bytes": 8787,
-      "gzipBytes": 2466,
-      "sha256": "c3cbc20212ba27453d0188f227f7b2865627321c2492f88684552b7b599ed5f0"
+      "bytes": 10124,
+      "gzipBytes": 2867,
+      "sha256": "dc6c4daafb55c1958af3b2ed78dc04ead80c2e8a016575c1774e018e2a6cd214"
     },
     {
       "path": "assets/js/app.js",
-      "bytes": 30707,
-      "gzipBytes": 7701,
-      "sha256": "a38368542852511baaa757c1289fc0ed1b858b1aea137aacab1273542d06084d"
+      "bytes": 31597,
+      "gzipBytes": 8123,
+      "sha256": "13d11aeaa1c01abe701814cb93847097045324c47ebbab73ce240a2cca6a3f96"
     },
     {
       "path": "assets/vendor/leaflet/leaflet.css",
@@ -89,12 +89,6 @@
       "sha256": "6d735512fb7cab04ac7ca6048aa41437eba4f53595b83d8da4f25c198ba01f91"
     },
     {
-      "path": "data/indonesia-adm2-detailed.geojson",
-      "bytes": 11003421,
-      "gzipBytes": 2999956,
-      "sha256": "5a5cc09736dea030b30536cec6958c8f9aaad4b61f71b1c45500db95bcc360e8"
-    },
-    {
       "path": "sample/sample-project.json",
       "bytes": 755,
       "gzipBytes": 381,
@@ -105,6 +99,12 @@
       "bytes": 227,
       "gzipBytes": 197,
       "sha256": "10de9761ce0e394a3fb1084a8c157116aba4a2a05e6357dfe4ce56f63b7acd2d"
+    },
+    {
+      "path": "data/indonesia-adm2-detailed.geojson",
+      "bytes": 11003421,
+      "gzipBytes": 2999956,
+      "sha256": "5a5cc09736dea030b30536cec6958c8f9aaad4b61f71b1c45500db95bcc360e8"
     },
     {
       "path": "assets/vendor/leaflet/images/layers-2x.png",
@@ -146,9 +146,9 @@
   "runtimeInitialAssets": [
     {
       "path": "index.html",
-      "bytes": 7789,
-      "gzipBytes": 2252,
-      "sha256": "4fcf93e2a5de67856675da413c2af07530485265aff787bf66173cf21e8f6f20"
+      "bytes": 8054,
+      "gzipBytes": 2344,
+      "sha256": "64e6a644f119828c9f40d59edea131b9504f1ab9f13d19d62ab3c922104ede65"
     },
     {
       "path": "robots.txt",
@@ -176,21 +176,21 @@
     },
     {
       "path": "assets/js/export.js",
-      "bytes": 15330,
-      "gzipBytes": 4609,
-      "sha256": "830b1665a6886ac955d9a3d1d6622a26a4e0bf5aa26831b8def77f495c84d0c3"
+      "bytes": 16990,
+      "gzipBytes": 5120,
+      "sha256": "1adca20529411b3ae56ddd413ddb0c321db83bdc7ba2e00e015c4738ec483fcf"
     },
     {
       "path": "assets/js/map.js",
-      "bytes": 8787,
-      "gzipBytes": 2466,
-      "sha256": "c3cbc20212ba27453d0188f227f7b2865627321c2492f88684552b7b599ed5f0"
+      "bytes": 10124,
+      "gzipBytes": 2867,
+      "sha256": "dc6c4daafb55c1958af3b2ed78dc04ead80c2e8a016575c1774e018e2a6cd214"
     },
     {
       "path": "assets/js/app.js",
-      "bytes": 30707,
-      "gzipBytes": 7701,
-      "sha256": "a38368542852511baaa757c1289fc0ed1b858b1aea137aacab1273542d06084d"
+      "bytes": 31597,
+      "gzipBytes": 8123,
+      "sha256": "13d11aeaa1c01abe701814cb93847097045324c47ebbab73ce240a2cca6a3f96"
     },
     {
       "path": "assets/vendor/leaflet/leaflet.css",
@@ -211,12 +211,6 @@
       "sha256": "6d735512fb7cab04ac7ca6048aa41437eba4f53595b83d8da4f25c198ba01f91"
     },
     {
-      "path": "data/indonesia-adm2-detailed.geojson",
-      "bytes": 11003421,
-      "gzipBytes": 2999956,
-      "sha256": "5a5cc09736dea030b30536cec6958c8f9aaad4b61f71b1c45500db95bcc360e8"
-    },
-    {
       "path": "sample/sample-project.json",
       "bytes": 755,
       "gzipBytes": 381,
@@ -227,6 +221,14 @@
       "bytes": 227,
       "gzipBytes": 197,
       "sha256": "10de9761ce0e394a3fb1084a8c157116aba4a2a05e6357dfe4ce56f63b7acd2d"
+    }
+  ],
+  "runtimeOnDemandAssets": [
+    {
+      "path": "data/indonesia-adm2-detailed.geojson",
+      "bytes": 11003421,
+      "gzipBytes": 2999956,
+      "sha256": "5a5cc09736dea030b30536cec6958c8f9aaad4b61f71b1c45500db95bcc360e8"
     }
   ],
   "geometryFiles": {
@@ -294,9 +296,7 @@
     "dataRegistrySchema": "No explicit version field found in data/indonesia-adm2-registry.csv"
   },
   "network": {
-    "externalUrls": [
-      "https://www.geoboundaries.org/api/current/gbOpen/IDN/ADM2/"
-    ],
+    "externalUrls": [],
     "initialRuntimeAssetUrls": [
       "index.html",
       "robots.txt",
@@ -309,7 +309,6 @@
       "assets/vendor/leaflet/leaflet.css",
       "assets/vendor/leaflet/leaflet.js",
       "data/indonesia-adm2-simplified.geojson",
-      "data/indonesia-adm2-detailed.geojson",
       "sample/sample-project.json",
       "sample/sample-region-colors.csv"
     ]

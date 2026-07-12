@@ -16,6 +16,15 @@
     return { width: 1600, height: 900 };
   }
 
+  function estimatePngCost(options) {
+    const size = getSize(options || {});
+    const pixels = size.width * size.height;
+    const estimatedMegabytes = Math.ceil((pixels * 4 * 2.2) / 1024 / 1024);
+    const deviceMemory = navigator.deviceMemory || null;
+    const risky = pixels >= 3840 * 2160 || estimatedMegabytes > 64 || (deviceMemory && deviceMemory <= 2 && pixels > 2560 * 1440);
+    return { width: size.width, height: size.height, pixels, estimatedMegabytes, risky, deviceMemory };
+  }
+
   function getBounds(features) {
     let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
     features.forEach((feature) => {
@@ -273,41 +282,70 @@
   }
 
   function exportPng(features, state, options) {
+    const requestedSize = getSize({ pngSize: options.pngSize });
+    const fallbackSize = { width: 1920, height: 1080 };
+    const hardPixelLimit = options.maxPixels || 3840 * 2160;
+    const shouldUseFallback = requestedSize.width * requestedSize.height > hardPixelLimit;
+    const firstSize = shouldUseFallback ? fallbackSize : requestedSize;
+    return renderPng(features, state, options, firstSize, Boolean(shouldUseFallback)).catch((error) => {
+      if (firstSize.width === fallbackSize.width && firstSize.height === fallbackSize.height) throw error;
+      return renderPng(features, state, Object.assign({}, options, { forceCanvasFailure: false }), fallbackSize, true);
+    });
+  }
+
+  function renderPng(features, state, options, size, fallbackUsed) {
     return new Promise((resolve, reject) => {
-      const size = getSize({ pngSize: options.pngSize });
-      const svg = buildSvg(features, state, Object.assign({}, options, { pngSize: options.pngSize }));
+      if (options.forceCanvasFailure) {
+        reject(new Error("Simulasi kegagalan canvas."));
+        return;
+      }
+      const svg = buildSvg(features, state, Object.assign({}, options, { pngSize: `${size.width}x${size.height}` }));
       const image = new Image();
       const blob = new Blob([svg], { type: "image/svg+xml" });
       const url = URL.createObjectURL(blob);
+      let pngUrl = null;
+      function cleanup() {
+        if (pngUrl) URL.revokeObjectURL(pngUrl);
+        URL.revokeObjectURL(url);
+      }
       image.onload = () => {
         try {
           const canvas = document.createElement("canvas");
           canvas.width = size.width;
           canvas.height = size.height;
           const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("Browser tidak dapat membuat canvas PNG.");
           if (!options.transparent) {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, size.width, size.height);
           }
           ctx.drawImage(image, 0, 0);
           canvas.toBlob((png) => {
-            if (!png) reject(new Error("Browser tidak dapat membuat PNG."));
+            if (!png) {
+              cleanup();
+              reject(new Error("Browser tidak dapat membuat PNG."));
+              return;
+            }
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(png);
+            pngUrl = URL.createObjectURL(png);
+            link.href = pngUrl;
             link.download = "peta-warna-indonesia.png";
             link.click();
-            URL.revokeObjectURL(link.href);
-            URL.revokeObjectURL(url);
-            resolve();
+            cleanup();
+            resolve({ fallbackUsed, size });
           }, "image/png");
         } catch (error) {
+          cleanup();
           reject(error);
         }
       };
-      image.onerror = () => reject(new Error("SVG tidak dapat dirender menjadi PNG."));
+      image.onerror = () => {
+        cleanup();
+        reject(new Error("SVG tidak dapat dirender menjadi PNG."));
+      };
       image.src = url;
     });
   }
 
-  window.MapExport = { buildSvg, exportSvg, exportPng };
+  window.MapExport = { buildSvg, exportSvg, exportPng, estimatePngCost };
 })();

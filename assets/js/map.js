@@ -25,6 +25,8 @@
     let features = [];
     let highlights = {};
     let collisionFrame = null;
+    let lastLabelUpdate = 0;
+    const labelZoomThreshold = window.matchMedia && window.matchMedia("(max-width: 860px)").matches ? 7.25 : 6.5;
 
     function styleFeature(feature) {
       const id = feature.properties.region_id;
@@ -46,12 +48,9 @@
         style: styleFeature,
         onEachFeature(feature, layer) {
           const id = feature.properties.region_id;
+          layer.feature = feature;
           layersById.set(id, layer);
-          layer.bindTooltip(labelText(feature), {
-            permanent: true,
-            direction: "center",
-            className: "region-name-label"
-          });
+          bindRegionTooltip(layer, false);
           layer.on({
             click() {
               select(id, true);
@@ -68,6 +67,7 @@
       map.on("zoomend moveend resize", scheduleLabelCollisionUpdate);
       fitIndonesia();
       refreshTooltipLabels();
+      setLayerAccessibility();
     }
 
     function labelText(feature) {
@@ -83,17 +83,25 @@
       layersById.forEach((layer) => {
         const tooltip = layer.getTooltip && layer.getTooltip();
         if (tooltip) tooltip.setContent(labelText(layer.feature));
+        if (layer._path) layer._path.setAttribute("aria-label", labelText(layer.feature));
       });
       scheduleLabelCollisionUpdate();
     }
 
     function scheduleLabelCollisionUpdate() {
       if (collisionFrame) cancelAnimationFrame(collisionFrame);
-      collisionFrame = requestAnimationFrame(updateLabelCollisions);
+      const now = performance.now();
+      const delay = now - lastLabelUpdate < 80 ? 80 : 0;
+      collisionFrame = requestAnimationFrame(() => {
+        if (delay) window.setTimeout(updateLabelCollisions, delay);
+        else updateLabelCollisions();
+      });
     }
 
     function updateLabelCollisions() {
       collisionFrame = null;
+      lastLabelUpdate = performance.now();
+      updatePermanentLabelCandidates();
       const labels = [];
       layersById.forEach((layer, id) => {
         const tooltip = layer.getTooltip && layer.getTooltip();
@@ -118,6 +126,32 @@
         const overlaps = visible.some((item) => boxesOverlap(label.bounds, item.bounds, 4));
         if (overlaps) label.element.classList.add("label-hidden");
         else visible.push(label);
+      });
+    }
+
+    function updatePermanentLabelCandidates() {
+      const zoomAllowsGeneralLabels = map.getZoom() >= labelZoomThreshold;
+      layersById.forEach((layer, id) => {
+        const shouldBePermanent = id === selectedId || Boolean(highlights[id]) || zoomAllowsGeneralLabels;
+        if (layer._labelPermanent !== shouldBePermanent) bindRegionTooltip(layer, shouldBePermanent);
+      });
+    }
+
+    function bindRegionTooltip(layer, permanent) {
+      layer.unbindTooltip();
+      layer.bindTooltip(labelText(layer.feature), {
+        permanent,
+        direction: "center",
+        className: "region-name-label"
+      });
+      layer._labelPermanent = permanent;
+    }
+
+    function setLayerAccessibility() {
+      layersById.forEach((layer) => {
+        if (!layer._path) return;
+        layer._path.setAttribute("role", "button");
+        layer._path.setAttribute("aria-label", labelText(layer.feature));
       });
     }
 

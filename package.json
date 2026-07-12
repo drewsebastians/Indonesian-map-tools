@@ -14,6 +14,7 @@
     "test:unit": "node --test --test-isolation=none tests/unit/*.test.js",
     "test:e2e:smoke": "playwright test tests/e2e/smoke.spec.js",
     "test:a11y": "playwright test tests/e2e/a11y.spec.js",
+    "test:performance": "node scripts/check-performance-budgets.js",
     "measure": "node scripts/measure.js",
     "check": "node scripts/check.js",
     "deploy": "node scripts/wrangler-command.js deploy",

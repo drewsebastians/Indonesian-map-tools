@@ -59,6 +59,12 @@ npm run test:a11y
 Runs an axe scan and fails on serious or critical violations. Full findings are written under `artifacts/batch-1/`.
 
 ```text
+npm run test:performance
+```
+
+Checks the versioned performance budget after smoke-test network evidence has been generated.
+
+```text
 npm run measure
 ```
 
@@ -68,7 +74,7 @@ Writes reproducible size, checksum, geometry, schema, and network-baseline artif
 npm run check
 ```
 
-Runs the non-deployment local gate: build, data tests, unit tests, smoke tests, accessibility test, and measurements.
+Runs the non-deployment local gate: build, data tests, unit tests, smoke tests, accessibility test, measurements, and performance budgets.
 
 ## Notes
 

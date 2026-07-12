@@ -10,7 +10,8 @@ const commands = [
   ["test:unit"],
   ["test:e2e:smoke"],
   ["test:a11y"],
-  ["measure"]
+  ["measure"],
+  ["test:performance"]
 ];
 
 for (const [script] of commands) {

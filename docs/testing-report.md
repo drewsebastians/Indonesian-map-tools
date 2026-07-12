@@ -4,10 +4,11 @@ Test date: 2026-06-18
 
 ## Automated checks
 
-Command:
+Commands:
 
 ```text
 python tests/run_data_tests.py
+npm run check
 ```
 
 Coverage:
@@ -22,8 +23,12 @@ Coverage:
 - Registry rows reconcile with GeoJSON features.
 - Sample CSV codes match the registry.
 - Sample project IDs match the GeoJSON.
+- Project JSON sanitization rejects invalid schema, oversized payloads, and invalid colors.
+- Playwright smoke test verifies load, select, color, save, SVG export, smallest PNG export, tiered labels, high-detail opt-in export, largest PNG, transparent PNG, and fallback PNG behavior.
+- Axe scan fails on serious or critical accessibility issues.
+- Performance budget gate checks initial compressed size, simplified geometry gzip size, shell JavaScript gzip size, startup request count, and forbidden startup geometry URLs.
 
-Result: passed.
+Result: passed locally on 2026-07-12 after Batch 1 Prompt 3 changes.
 
 Evidence:
 
@@ -50,7 +55,10 @@ The following should be verified in a browser after deployment or local static s
 | Project | Save/open sample project | JSON validates and restores highlights |
 | Export | SVG | File downloads and contains map, title, legend, attribution |
 | Export | PNG | File downloads at selected size |
-| Privacy | Network | Runtime resources are same-site static files only |
+| Privacy | Network | Startup resources are same-site static files only |
+| Performance | Startup network | Detailed geometry and external boundary endpoints are not requested |
+| Export | High-detail opt-in | Detailed geometry is fetched only after explicit high-detail export selection |
+| Export | PNG fallback | Forced canvas failure retries with 1920 x 1080 fallback |
 | Mobile | Narrow viewport | Controls stack above the map and remain reachable |
 
 ## Current limitations
@@ -66,7 +74,7 @@ http://localhost:8000/
 Observed in the in-app browser:
 
 - Page title: Peta Warna Wilayah Indonesia
-- Loading status: 519 wilayah dimuat.
+- Loading status: 519 wilayah dimuat from the standard geometry snapshot.
 - Rendered Leaflet SVG paths: 519
 - Region dropdown options: 520
 - Console errors: 0
@@ -77,4 +85,4 @@ Observed in the in-app browser:
 
 ## Current limitations
 
-Cloudflare Workers smoke testing still needs to be run after deployment. Cross-browser checks in Edge, Chrome, and Firefox were not completed in this environment.
+Cloudflare Workers smoke testing still needs to be run after a verified deployment with the required noindex headers. Cross-browser checks in Edge, Chrome, and Firefox were not completed in this environment.

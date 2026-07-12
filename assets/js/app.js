@@ -1,15 +1,10 @@
 (function () {
   const DATA_URL = "./data/indonesia-adm2-simplified.geojson";
-  const DETAILED_GEOMETRY_SOURCES = [
-    {
-      type: "geojson",
-      url: "./data/indonesia-adm2-detailed.geojson"
-    },
-    {
-      type: "api",
-      url: "https://www.geoboundaries.org/api/current/gbOpen/IDN/ADM2/"
-    }
-  ];
+  const BOUNDARY_VERSION = "IDN-ADM2-2020-CODAB-geoboundaries";
+  const DETAILED_GEOMETRY = {
+    url: "./data/indonesia-adm2-detailed.geojson",
+    sha256: "5a5cc09736dea030b30536cec6958c8f9aaad4b61f71b1c45500db95bcc360e8"
+  };
   const quickColors = ["#4472C4", "#E74C3C", "#70AD47", "#FFC000", "#5B9BD5", "#A64D79", "#00A388", "#7F6000"];
   const state = {
     title: "Peta Sorotan Wilayah Indonesia",
@@ -26,6 +21,8 @@
     groupNames: {},
     groupMeta: {},
     exportSettings: {},
+    highDetailCollection: null,
+    highDetailFeatureById: new Map(),
     undo: []
   };
   let mapApi = null;
@@ -41,7 +38,7 @@
       "undoBtn", "resetBtn", "highlightCount", "highlightList", "showLegend", "legendPosition",
       "groupCount", "groupingList", "legendItems", "addLegendBtn", "csvFile", "previewCsvBtn", "applyCsvBtn", "csvPreview",
       "saveProjectBtn", "openProjectBtn", "projectFile", "clearProjectBtn", "autosaveStatus",
-      "exportRatio", "exportLabels", "transparentBg", "pngSize", "exportSvgBtn", "exportPngBtn",
+      "exportRatio", "exportLabels", "transparentBg", "exportHighDetail", "pngSize", "exportSvgBtn", "exportPngBtn",
       "fitIndonesiaBtn", "loadingIndicator", "errorArea", "appShell", "controlPanel", "sidebarToggleBtn", "floatingExportBtn"
     ].forEach((id) => { el[id] = document.getElementById(id); });
     mapApi = IndonesiaMap.createMap("map", { onSelect: handleFeatureSelected });
@@ -104,12 +101,9 @@
 
   async function loadData() {
     try {
-      const response = await fetch(DATA_URL, { cache: "no-store" });
+      const response = await fetch(DATA_URL, { cache: "force-cache" });
       if (!response.ok) throw new Error("Data peta tidak dapat dimuat.");
-      const baseCollection = await response.json();
-      const detailedCollection = await loadDetailedGeometry();
-      const merged = detailedCollection ? mergeDetailedGeometry(baseCollection, detailedCollection) : { collection: baseCollection, matched: 0 };
-      const collection = merged.collection;
+      const collection = await response.json();
       state.features = collection.features || [];
       state.featureById = new Map(state.features.map((feature) => [feature.properties.region_id, feature]));
       mapApi.render(collection);
@@ -120,55 +114,45 @@
       renderHighlightList();
       renderGroupingEditor();
       refreshMapLegend();
-      el.loadingIndicator.textContent = merged.matched > 450
-        ? `${state.features.length} wilayah dimuat dengan geometri detail.`
-        : `${state.features.length} wilayah dimuat. Geometri detail cocok ${merged.matched}/${state.features.length}; cek nama field detail GeoJSON.`;
+      el.loadingIndicator.textContent = `${state.features.length} wilayah dimuat dari snapshot batas ${BOUNDARY_VERSION} (geometri standar).`;
     } catch (error) {
       showError(error.message);
       el.loadingIndicator.textContent = "Gagal memuat peta.";
     }
   }
 
-  async function loadDetailedGeometry() {
-    for (const source of DETAILED_GEOMETRY_SOURCES) {
-      try {
-        if (source.type === "api") {
-          const metadataResponse = await fetch(source.url, { cache: "force-cache" });
-          if (!metadataResponse.ok) throw new Error("Metadata geometri detail tidak tersedia.");
-          const metadata = await metadataResponse.json();
-          const downloadUrls = [
-            metadata.simplifiedGeometryGeoJSON,
-            metadata.gjDownloadURL
-          ].filter(Boolean);
-          for (const downloadUrl of downloadUrls) {
-            try {
-              return await fetchGeoJson(downloadUrl);
-            } catch (error) {
-              // Try the next official geoBoundaries download URL.
-            }
-          }
-          throw new Error("URL GeoJSON detail tidak dapat dimuat.");
-        }
-        return await fetchGeoJson(source.url);
-      } catch (error) {
-        // Try the next public source; the local simplified map remains the final fallback.
-      }
-    }
-    return null;
-  }
-
-  async function fetchGeoJson(url) {
+  async function fetchGeoJson(url, expectedSha256) {
     const response = await fetch(url, { cache: "force-cache" });
     if (!response.ok) throw new Error("Geometri detail tidak dapat dimuat.");
     const text = await response.text();
     if (/^version https:\/\/git-lfs.github.com\/spec\/v1/.test(text.trim())) {
       throw new Error("URL mengarah ke Git LFS pointer, bukan GeoJSON asli.");
     }
+    if (expectedSha256) {
+      const actualSha256 = await sha256(text);
+      if (actualSha256 !== expectedSha256) throw new Error("Checksum geometri detail tidak sesuai.");
+    }
     const collection = JSON.parse(text);
     if (!collection || collection.type !== "FeatureCollection" || !Array.isArray(collection.features)) {
       throw new Error("Format geometri detail tidak valid.");
     }
     return collection;
+  }
+
+  async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hash)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function loadHighDetailCollection() {
+    if (state.highDetailCollection) return state.highDetailCollection;
+    const detailedCollection = await fetchGeoJson(DETAILED_GEOMETRY.url, DETAILED_GEOMETRY.sha256);
+    const merged = mergeDetailedGeometry({ type: "FeatureCollection", features: state.features }, detailedCollection);
+    if (merged.matched <= 450) throw new Error(`Geometri detail hanya cocok ${merged.matched}/${state.features.length}.`);
+    state.highDetailCollection = merged.collection;
+    state.highDetailFeatureById = new Map((merged.collection.features || []).map((feature) => [feature.properties.region_id, feature]));
+    return state.highDetailCollection;
   }
 
   function mergeDetailedGeometry(baseCollection, detailedCollection) {
@@ -620,22 +604,31 @@
     el.autosaveStatus.textContent = ok ? "Autosave tersimpan di browser ini." : "Autosave tidak tersedia.";
   }
 
-  function exportSvg() {
-    const payload = getExportPayload();
-    MapExport.exportSvg(payload.features, state, {
-      ratio: el.exportRatio.value,
-      labels: el.exportLabels.checked,
-      transparent: el.transparentBg.checked,
-      viewBounds: payload.viewBounds,
-      legendFeatures: state.features
-    });
+  async function exportSvg() {
+    try {
+      const payload = await getExportPayload();
+      MapExport.exportSvg(payload.features, state, {
+        ratio: el.exportRatio.value,
+        labels: el.exportLabels.checked,
+        transparent: el.transparentBg.checked,
+        viewBounds: payload.viewBounds,
+        legendFeatures: state.features
+      });
+    } catch (error) {
+      showError("SVG gagal dibuat: " + error.message);
+    }
   }
 
   async function exportPng() {
     el.loadingIndicator.textContent = "Membuat PNG...";
     try {
-      const payload = getExportPayload();
-      await MapExport.exportPng(payload.features, state, {
+      const payload = await getExportPayload();
+      const pngPlan = MapExport.estimatePngCost({ pngSize: el.pngSize.value });
+      if (pngPlan.risky && !confirm(`Ekspor PNG ${pngPlan.width} x ${pngPlan.height} dapat memakai sekitar ${pngPlan.estimatedMegabytes} MB memori. Lanjutkan?`)) {
+        el.loadingIndicator.textContent = "Ekspor PNG dibatalkan.";
+        return;
+      }
+      const result = await MapExport.exportPng(payload.features, state, {
         pngSize: el.pngSize.value,
         ratio: el.exportRatio.value,
         labels: el.exportLabels.checked,
@@ -643,16 +636,29 @@
         viewBounds: payload.viewBounds,
         legendFeatures: state.features
       });
-      el.loadingIndicator.textContent = "PNG selesai dibuat.";
+      el.loadingIndicator.textContent = result.fallbackUsed
+        ? `PNG selesai dibuat pada resolusi fallback ${result.size.width} x ${result.size.height}.`
+        : "PNG selesai dibuat.";
     } catch (error) {
       showError("PNG gagal dibuat: " + error.message);
       el.loadingIndicator.textContent = "Ekspor PNG gagal.";
     }
   }
 
-  function getExportPayload() {
+  async function getExportPayload() {
     const view = mapApi.getCurrentView();
-    const features = view.visibleIds.map((id) => state.featureById.get(id)).filter(Boolean);
+    let featureById = state.featureById;
+    if (el.exportHighDetail.checked) {
+      if (!confirm("Gunakan geometri detail lokal untuk ekspor? Data sekitar 10,5 MB akan dimuat hanya untuk ekspor ini.")) {
+        el.exportHighDetail.checked = false;
+        el.loadingIndicator.textContent = "Geometri detail dibatalkan; ekspor memakai geometri standar.";
+      } else {
+        el.loadingIndicator.textContent = "Memuat geometri detail lokal untuk ekspor...";
+        await loadHighDetailCollection();
+        featureById = state.highDetailFeatureById;
+      }
+    }
+    const features = view.visibleIds.map((id) => featureById.get(id) || state.featureById.get(id)).filter(Boolean);
     return {
       // Export follows the user's current zoom and pan position for every export ratio.
       features: features.length ? features : state.features,
