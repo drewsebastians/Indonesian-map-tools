@@ -82,17 +82,31 @@ The boundary data is for visual reference and is not a legal boundary determinat
 
 ## Local development
 
-Serve the repository root with any static server, for example:
+Use Node.js 24.x and npm, then install dependencies:
 
 ```text
-python -m http.server 8000
+npm ci
+```
+
+Serve the repository root locally:
+
+```text
+npm run dev
 ```
 
 Then open:
 
 ```text
-http://localhost:8000/
+http://127.0.0.1:8000/
 ```
+
+Create the deployable static build:
+
+```text
+npm run build
+```
+
+The build copies only allowlisted production files into `dist/`.
 
 ## GitHub Pages deployment
 
@@ -100,13 +114,23 @@ The app is ready to deploy from the repository root. See `docs/deployment-guide.
 
 ## Testing
 
-Run:
+Run the complete non-deployment local gate:
 
 ```text
-python tests/run_data_tests.py
+npm run check
 ```
 
-Current automated data checks passed. Browser and deployment smoke tests should be run after serving the app locally or enabling GitHub Pages.
+Individual checks:
+
+```text
+npm run test:data
+npm run test:unit
+npm run test:e2e:smoke
+npm run test:a11y
+npm run measure
+```
+
+Batch 1 baseline evidence is generated in `artifacts/batch-1/` and summarized in `docs/batch-1/01-baseline-audit.md`. See `docs/development.md` for command details.
 
 ## License
 
