@@ -424,3 +424,30 @@ test("deterministic visualization preview applies a shared legend", async ({ pag
   await expect(page.locator("#map .map-legend")).toContainText(/Legenda|Tidak ada data/i);
   await expect(page.locator("#dataTable tbody tr").first()).toContainText(/exact|siap/i);
 });
+
+test("professional export writes PDF and mapping CSV with safe metadata", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await page.locator("#exampleBtn").click();
+  await page.locator("#applyCsvBtn").click();
+  await page.locator("#exportSubtitle").fill("Ringkasan <aman>");
+  await page.locator("#exportSource").fill("Sumber lokal");
+  await page.locator("#exportPeriod").fill("2025");
+  await page.locator("#exportFilenameSlug").fill("uji metadata / aman");
+  await page.locator("#exportRatio").selectOption("a3");
+  await page.locator("#exportExtent").selectOption("national");
+
+  const mappingDownload = page.waitForEvent("download");
+  await page.locator("#exportMappingBtn").click();
+  const mapping = await mappingDownload;
+  expect(mapping.suggestedFilename()).toBe("uji-metadata-aman-mapping.csv");
+  expect(fs.readFileSync(await mapping.path(), "utf8")).toContain("Canonical_Region_ID");
+
+  const pdfDownload = page.waitForEvent("download");
+  await page.locator("#exportPdfBtn").click();
+  const pdf = await pdfDownload;
+  expect(pdf.suggestedFilename()).toBe("uji-metadata-aman.pdf");
+  const pdfBytes = fs.readFileSync(await pdf.path());
+  expect(pdfBytes.subarray(0, 8).toString()).toBe("%PDF-1.4");
+  expect(pdfBytes.toString("latin1")).toContain("IDN-ADM2-2020");
+});

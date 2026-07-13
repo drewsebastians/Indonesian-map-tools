@@ -23,6 +23,7 @@
     groupMeta: {},
     importCorrections: {},
     exportSettings: {},
+    exportMeta: { subtitle: "", source: "", period: "", footnote: "", legendTitle: "Legenda", filenameSlug: "peta-warna-indonesia" },
     unresolvedHighlights: {},
     migrationReport: null,
     workflowStage: "input",
@@ -53,7 +54,7 @@
       "importLocale", "previewCsvBtn", "applyCsvBtn", "cancelImportBtn", "importMapping", "csvPreview",
       "saveProjectBtn", "openProjectBtn", "projectFile", "clearProjectBtn", "autosaveStatus",
       "migrationReportBtn", "dataTruthBadge",
-      "exportRatio", "exportLabels", "transparentBg", "exportHighDetail", "pngSize", "exportSvgBtn", "exportPngBtn",
+      "exportRatio", "exportExtent", "exportLabels", "transparentBg", "exportHighDetail", "pngSize", "exportSvgBtn", "exportPngBtn", "exportPdfBtn", "exportMappingBtn", "exportSubtitle", "exportSource", "exportPeriod", "exportFootnote", "exportLegendTitle", "exportFilenameSlug",
       "fitIndonesiaBtn", "loadingIndicator", "errorArea", "appShell", "controlPanel", "sidebarToggleBtn", "floatingExportBtn",
       "workflowSteps", "workflowStatus", "basicModeBtn", "advancedModeBtn", "exampleBtn", "advancedImportOptions", "dataTablePanel", "dataTable", "dataTableFilter", "dataTableSort", "dataTableCount", "dataTableEmpty", "dataTableAnnouncement", "mapSelectionStatus",
       "vizMode", "vizClasses", "vizPalette", "vizReverse", "vizCenter", "vizBreaks", "vizNumberFormat", "vizPreviewBtn", "vizApplyBtn", "vizSummary", "vizLegendPreview"
@@ -69,6 +70,7 @@
 
   function setupEvents() {
     el.projectTitle.addEventListener("input", () => { state.title = el.projectTitle.value.trim() || "Peta Sorotan Wilayah Indonesia"; scheduleSave(); });
+    ["exportSubtitle", "exportSource", "exportPeriod", "exportFootnote", "exportLegendTitle", "exportFilenameSlug"].forEach((id) => el[id].addEventListener("input", () => { state.exportMeta[id.replace("export", "").replace(/^./, (char) => char.toLowerCase())] = el[id].value.slice(0, id === "exportFilenameSlug" ? 80 : 180); scheduleSave(); }));
     el.basicModeBtn.addEventListener("click", () => setMode("basic"));
     el.advancedModeBtn.addEventListener("click", () => setMode("advanced"));
     el.exampleBtn.addEventListener("click", useExample);
@@ -98,6 +100,8 @@
     el.clearProjectBtn.addEventListener("click", clearProject);
     el.exportSvgBtn.addEventListener("click", exportSvg);
     el.exportPngBtn.addEventListener("click", exportPng);
+    el.exportPdfBtn.addEventListener("click", exportPdf);
+    el.exportMappingBtn.addEventListener("click", exportMapping);
     el.sidebarToggleBtn.addEventListener("click", toggleSidebar);
     el.floatingExportBtn.addEventListener("click", exportPng);
     el.fitIndonesiaBtn.addEventListener("click", () => mapApi.fitIndonesia());
@@ -1071,8 +1075,15 @@
     state.uiMode = project.uiMode || "basic";
     state.importRows = Array.isArray(project.importRows) ? project.importRows : [];
     state.visualization = project.visualization || null;
+    state.exportMeta = Object.assign({}, state.exportMeta, project.exportMeta || {});
     state.selectedDataRow = null;
     el.projectTitle.value = state.title;
+    el.exportSubtitle.value = state.exportMeta.subtitle || "";
+    el.exportSource.value = state.exportMeta.source || "";
+    el.exportPeriod.value = state.exportMeta.period || "";
+    el.exportFootnote.value = state.exportMeta.footnote || "";
+    el.exportLegendTitle.value = state.exportMeta.legendTitle || "Legenda";
+    el.exportFilenameSlug.value = state.exportMeta.filenameSlug || "peta-warna-indonesia";
     setMode(state.uiMode);
     updateAfterHighlightChange();
     el.dataTablePanel.hidden = !state.importRows.length;
@@ -1127,6 +1138,7 @@
       const payload = await getExportPayload();
       MapExport.exportSvg(payload.features, state, {
         ratio: el.exportRatio.value,
+        extent: el.exportExtent.value,
         labels: el.exportLabels.checked,
         transparent: el.transparentBg.checked,
         viewBounds: payload.viewBounds,
@@ -1149,6 +1161,7 @@
       const result = await MapExport.exportPng(payload.features, state, {
         pngSize: el.pngSize.value,
         ratio: el.exportRatio.value,
+        extent: el.exportExtent.value,
         labels: el.exportLabels.checked,
         transparent: el.transparentBg.checked,
         viewBounds: payload.viewBounds,
@@ -1161,6 +1174,30 @@
       showError("PNG gagal dibuat: " + error.message);
       el.loadingIndicator.textContent = "Ekspor PNG gagal.";
     }
+  }
+
+  async function exportPdf() {
+    el.loadingIndicator.textContent = "Membuat PDF...";
+    try {
+      const payload = await getExportPayload();
+      const result = await MapExport.exportPdf(payload.features, state, {
+        ratio: el.exportRatio.value === "a3" ? "a3" : "a4",
+        extent: el.exportExtent.value,
+        labels: el.exportLabels.checked,
+        transparent: false,
+        viewBounds: payload.viewBounds,
+        legendFeatures: state.features
+      });
+      el.loadingIndicator.textContent = `PDF selesai (${result.rasterized ? "mode raster aman" : "vektor"}).`;
+    } catch (error) {
+      showError("PDF gagal dibuat: " + error.message);
+      el.loadingIndicator.textContent = "Ekspor PDF gagal.";
+    }
+  }
+
+  function exportMapping() {
+    if (!state.importRows.length) return showError("Belum ada data mapping untuk diekspor.");
+    MapExport.exportMappingCsv(state.importRows, state);
   }
 
   async function getExportPayload() {
@@ -1176,11 +1213,12 @@
         featureById = state.highDetailFeatureById;
       }
     }
-    const features = view.visibleIds.map((id) => featureById.get(id) || state.featureById.get(id)).filter(Boolean);
+    const national = el.exportExtent.value === "national";
+    const features = national ? Array.from(featureById.values()) : view.visibleIds.map((id) => featureById.get(id) || state.featureById.get(id)).filter(Boolean);
     return {
       // Export follows the user's current zoom and pan position for every export ratio.
       features: features.length ? features : state.features,
-      viewBounds: view.bounds
+      viewBounds: national ? null : view.bounds
     };
   }
 

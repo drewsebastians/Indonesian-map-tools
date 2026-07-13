@@ -100,6 +100,8 @@ test("buildProject stores schema, boundary, registry, and canonical region refer
     workflowStage: "visualize",
     uiMode: "advanced",
     importRows: [{ rowId: "row-1", rowNumber: 2, record: { regionName: "Surabaya", province: "Jawa Timur" }, matchedId: "known-id", matchedName: "Surabaya - Jawa Timur", matchStatus: "exact-code", errors: [], warnings: [] }],
+    visualization: { version: "IDN-VIS-v1", paletteVersion: "IDN-PALETTE-v1", method: "equal-interval", assignments: { "known-id": { classKey: "0", color: "#4472C4" } }, legend: [{ label: "0–10", color: "#4472C4", key: "0" }] },
+    exportMeta: { subtitle: "Sub", source: "Source", period: "2025", footnote: "Foot", legendTitle: "Legend", filenameSlug: "safe-file" },
     exportSettings: {}
   }, storage.createRegionAdapter(features));
 
@@ -111,6 +113,8 @@ test("buildProject stores schema, boundary, registry, and canonical region refer
   assert.equal(project.workflowStage, "visualize");
   assert.equal(project.uiMode, "advanced");
   assert.equal(project.importRows[0].matchedId, "known-id");
+  assert.equal(project.visualization.method, "equal-interval");
+  assert.equal(project.exportMeta.filenameSlug, "safe-file");
 });
 
 test("sanitizeProject keeps only registry-current import corrections", () => {

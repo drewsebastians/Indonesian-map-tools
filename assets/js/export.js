@@ -12,8 +12,46 @@
     }
     if (options.ratio === "4:3") return { width: 1600, height: 1200 };
     if (options.ratio === "a4") return { width: 1754, height: 1240 };
+    if (options.ratio === "a3") return { width: 2480, height: 1754 };
     if (options.ratio === "1:1") return { width: 1400, height: 1400 };
     return { width: 1600, height: 900 };
+  }
+
+  function sanitizeText(value, max = 180) {
+    return String(value == null ? "" : value).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim().slice(0, max);
+  }
+
+  function slugify(value) {
+    const slug = sanitizeText(value, 80).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return slug || "peta-warna-indonesia";
+  }
+
+  function buildExportSpec(features, state, options = {}) {
+    const metadata = Object.assign({
+      title: state.title || "Peta Sorotan Wilayah Indonesia",
+      subtitle: "",
+      source: "",
+      period: "",
+      footnote: "",
+      legendTitle: "Legenda",
+      filenameSlug: "peta-warna-indonesia"
+    }, state.exportMeta || {}, options.metadata || {});
+    Object.keys(metadata).forEach((key) => { metadata[key] = sanitizeText(metadata[key], key === "title" ? 90 : key === "filenameSlug" ? 80 : 180); });
+    const extent = options.extent === "national" ? "national" : "current-view";
+    return {
+      version: "IDN-EXPORT-v2",
+      features: features || [],
+      legend: state.visualization && Array.isArray(state.visualization.legend) ? state.visualization.legend : (state.legend || []),
+      metadata,
+      extent,
+      bounds: options.viewBounds || getBounds(features || []),
+      size: getSize(options),
+      transparent: Boolean(options.transparent),
+      labels: options.labels !== false,
+      attribution: "Data: geoBoundaries/HDX COD-AB ADM2 snapshot 2020; 519 fitur geometri; registry metadata v1 2025. Referensi visual; bukan penetapan batas hukum.",
+      boundaryVersion: "IDN-ADM2-2020-geoboundaries-22746128",
+      registryVersion: "IDN-ADM-REGISTRY-v1-2025-06-23"
+    };
   }
 
   function estimatePngCost(options) {
@@ -102,6 +140,7 @@
   }
 
   function buildLegendItems(state, features) {
+    if (state.visualization && Array.isArray(state.visualization.legend) && state.visualization.legend.length) return state.visualization.legend;
     // Exported legends use color groups instead of one row for every highlighted region.
     const groups = new Map();
     Object.keys(state.highlights || {}).forEach((id) => {
@@ -125,10 +164,11 @@
   }
 
   function buildSvg(features, state, options) {
-    const size = getSize(options);
+    const spec = options && options.spec ? options.spec : buildExportSpec(features, state, options || {});
+    const size = spec.size;
     const margin = 58;
     const legendAreaHeight = state.legendVisible ? 142 : 72;
-    const bounds = options.viewBounds || getBounds(features);
+    const bounds = spec.bounds;
     const boundsWidth = Math.max(bounds.maxX - bounds.minX, 0.001);
     const boundsHeight = Math.max(bounds.maxY - bounds.minY, 0.001);
     const scale = Math.min((size.width - margin * 2) / boundsWidth, (size.height - margin * 2 - legendAreaHeight) / boundsHeight);
@@ -138,7 +178,7 @@
     const offsetX = (size.width - mapWidth) / 2;
     const offsetY = 92 + ((size.height - 88 - legendAreaHeight - mapHeight) / 2);
     const project = (x, y) => ({ x: offsetX + (x - bounds.minX) * scale, y: offsetY + (bounds.maxY - y) * scale });
-    const background = options.transparent ? "" : `<rect width="100%" height="100%" fill="#97d2e2"/>`;
+    const background = spec.transparent ? "" : `<rect width="100%" height="100%" fill="#97d2e2"/>`;
     const paths = features.map((feature) => {
       const id = feature.properties.region_id;
       const item = state.highlights[id];
@@ -146,20 +186,22 @@
       const stroke = item ? "#49535d" : "#aeb8c2";
       return `<path d="${pathForGeometry(feature.geometry, project)}" fill="${fill}" stroke="${stroke}" stroke-width="0.75" vector-effect="non-scaling-stroke"><title>${escapeXml(feature.properties.display_name)}</title></path>`;
     }).join("\n");
-    const labelPlacements = options.labels ? placeLabels(features, state, project, size, labelSize) : [];
+    const labelPlacements = spec.labels ? placeLabels(features, state, project, size, labelSize) : [];
     const labels = labelPlacements.map((item) => {
       return `<text x="${item.x.toFixed(1)}" y="${item.y.toFixed(1)}" text-anchor="middle" font-size="${item.fontSize}" paint-order="stroke" stroke="#ffffff" stroke-width="${(item.fontSize / 4).toFixed(1)}" stroke-linejoin="round" fill="#1e2933">${escapeXml(labelText(item.feature, state))}</text>`;
     }).join("\n");
-    const legend = state.legendVisible ? buildLegend(state, size, options.legendFeatures || features) : "";
-    const title = buildTitle(state.title, size);
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img" aria-label="${escapeXml(state.title)}">\n${background}\n<metadata>${escapeXml(JSON.stringify({ boundaryVersion: "IDN-ADM2-2020-geoboundaries-22746128", registryVersion: "IDN-ADM-REGISTRY-v1-2025-06-23", featureScope: "519 geometry features; not current autonomous region count", disclaimer: "visual reference only; not a legal boundary determination" }))}</metadata>\n<g font-family="Arial, Helvetica, sans-serif">${paths}\n${labels}\n${legend}</g>\n${title}\n<text x="${margin}" y="${size.height - 40}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">Data: geoBoundaries/HDX COD-AB ADM2 snapshot 2020; 519 fitur geometri; registry metadata v1 2025.</text>\n<text x="${margin}" y="${size.height - 22}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">Referensi visual; bukan penetapan batas hukum. Atribusi sumber wajib dipertahankan.</text>\n</svg>`;
+    const legend = state.legendVisible ? buildLegend(state, size, spec.legendFeatures || features, spec.metadata.legendTitle) : "";
+    const title = buildTitle(spec.metadata.title, size, spec.metadata.subtitle);
+    const metadata = Object.assign({}, spec, { features: undefined });
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img" aria-label="${escapeXml(spec.metadata.title)}">\n${background}\n<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>\n<g font-family="Arial, Helvetica, sans-serif">${paths}\n${labels}\n${legend}</g>\n${title}\n<text x="${margin}" y="${size.height - 58}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.source || spec.attribution)}</text>\n<text x="${margin}" y="${size.height - 40}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.period || "")}</text>\n<text x="${margin}" y="${size.height - 22}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.footnote || spec.attribution)} Atribusi sumber wajib dipertahankan.</text>\n</svg>`;
   }
 
-  function buildTitle(title, size) {
+  function buildTitle(title, size, subtitle) {
     const text = String(title || "Peta Sorotan Wilayah Indonesia").slice(0, 90);
     const width = Math.min(size.width - 116, Math.max(360, text.length * 18));
     const x = (size.width - width) / 2;
-    return `<g><rect x="${x.toFixed(1)}" y="17" width="${width.toFixed(1)}" height="42" rx="6" fill="rgba(255,255,255,0.92)" stroke="#d8dee6"/><text x="${size.width / 2}" y="44" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#1e2933">${escapeXml(text)}</text></g>`;
+    const sub = sanitizeText(subtitle, 180);
+    return `<g><rect x="${x.toFixed(1)}" y="17" width="${width.toFixed(1)}" height="${sub ? 60 : 42}" rx="6" fill="rgba(255,255,255,0.92)" stroke="#d8dee6"/><text x="${size.width / 2}" y="44" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#1e2933">${escapeXml(text)}</text>${sub ? `<text x="${size.width / 2}" y="64" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#5c6975">${escapeXml(sub)}</text>` : ""}</g>`;
   }
 
   function getLabelSize(boundsWidth, boundsHeight, labelCount, size) {
@@ -245,7 +287,7 @@
     return Math.min(max, Math.max(min, value));
   }
 
-  function buildLegend(state, size, features) {
+  function buildLegend(state, size, features, legendTitle) {
     const items = buildLegendItems(state, features);
     if (!items.length) return "";
     const rowHeight = 22;
@@ -264,7 +306,7 @@
       const yy = y + 48 + row * rowHeight;
       return `<rect x="${xx + 14}" y="${yy - 12}" width="14" height="14" fill="${item.color}" stroke="#4b5563"/><text x="${xx + 38}" y="${yy}" font-size="13" fill="#1e2933">${escapeXml(item.label)}</text>`;
     }).join("");
-    return `<g><rect x="${x.toFixed(1)}" y="${y}" width="${width.toFixed(1)}" height="${height}" fill="#ffffff" stroke="#d8dee6"/><text x="${x + 14}" y="${y + 22}" font-size="15" font-weight="700" fill="#1e2933">Legenda Warna</text>${rows}</g>`;
+    return `<g><rect x="${x.toFixed(1)}" y="${y}" width="${width.toFixed(1)}" height="${height}" fill="#ffffff" stroke="#d8dee6"/><text x="${x + 14}" y="${y + 22}" font-size="15" font-weight="700" fill="#1e2933">${escapeXml(legendTitle || "Legenda")}</text>${rows}</g>`;
   }
 
   function downloadText(filename, text, type) {
@@ -277,8 +319,15 @@
   }
 
   function exportSvg(features, state, options) {
-    const svg = buildSvg(features, state, options);
-    downloadText("peta-warna-indonesia.svg", svg, "image/svg+xml");
+    const spec = buildExportSpec(features, state, options || {});
+    const svg = buildSvg(features, state, Object.assign({}, options, { spec }));
+    downloadText(`${slugify(spec.metadata.filenameSlug)}.svg`, svg, "image/svg+xml");
+  }
+
+  function downloadBlob(filename, blob) {
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url; link.download = filename; link.click(); URL.revokeObjectURL(url);
   }
 
   function exportPng(features, state, options) {
@@ -291,6 +340,67 @@
       if (firstSize.width === fallbackSize.width && firstSize.height === fallbackSize.height) throw error;
       return renderPng(features, state, Object.assign({}, options, { forceCanvasFailure: false }), fallbackSize, true);
     });
+  }
+
+  function createJpegBlob(features, state, options, size) {
+    return new Promise((resolve, reject) => {
+      const spec = buildExportSpec(features, state, Object.assign({}, options, { pngSize: `${size.width}x${size.height}` }));
+      const svg = buildSvg(features, state, Object.assign({}, options, { spec }));
+      const image = new Image();
+      const svgUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+      image.onload = () => {
+        try {
+          const canvas = document.createElement("canvas"); canvas.width = size.width; canvas.height = size.height;
+          const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("Browser tidak dapat membuat kanvas PDF.");
+          ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, size.width, size.height); ctx.drawImage(image, 0, 0);
+          canvas.toBlob((blob) => { URL.revokeObjectURL(svgUrl); blob ? resolve({ blob, spec, size }) : reject(new Error("Browser tidak dapat menyiapkan PDF.")); }, "image/jpeg", 0.92);
+        } catch (error) { URL.revokeObjectURL(svgUrl); reject(error); }
+      };
+      image.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error("Pratinjau PDF gagal dirender.")); };
+      image.src = svgUrl;
+    });
+  }
+
+  function pdfAscii(value) {
+    return sanitizeText(value, 180).replace(/[^\x20-\x7E]/g, "?").replace(/[()\\]/g, (char) => `\\${char}`);
+  }
+
+  async function exportPdf(features, state, options = {}) {
+    const ratio = options.ratio === "a3" ? "a3" : "a4";
+    const px = ratio === "a3" ? { width: 2480, height: 1754 } : { width: 1754, height: 1240 };
+    const rendered = await createJpegBlob(features, state, Object.assign({}, options, { ratio }), px);
+    const imageBytes = new Uint8Array(await rendered.blob.arrayBuffer());
+    const pt = ratio === "a3" ? { width: 1190.55, height: 841.89 } : { width: 841.89, height: 595.28 };
+    const enc = new TextEncoder(); const chunks = []; const offsets = [0]; let length = 0;
+    const pushText = (text) => { const bytes = enc.encode(text); chunks.push(bytes); length += bytes.length; };
+    const pushBytes = (bytes) => { chunks.push(bytes); length += bytes.length; };
+    pushText("%PDF-1.4\n%\xFF\xFF\xFF\xFF\n");
+    const object = (number, body) => { offsets[number] = length; pushText(`${number} 0 obj\n${body}\nendobj\n`); };
+    object(1, "<< /Type /Catalog /Pages 2 0 R >>");
+    object(2, "<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+    object(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pt.width} ${pt.height}] /Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>`);
+    const stream = `q\n${pt.width} 0 0 ${pt.height} 0 0 cm\n/Im0 Do\nQ\n`;
+    object(4, `<< /Length ${enc.encode(stream).length} >>\nstream\n${stream}endstream`);
+    offsets[5] = length; pushText(`5 0 obj\n<< /Type /XObject /Subtype /Image /Width ${px.width} /Height ${px.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imageBytes.length} >>\nstream\n`); pushBytes(imageBytes); pushText("\nendstream\nendobj\n");
+    object(6, `<< /Title (${pdfAscii(rendered.spec.metadata.title)}) /Subject (Mapnesia ${rendered.spec.boundaryVersion}; ${pdfAscii(rendered.spec.attribution)}) >>`);
+    const xrefOffset = length; pushText("xref\n0 7\n0000000000 65535 f \n");
+    for (let index = 1; index <= 6; index += 1) pushText(`${String(offsets[index] || 0).padStart(10, "0")} 00000 n \n`);
+    pushText(`trailer\n<< /Size 7 /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+    downloadBlob(`${slugify(rendered.spec.metadata.filenameSlug)}.pdf`, new Blob(chunks, { type: "application/pdf" }));
+    return { size: px, rasterized: true, spec: rendered.spec };
+  }
+
+  function exportMappingCsv(rows, state) {
+    const lines = [["Source_Row_ID", "Source_Row_Number", "Original_Region", "Original_Province", "Original_Code", "Canonical_Region_ID", "Matched_Display_Name", "Match_Status", "Correction", "Value", "Category", "Visualization_Class", "Visualization_Color", "Boundary_Version", "Registry_Version"].join(",")];
+    const assignments = state.visualization && state.visualization.assignments || {};
+    (rows || []).slice().sort((a, b) => Number(a.rowNumber) - Number(b.rowNumber) || String(a.rowId).localeCompare(String(b.rowId))).forEach((row) => {
+      const assignment = assignments[row.matchedId] || {};
+      const values = [row.rowId, row.rowNumber, row.record && row.record.regionName, row.record && row.record.province, row.record && row.record.regionCode, row.matchedId || "", row.matchedName || "", row.matchStatus || "", row.matchStatus === "user-resolved" ? "yes" : "no", row.record && row.record.numericValue, row.record && row.record.category, row.classKey || assignment.classKey || "", row.color || assignment.color || "", "IDN-ADM2-2020-geoboundaries-22746128", "IDN-ADM-REGISTRY-v1-2025-06-23"].map((value) => `"${String(value == null ? "" : value).replace(/^[=+@-]/, "'").replace(/"/g, '""')}"`);
+      lines.push(values.join(","));
+    });
+    const filename = `${slugify((state.exportMeta && state.exportMeta.filenameSlug) || "peta-warna-indonesia")}-mapping.csv`;
+    downloadText(filename, lines.join("\n"), "text/csv;charset=utf-8");
+    return lines.join("\n");
   }
 
   function renderPng(features, state, options, size, fallbackUsed) {
@@ -347,5 +457,5 @@
     });
   }
 
-  window.MapExport = { buildSvg, exportSvg, exportPng, estimatePngCost };
+  window.MapExport = { buildSvg, buildExportSpec, exportSvg, exportPng, exportPdf, exportMappingCsv, estimatePngCost, getBounds, slugify };
 })();

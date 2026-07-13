@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-07-13T07:35:18.619Z",
-  "initialCompressedBytes": 607807,
+  "generatedAt": "2026-07-13T07:47:08.269Z",
+  "initialCompressedBytes": 610869,
   "simplifiedGeometryGzipBytes": 518479,
-  "shellJavaScriptGzipBytes": 78496,
+  "shellJavaScriptGzipBytes": 81310,
   "hard": {
     "initialCompressedBytes": 1100000,
     "simplifiedGeometryGzipBytes": 600000,

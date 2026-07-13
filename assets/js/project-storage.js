@@ -135,6 +135,18 @@
     };
   }
 
+  function sanitizeExportMeta(raw) {
+    const value = raw && typeof raw === "object" ? raw : {};
+    return {
+      subtitle: String(value.subtitle || "").replace(/[\u0000-\u001F]/g, "").slice(0, 180),
+      source: String(value.source || "").replace(/[\u0000-\u001F]/g, "").slice(0, 180),
+      period: String(value.period || "").replace(/[\u0000-\u001F]/g, "").slice(0, 80),
+      footnote: String(value.footnote || "").replace(/[\u0000-\u001F]/g, "").slice(0, 180),
+      legendTitle: String(value.legendTitle || "Legenda").replace(/[\u0000-\u001F]/g, "").slice(0, 80),
+      filenameSlug: String(value.filenameSlug || "peta-warna-indonesia").replace(/[^a-zA-Z0-9_-]+/g, "-").slice(0, 80) || "peta-warna-indonesia"
+    };
+  }
+
   function emptyMigrationReport(fromSchema) {
     return {
       createdAt: new Date().toISOString(),
@@ -258,6 +270,7 @@
       uiMode: raw.uiMode === "advanced" ? "advanced" : "basic",
       importRows: sanitizeImportRows(raw.importRows),
       visualization: sanitizeVisualization(raw.visualization),
+      exportMeta: sanitizeExportMeta(raw.exportMeta),
       exportSettings: raw.exportSettings || {},
       migrationReport: finalizeMigrationReport(migrationReport),
       savedAt: raw.savedAt || new Date().toISOString()
@@ -302,6 +315,7 @@
       uiMode: state.uiMode === "advanced" ? "advanced" : "basic",
       importRows: sanitizeImportRows(state.importRows),
       visualization: sanitizeVisualization(state.visualization),
+      exportMeta: sanitizeExportMeta(state.exportMeta),
       exportSettings: state.exportSettings || {},
       migrationReport: state.migrationReport || null,
       savedAt: new Date().toISOString()

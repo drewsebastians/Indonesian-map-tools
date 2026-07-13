@@ -41,6 +41,18 @@
       <section class="panel-section">
         <label for="projectTitle">Judul Peta</label>
         <input id="projectTitle" type="text" maxlength="90" value="Peta Sorotan Wilayah Indonesia">
+        <label for="exportSubtitle">Subjudul</label>
+        <input id="exportSubtitle" type="text" maxlength="180" placeholder="Opsional">
+        <label for="exportSource">Sumber angka/data pengguna</label>
+        <input id="exportSource" type="text" maxlength="180" placeholder="Opsional; atribusi batas tetap otomatis">
+        <label for="exportPeriod">Periode</label>
+        <input id="exportPeriod" type="text" maxlength="80" placeholder="Contoh: 2025">
+        <label for="exportFootnote">Catatan kaki</label>
+        <input id="exportFootnote" type="text" maxlength="180" placeholder="Opsional">
+        <label for="exportLegendTitle">Judul legenda</label>
+        <input id="exportLegendTitle" type="text" maxlength="80" value="Legenda">
+        <label for="exportFilenameSlug">Nama file</label>
+        <input id="exportFilenameSlug" type="text" maxlength="80" value="peta-warna-indonesia" inputmode="url">
       </section>
 
       <section class="panel-section" data-workflow-step="visualize">
@@ -197,8 +209,14 @@
           <option value="16:9">16:9</option>
           <option value="4:3">4:3</option>
           <option value="a4">A4 landscape</option>
+          <option value="a3">A3 landscape</option>
           <option value="1:1">Square</option>
           <option value="bounds">Tampilan peta saat ini</option>
+        </select>
+        <label for="exportExtent">Cakupan ekspor</label>
+        <select id="exportExtent">
+          <option value="national">Seluruh Indonesia</option>
+          <option value="current-view">Tampilan peta saat ini</option>
         </select>
         <label class="check-row"><input id="exportLabels" type="checkbox" checked> Sertakan semua nama wilayah</label>
         <label class="check-row"><input id="transparentBg" type="checkbox"> Latar transparan</label>
@@ -213,6 +231,8 @@
         <div class="button-grid">
           <button id="exportSvgBtn" type="button">Ekspor SVG</button>
           <button id="exportPngBtn" type="button">Ekspor PNG</button>
+          <button id="exportPdfBtn" type="button">Ekspor PDF</button>
+          <button id="exportMappingBtn" type="button" class="secondary">Ekspor tabel mapping CSV</button>
         </div>
       </section>
 
