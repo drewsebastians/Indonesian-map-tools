@@ -367,3 +367,42 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
   await expect(page.locator("#importMapping")).toContainText("Sheet: Cadangan");
   await expect(page.locator("#csvPreview")).toContainText("1");
 });
+
+test("beginner workflow example keeps table and map selection linked", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await expect(page.locator("#workflowSteps")).toContainText("Input");
+  await page.locator("#exampleBtn").click();
+  await expect(page.locator("#workflowStatus")).toContainText(/Match|baris siap/i);
+  await page.locator("#applyCsvBtn").click();
+  await expect(page.locator("#dataTablePanel")).toBeVisible();
+  await expect(page.locator("#dataTable tbody tr")).toHaveCount(2);
+  await expect(page.locator("#workflowStatus")).toContainText(/Visualize|wilayah tampil/i);
+
+  await page.locator("#dataTable tbody tr").first().click();
+  await expect(page.locator("#mapSelectionStatus")).toContainText(/dipilih/i);
+  await expect(page.locator("#dataTable tbody tr").first()).toHaveClass(/selected/);
+
+  const surabayaPath = page.locator('.leaflet-interactive[aria-label*="Surabaya"]').first();
+  await surabayaPath.click();
+  await expect(page.locator("#dataTable tbody tr").filter({ hasText: "Surabaya" }).first()).toHaveClass(/selected/);
+
+  await page.locator("#dataTableFilter").fill("Denpasar");
+  await expect(page.locator("#dataTable tbody tr")).toHaveCount(1);
+  await page.locator("#advancedModeBtn").click();
+  await expect(page.locator("#dataTableCount")).toHaveText("1");
+  await page.locator("#basicModeBtn").click();
+  await expect(page.locator("#dataTableCount")).toHaveText("1");
+});
+
+test("mobile layout keeps the map reachable before the control panel", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto("/");
+  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  const positions = await page.evaluate(() => ({
+    map: document.querySelector(".map-area").getBoundingClientRect().top,
+    panel: document.querySelector(".control-panel").getBoundingClientRect().top
+  }));
+  expect(positions.map).toBeLessThanOrEqual(positions.panel);
+  await expect(page.locator("#map")).toBeVisible();
+});

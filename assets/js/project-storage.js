@@ -85,6 +85,31 @@
     };
   }
 
+  function sanitizeImportRows(rawRows) {
+    if (!Array.isArray(rawRows)) return [];
+    return rawRows.slice(0, 2000).map((row, index) => {
+      const record = row && row.record && typeof row.record === "object" ? row.record : {};
+      return {
+        rowId: String((row && row.rowId) || `row-${index + 1}`).slice(0, 120),
+        rowNumber: Number.isFinite(Number(row && row.rowNumber)) ? Number(row.rowNumber) : index + 2,
+        record: {
+          regionCode: String(record.regionCode || "").slice(0, 120),
+          province: String(record.province || "").slice(0, 120),
+          regionName: String(record.regionName || "").slice(0, 160),
+          numericValue: String(record.numericValue || "").slice(0, 120),
+          category: String(record.category || "").slice(0, 120),
+          source: String(record.source || "").slice(0, 160),
+          period: String(record.period || "").slice(0, 80)
+        },
+        matchedId: row && row.matchedId ? String(row.matchedId).slice(0, 120) : null,
+        matchedName: String((row && row.matchedName) || "").slice(0, 180),
+        matchStatus: String((row && row.matchStatus) || "unmatched").slice(0, 60),
+        errors: Array.isArray(row && row.errors) ? row.errors.slice(0, 4).map((item) => String(item).slice(0, 180)) : [],
+        warnings: Array.isArray(row && row.warnings) ? row.warnings.slice(0, 4).map((item) => String(item).slice(0, 180)) : []
+      };
+    });
+  }
+
   function emptyMigrationReport(fromSchema) {
     return {
       createdAt: new Date().toISOString(),
@@ -204,6 +229,9 @@
       groupNames,
       groupMeta,
       importCorrections,
+      workflowStage: ["input", "match", "visualize", "export"].includes(raw.workflowStage) ? raw.workflowStage : "input",
+      uiMode: raw.uiMode === "advanced" ? "advanced" : "basic",
+      importRows: sanitizeImportRows(raw.importRows),
       exportSettings: raw.exportSettings || {},
       migrationReport: finalizeMigrationReport(migrationReport),
       savedAt: raw.savedAt || new Date().toISOString()
@@ -244,6 +272,9 @@
       groupNames: state.groupNames || {},
       groupMeta: state.groupMeta || {},
       importCorrections: state.importCorrections || {},
+      workflowStage: ["input", "match", "visualize", "export"].includes(state.workflowStage) ? state.workflowStage : "input",
+      uiMode: state.uiMode === "advanced" ? "advanced" : "basic",
+      importRows: sanitizeImportRows(state.importRows),
       exportSettings: state.exportSettings || {},
       migrationReport: state.migrationReport || null,
       savedAt: new Date().toISOString()

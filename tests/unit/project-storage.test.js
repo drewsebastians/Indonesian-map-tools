@@ -97,6 +97,9 @@ test("buildProject stores schema, boundary, registry, and canonical region refer
     importCorrections: {
       row_1: { action: "resolve", targetId: "known-id", registryVersion: storage.REGISTRY_VERSION, decidedAt: "2026-07-13T00:00:00.000Z" }
     },
+    workflowStage: "visualize",
+    uiMode: "advanced",
+    importRows: [{ rowId: "row-1", rowNumber: 2, record: { regionName: "Surabaya", province: "Jawa Timur" }, matchedId: "known-id", matchedName: "Surabaya - Jawa Timur", matchStatus: "exact-code", errors: [], warnings: [] }],
     exportSettings: {}
   }, storage.createRegionAdapter(features));
 
@@ -105,6 +108,9 @@ test("buildProject stores schema, boundary, registry, and canonical region refer
   assert.equal(project.registryVersion, "IDN-ADM-REGISTRY-v1-2025-06-23");
   assert.equal(project.regionRefs["known-id"].legacyRegionId, "known-id");
   assert.equal(project.importCorrections.row_1.targetId, "known-id");
+  assert.equal(project.workflowStage, "visualize");
+  assert.equal(project.uiMode, "advanced");
+  assert.equal(project.importRows[0].matchedId, "known-id");
 });
 
 test("sanitizeProject keeps only registry-current import corrections", () => {

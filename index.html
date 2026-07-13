@@ -24,11 +24,26 @@
       </header>
 
       <section class="panel-section">
+        <div class="workflow-intro">
+          <h2>Mulai membuat peta</h2>
+          <p class="notice">Masukkan data, periksa kecocokan wilayah, lihat hasilnya di peta, lalu ekspor. Semua data tetap di perangkat Anda.</p>
+          <div id="workflowSteps" class="workflow-steps" role="navigation" aria-label="Tahapan membuat peta"></div>
+          <p id="workflowStatus" class="status-line" aria-live="polite">Tahap 1 dari 4: Input data.</p>
+          <div class="mode-toggle" role="group" aria-label="Mode tampilan">
+            <span>Mode:</span>
+            <button id="basicModeBtn" type="button" class="mode-button active" aria-pressed="true">Dasar</button>
+            <button id="advancedModeBtn" type="button" class="mode-button secondary" aria-pressed="false">Lanjutan</button>
+          </div>
+          <button id="exampleBtn" type="button" class="secondary example-button">Coba contoh lokal</button>
+        </div>
+      </section>
+
+      <section class="panel-section">
         <label for="projectTitle">Judul Peta</label>
         <input id="projectTitle" type="text" maxlength="90" value="Peta Sorotan Wilayah Indonesia">
       </section>
 
-      <section class="panel-section">
+      <section class="panel-section" data-workflow-step="visualize">
         <h2>Pilih Wilayah</h2>
         <label for="searchInput">Cari Wilayah</label>
         <input id="searchInput" type="search" autocomplete="off" placeholder="Contoh: Surabaya">
@@ -43,8 +58,9 @@
         <div class="selected-region" id="selectedRegion">Belum ada wilayah dipilih.</div>
       </section>
 
-      <section class="panel-section">
-        <h2>Warna</h2>
+      <section class="panel-section" data-workflow-step="visualize">
+        <h2>Pewarnaan manual (alternatif)</h2>
+        <p class="notice">Gunakan jalur ini bila Anda ingin memilih wilayah dan warna satu per satu.</p>
         <label for="colorPicker">Pilih Warna</label>
         <div class="color-row">
           <input id="colorPicker" type="color" value="#4472C4">
@@ -62,7 +78,7 @@
         </div>
       </section>
 
-      <section class="panel-section">
+      <section class="panel-section" data-workflow-step="visualize">
         <div class="section-heading">
           <h2>Wilayah Disorot</h2>
           <span id="highlightCount" class="count-pill">0</span>
@@ -70,7 +86,7 @@
         <div id="highlightList" class="highlight-list" aria-live="polite"></div>
       </section>
 
-      <section class="panel-section">
+      <section class="panel-section" data-workflow-step="visualize">
         <div class="section-heading">
           <h2>Grouping</h2>
           <span id="groupCount" class="count-pill">0</span>
@@ -79,7 +95,7 @@
         <div id="groupingList" class="grouping-list" aria-live="polite"></div>
       </section>
 
-      <section class="panel-section">
+      <section class="panel-section" data-workflow-step="visualize">
         <h2>Legenda</h2>
         <label class="check-row"><input id="showLegend" type="checkbox" checked> Tampilkan legenda</label>
         <label for="legendPosition">Posisi legenda</label>
@@ -93,7 +109,7 @@
         <button id="addLegendBtn" type="button" class="secondary">Tambah Legenda</button>
       </section>
 
-      <section class="panel-section">
+      <section class="panel-section" data-workflow-step="input">
         <h2>Impor Data</h2>
         <p class="notice">Paste, CSV, TSV, dan XLSX diproses hanya di browser ini dan tidak diunggah ke server.</p>
         <label for="importPaste">Paste dari Excel/Sheets</label>
@@ -102,19 +118,22 @@
         <input id="csvFile" type="file" accept=".csv,.tsv,.txt,.xlsx,text/csv,text/tab-separated-values,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-label="Pilih file CSV, TSV, atau XLSX">
         <label for="xlsxSheet" class="hidden">Sheet XLSX</label>
         <select id="xlsxSheet" class="hidden" aria-label="Pilih sheet XLSX"></select>
-        <label for="importDelimiter">Delimiter</label>
-        <select id="importDelimiter">
-          <option value="auto">Deteksi otomatis</option>
-          <option value="comma">Koma (,)</option>
-          <option value="semicolon">Titik koma (;)</option>
-          <option value="tab">Tab</option>
-        </select>
-        <label for="importLocale">Format angka</label>
-        <select id="importLocale">
-          <option value="auto">Deteksi otomatis</option>
-          <option value="id-ID">Indonesia: 1.234,56</option>
-          <option value="en-US">Internasional: 1,234.56</option>
-        </select>
+        <details id="advancedImportOptions" class="advanced-options">
+          <summary>Opsi lanjutan import</summary>
+          <label for="importDelimiter">Delimiter</label>
+          <select id="importDelimiter">
+            <option value="auto">Deteksi otomatis</option>
+            <option value="comma">Koma (,)</option>
+            <option value="semicolon">Titik koma (;)</option>
+            <option value="tab">Tab</option>
+          </select>
+          <label for="importLocale">Format angka</label>
+          <select id="importLocale">
+            <option value="auto">Deteksi otomatis</option>
+            <option value="id-ID">Indonesia: 1.234,56</option>
+            <option value="en-US">Internasional: 1,234.56</option>
+          </select>
+        </details>
         <div class="button-grid">
           <button id="previewCsvBtn" type="button">Pratinjau Import</button>
           <button id="applyCsvBtn" type="button" class="secondary" disabled>Terapkan Hasil Valid</button>
@@ -136,7 +155,7 @@
         </div>
       </section>
 
-      <section class="panel-section">
+      <section id="exportSection" class="panel-section" data-workflow-step="export">
         <h2>Ekspor</h2>
         <label for="exportRatio">Rasio Kanvas</label>
         <select id="exportRatio">
@@ -180,9 +199,39 @@
       <div class="map-toolbar">
         <button id="fitIndonesiaBtn" type="button" class="secondary">Lihat Indonesia</button>
         <span id="loadingIndicator" class="status-line">Memuat peta...</span>
+        <span id="mapSelectionStatus" class="status-line" aria-live="polite"></span>
       </div>
       <div id="errorArea" class="error-area" role="alert"></div>
       <div id="map" aria-label="Peta Indonesia"></div>
+      <section id="dataTablePanel" class="data-table-panel" aria-labelledby="dataTableTitle" hidden>
+        <div class="section-heading">
+          <div>
+            <h2 id="dataTableTitle">Data Anda</h2>
+            <p class="notice">Pilih baris untuk menyorot wilayah yang cocok di peta.</p>
+          </div>
+          <span id="dataTableCount" class="count-pill">0</span>
+        </div>
+        <div class="data-table-tools">
+          <label for="dataTableFilter">Cari di data</label>
+          <input id="dataTableFilter" type="search" placeholder="Wilayah, provinsi, kategori..." autocomplete="off">
+          <label for="dataTableSort">Urutkan</label>
+          <select id="dataTableSort">
+            <option value="row">Urutan sumber</option>
+            <option value="region">Wilayah A–Z</option>
+            <option value="status">Status</option>
+            <option value="value">Nilai</option>
+          </select>
+        </div>
+        <div id="dataTableAnnouncement" class="sr-only" aria-live="polite"></div>
+        <div class="data-table-scroll">
+          <table id="dataTable" class="data-table">
+            <caption class="sr-only">Data impor dan kecocokan wilayah</caption>
+            <thead><tr><th scope="col">Baris</th><th scope="col">Wilayah sumber</th><th scope="col">Provinsi</th><th scope="col">Wilayah cocok</th><th scope="col">Nilai/kategori</th><th scope="col">Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="dataTableEmpty" class="status-line">Belum ada data yang diterapkan.</p>
+      </section>
     </main>
     <button id="floatingExportBtn" class="floating-export-btn" type="button" hidden>Ekspor PNG</button>
   </div>

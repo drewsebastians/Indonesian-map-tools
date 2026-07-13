@@ -25,6 +25,10 @@
     exportSettings: {},
     unresolvedHighlights: {},
     migrationReport: null,
+    workflowStage: "input",
+    uiMode: "basic",
+    importRows: [],
+    selectedDataRow: null,
     highDetailCollection: null,
     highDetailFeatureById: new Map(),
     undo: []
@@ -48,16 +52,22 @@
       "saveProjectBtn", "openProjectBtn", "projectFile", "clearProjectBtn", "autosaveStatus",
       "migrationReportBtn", "dataTruthBadge",
       "exportRatio", "exportLabels", "transparentBg", "exportHighDetail", "pngSize", "exportSvgBtn", "exportPngBtn",
-      "fitIndonesiaBtn", "loadingIndicator", "errorArea", "appShell", "controlPanel", "sidebarToggleBtn", "floatingExportBtn"
+      "fitIndonesiaBtn", "loadingIndicator", "errorArea", "appShell", "controlPanel", "sidebarToggleBtn", "floatingExportBtn",
+      "workflowSteps", "workflowStatus", "basicModeBtn", "advancedModeBtn", "exampleBtn", "advancedImportOptions", "dataTablePanel", "dataTable", "dataTableFilter", "dataTableSort", "dataTableCount", "dataTableEmpty", "dataTableAnnouncement", "mapSelectionStatus"
     ].forEach((id) => { el[id] = document.getElementById(id); });
     mapApi = IndonesiaMap.createMap("map", { onSelect: handleFeatureSelected });
     setupEvents();
     setupColors();
+    renderWorkflow();
+    setMode("basic");
     loadData();
   }
 
   function setupEvents() {
     el.projectTitle.addEventListener("input", () => { state.title = el.projectTitle.value.trim() || "Peta Sorotan Wilayah Indonesia"; scheduleSave(); });
+    el.basicModeBtn.addEventListener("click", () => setMode("basic"));
+    el.advancedModeBtn.addEventListener("click", () => setMode("advanced"));
+    el.exampleBtn.addEventListener("click", useExample);
     el.searchInput.addEventListener("input", renderSearch);
     el.provinceSelect.addEventListener("change", handleProvinceChange);
     el.regionSelect.addEventListener("change", () => selectRegion(el.regionSelect.value, true));
@@ -84,7 +94,66 @@
     el.sidebarToggleBtn.addEventListener("click", toggleSidebar);
     el.floatingExportBtn.addEventListener("click", exportPng);
     el.fitIndonesiaBtn.addEventListener("click", () => mapApi.fitIndonesia());
+    el.dataTableFilter.addEventListener("input", renderDataTable);
+    el.dataTableSort.addEventListener("change", renderDataTable);
+    el.workflowSteps.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-workflow-stage]");
+      if (button) setWorkflowStage(button.dataset.workflowStage, true);
+    });
     window.addEventListener("resize", () => mapApi.invalidate());
+  }
+
+  const WORKFLOW = [
+    { id: "input", label: "Input", target: "[data-workflow-step='input']" },
+    { id: "match", label: "Match", target: "#dataTablePanel" },
+    { id: "visualize", label: "Visualize", target: "[data-workflow-step='visualize']" },
+    { id: "export", label: "Export", target: "#exportSection" }
+  ];
+
+  function renderWorkflow() {
+    if (!el.workflowSteps) return;
+    const currentIndex = WORKFLOW.findIndex((item) => item.id === state.workflowStage);
+    el.workflowSteps.innerHTML = WORKFLOW.map((item, index) => {
+      const complete = index < currentIndex || (item.id === "match" && state.importRows.length > 0) || (item.id === "visualize" && Object.keys(state.highlights).length > 0);
+      const classes = ["workflow-step", item.id === state.workflowStage ? "active" : "", complete ? "complete" : ""].filter(Boolean).join(" ");
+      return `<button type="button" class="${classes}" data-workflow-stage="${item.id}" aria-current="${item.id === state.workflowStage ? "step" : "false"}">${index + 1}. ${item.label}</button>`;
+    }).join("");
+    const status = state.workflowStage === "input" ? "Masukkan data dari paste atau file lokal." : state.workflowStage === "match" ? `${state.importRows.length || "Belum ada"} baris siap diperiksa di tabel.` : state.workflowStage === "visualize" ? `${Object.keys(state.highlights).length} wilayah tampil di peta.` : "Peta siap diekspor.";
+    el.workflowStatus.textContent = `Tahap ${Math.max(1, currentIndex + 1)} dari 4: ${status}`;
+  }
+
+  function setWorkflowStage(stage, focus) {
+    const index = WORKFLOW.findIndex((item) => item.id === stage);
+    if (index < 0) return;
+    if (stage === "match" && !pendingCsv && !state.importRows.length) return showError("Masukkan dan pratinjau data terlebih dahulu.");
+    if ((stage === "visualize" || stage === "export") && !Object.keys(state.highlights).length) return showError("Terapkan setidaknya satu baris yang valid terlebih dahulu.");
+    state.workflowStage = stage;
+    renderWorkflow();
+    scheduleSave();
+    if (focus) {
+      const target = document.querySelector(WORKFLOW[index].target);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (stage === "match" && el.dataTablePanel) el.dataTablePanel.hidden = false;
+    }
+  }
+
+  function setMode(mode) {
+    state.uiMode = mode === "advanced" ? "advanced" : "basic";
+    el.appShell.dataset.mode = state.uiMode;
+    el.basicModeBtn.classList.toggle("active", state.uiMode === "basic");
+    el.advancedModeBtn.classList.toggle("active", state.uiMode === "advanced");
+    el.basicModeBtn.setAttribute("aria-pressed", String(state.uiMode === "basic"));
+    el.advancedModeBtn.setAttribute("aria-pressed", String(state.uiMode === "advanced"));
+    if (el.advancedImportOptions) el.advancedImportOptions.open = state.uiMode === "advanced";
+    scheduleSave();
+  }
+
+  async function useExample() {
+    el.importPaste.value = "wilayah\tprovinsi\tnilai\tkategori\nKota Surabaya\tJawa Timur\t125\tContoh tinggi\nKota Denpasar\tBali\t77\tContoh sedang\n";
+    el.csvFile.value = "";
+    setWorkflowStage("input", false);
+    await previewCsv();
+    setWorkflowStage("match", true);
   }
 
   function toggleSidebar() {
@@ -312,6 +381,18 @@
     el.categoryInput.value = state.highlights[p.region_id]?.category || "";
     el.valueInput.value = state.highlights[p.region_id]?.value || "";
     if (state.highlights[p.region_id]) el.colorPicker.value = state.highlights[p.region_id].color;
+    selectDataRowForFeature(p.region_id);
+  }
+
+  function selectDataRowForFeature(regionId) {
+    const row = state.importRows.find((item) => item.matchedId === regionId);
+    if (!row) {
+      if (el.mapSelectionStatus) el.mapSelectionStatus.textContent = "Wilayah dipilih dari peta; belum ada baris data yang cocok.";
+      return;
+    }
+    state.selectedDataRow = row.rowId;
+    renderDataTable();
+    if (el.mapSelectionStatus) el.mapSelectionStatus.textContent = `Baris ${row.rowNumber} dipilih dari peta.`;
   }
 
   function applySelectedColor() {
@@ -361,6 +442,8 @@
     renderGroupingEditor();
     renderLegendEditor(false);
     refreshMapLegend();
+    if (Object.keys(state.highlights).length && state.workflowStage === "match") state.workflowStage = "visualize";
+    renderWorkflow();
     scheduleSave();
   }
 
@@ -591,6 +674,7 @@
       renderImportMapping();
       renderCsvPreview();
       el.applyCsvBtn.disabled = !pendingCsv.valid.length;
+      setWorkflowStage("match", false);
     } catch (error) {
       showError(error.message);
     } finally {
@@ -627,6 +711,7 @@
     el.importMapping.innerHTML = "";
     el.csvPreview.innerHTML = "";
     el.applyCsvBtn.disabled = true;
+    if (!state.importRows.length) setWorkflowStage("input", false);
   }
 
   function renderXlsxSheetChooser() {
@@ -779,8 +864,73 @@
         value: item.record.numericValue
       };
     });
+    state.importRows = pendingCsv.all.map((item) => ({
+      rowId: item.rowId,
+      rowNumber: item.rowNumber,
+      record: Object.assign({}, item.record),
+      matchedId: item.matched ? item.matched.id : null,
+      matchedName: item.matched ? displayName(item.matched.feature) : "",
+      matchStatus: item.matchStatus || "unmatched",
+      errors: item.errors.slice(0, 4),
+      warnings: item.warnings.slice(0, 4)
+    }));
+    el.dataTablePanel.hidden = false;
+    state.selectedDataRow = null;
+    el.dataTableFilter.value = "";
+    el.dataTableSort.value = "row";
     updateAfterHighlightChange();
+    renderDataTable();
+    setWorkflowStage("visualize", false);
     el.csvPreview.insertAdjacentHTML("afterbegin", `<p class="status-line">${pendingCsv.valid.length} baris diterapkan.</p>`);
+  }
+
+  function renderDataTable() {
+    if (!el.dataTable || !state.importRows.length) {
+      if (el.dataTablePanel) el.dataTablePanel.hidden = !state.importRows.length;
+      return;
+    }
+    el.dataTablePanel.hidden = false;
+    const query = String(el.dataTableFilter.value || "").trim().toLocaleUpperCase("id-ID");
+    const sort = el.dataTableSort.value;
+    const rows = state.importRows.filter((item) => {
+      if (!query) return true;
+      const haystack = [item.record.regionName, item.record.province, item.record.regionCode, item.record.category, item.record.numericValue, item.matchedName].join(" ").toLocaleUpperCase("id-ID");
+      return haystack.includes(query);
+    }).sort((a, b) => {
+      if (sort === "region") return (a.matchedName || a.record.regionName).localeCompare(b.matchedName || b.record.regionName, "id");
+      if (sort === "status") return a.matchStatus.localeCompare(b.matchStatus, "id") || a.rowNumber - b.rowNumber;
+      if (sort === "value") return Number.parseFloat(a.record.numericValue) - Number.parseFloat(b.record.numericValue) || a.rowNumber - b.rowNumber;
+      return a.rowNumber - b.rowNumber;
+    });
+    const visible = rows.slice(0, 200);
+    el.dataTableCount.textContent = `${rows.length}${rows.length > 200 ? "+" : ""}`;
+    el.dataTableEmpty.textContent = rows.length > 200 ? `Menampilkan 200 dari ${rows.length} baris untuk menjaga kelancaran. Gunakan pencarian untuk menemukan baris lain.` : (rows.length ? "" : "Tidak ada baris yang cocok dengan pencarian.");
+    el.dataTableEmpty.hidden = rows.length > 0 && rows.length <= 200;
+    el.dataTable.querySelector("tbody").innerHTML = visible.map((item) => {
+      const selected = item.rowId === state.selectedDataRow ? " selected" : "";
+      const issue = item.errors.length ? " issue" : (item.matchedId ? " ready" : "");
+      const status = item.errors.length ? item.errors[0] : (item.matchStatus || "-");
+      return `<tr tabindex="0" class="${selected}${item.matchedId ? "" : " unmatched"}" data-table-row="${escapeAttr(item.rowId)}" aria-selected="${item.rowId === state.selectedDataRow ? "true" : "false"}"><td>${item.rowNumber}</td><td>${escapeHtml(item.record.regionName || item.record.regionCode || "-")}</td><td>${escapeHtml(item.record.province || "-")}</td><td>${escapeHtml(item.matchedName || "Belum terhubung")}</td><td>${escapeHtml(item.record.numericValue || item.record.category || "-")}</td><td><span class="status-chip${issue}">${escapeHtml(status)}</span></td></tr>`;
+    }).join("");
+    el.dataTable.querySelectorAll("[data-table-row]").forEach((row) => {
+      row.addEventListener("click", () => selectDataRow(row.dataset.tableRow));
+      row.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectDataRow(row.dataset.tableRow); } });
+    });
+  }
+
+  function selectDataRow(rowId) {
+    const row = state.importRows.find((item) => item.rowId === rowId);
+    if (!row) return;
+    state.selectedDataRow = rowId;
+    if (row.matchedId && state.featureById.has(row.matchedId)) {
+      mapApi.zoomTo(row.matchedId);
+      el.mapSelectionStatus.textContent = `Wilayah ${row.matchedName} dipilih dari baris ${row.rowNumber}.`;
+      el.dataTableAnnouncement.textContent = `Baris ${row.rowNumber}: ${row.matchedName} dipilih di peta.`;
+    } else {
+      el.mapSelectionStatus.textContent = `Baris ${row.rowNumber} belum memiliki wilayah yang cocok.`;
+      el.dataTableAnnouncement.textContent = `Baris ${row.rowNumber} belum memiliki wilayah yang cocok; peta tidak diubah.`;
+    }
+    renderDataTable();
   }
 
   function saveProject() {
@@ -819,8 +969,16 @@
     state.groupNames = project.groupNames || {};
     state.groupMeta = project.groupMeta || {};
     state.importCorrections = project.importCorrections || {};
+    state.workflowStage = project.workflowStage || (Object.keys(state.highlights).length ? "visualize" : "input");
+    state.uiMode = project.uiMode || "basic";
+    state.importRows = Array.isArray(project.importRows) ? project.importRows : [];
+    state.selectedDataRow = null;
     el.projectTitle.value = state.title;
+    setMode(state.uiMode);
     updateAfterHighlightChange();
+    el.dataTablePanel.hidden = !state.importRows.length;
+    renderDataTable();
+    renderWorkflow();
     renderLegendEditor(false);
     updateMigrationReportUi();
   }
