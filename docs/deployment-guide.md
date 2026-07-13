@@ -76,6 +76,16 @@ Remove-Item Env:PLAYWRIGHT_BASE_URL
 
 The workflow records the staging URL in the job summary. It does not contain credential values.
 
+## Cloudflare Direct Builds
+
+If Cloudflare is connected directly to this repository and the dashboard deploy command is:
+
+```text
+npx wrangler deploy
+```
+
+the repository `postinstall` script builds `dist/` during dependency installation before Wrangler runs. Keep `.node-version` and `.nvmrc` pinned to Node 24 so the direct Cloudflare build environment matches the GitHub Actions workflow and local engine requirement.
+
 ## Verification Checklist
 
 - `npm run check` passes.
