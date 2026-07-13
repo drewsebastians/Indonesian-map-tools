@@ -9,14 +9,18 @@
       budget: options.budget
     });
     return validateParsed(parsed, indexes, options.mapping || parsed.mapping, {
-      locale: options.localeOverride || "auto"
+      locale: options.localeOverride || "auto",
+      resolutions: options.resolutions || {}
     });
   }
 
   function validateParsed(parsed, indexes, mapping, options = {}) {
     const roles = Object.assign({}, mapping.roles || {});
     const seenTargets = new Set();
-    const all = parsed.rows.map((rawRow) => {
+    const matchedRows = typeof MatchingEngine !== "undefined" && indexes && indexes.matchingEngine
+      ? MatchingEngine.matchParsedRows(parsed, indexes.matchingEngine, mapping, { resolutions: options.resolutions || {} })
+      : null;
+    const all = parsed.rows.map((rawRow, index) => {
       const record = recordFromRoles(rawRow.cells, roles);
       const rowNumber = rawRow.rowNumber;
       const errors = rawRow.issues.filter((issue) => issue.severity === "error").map((issue) => issue.message);
@@ -33,25 +37,17 @@
         if (numberResult.kind === "ambiguous") warnings.push("Format angka ambigu; pilih locale yang tepat.");
       }
 
-      let matched = null;
-      let ambiguous = [];
-      if (code && indexes.byCode.has(code)) {
-        matched = indexes.byCode.get(code);
-      } else if (record.province && record.regionName) {
-        const key = ImportCore.normalizeText(record.province) + "|" + ImportCore.normalizeText(record.regionName);
-        const candidates = indexes.byProvinceName.get(key) || [];
-        if (candidates.length === 1) matched = candidates[0];
-        if (candidates.length > 1) ambiguous = candidates;
-      } else if (record.regionName && indexes.byName) {
-        const candidates = indexes.byName.get(ImportCore.normalizeText(record.regionName)) || [];
-        if (candidates.length === 1) matched = candidates[0];
-        if (candidates.length > 1) ambiguous = candidates;
+      const match = matchedRows ? matchedRows[index] : legacyMatch(record, rawRow, indexes, seenTargets, errors);
+      const matched = match && match.matched ? { id: match.matched.id, feature: match.matched.feature } : null;
+      const ambiguous = match && match.candidates ? match.candidates : [];
+      if (match) {
+        if (match.status === "ambiguous") errors.push("Nama wilayah ambigu; pilih kandidat atau tambahkan kode/provinsi yang lebih spesifik.");
+        if (match.status === "unmatched") errors.push("Wilayah tidak ditemukan.");
+        if (match.status === "invalid") errors.push("Baris tidak valid.");
+        if (match.status === "duplicate-target") errors.push("Duplikat target wilayah; pilih satu nilai atau abaikan salah satu baris.");
+        if (match.status === "ignored") warnings.push("Baris diabaikan.");
       }
-      if (!matched && !ambiguous.length && !errors.length) errors.push("Wilayah tidak ditemukan.");
-      if (ambiguous.length) errors.push("Nama wilayah ambigu; gunakan kode wilayah atau provinsi yang lebih spesifik.");
-      if (matched && seenTargets.has(matched.id)) errors.push("Duplikat wilayah dalam input.");
-      if (matched) seenTargets.add(matched.id);
-      return { rowId: rawRow.rowId, rowNumber, record, matched, ambiguous, errors, warnings, color, numberResult };
+      return { rowId: rawRow.rowId, rowNumber, record, matched, ambiguous, errors, warnings, color, numberResult, matchStatus: match && match.status, matchEvidence: match && match.evidence, candidates: ambiguous };
     });
     return {
       contractVersion: "batch2.importPreview.v1",
@@ -64,6 +60,29 @@
       warning: all.filter((row) => row.warnings.length && !row.errors.length),
       all
     };
+  }
+
+  function legacyMatch(record, rawRow, indexes, seenTargets, errors) {
+    const code = ImportCore.normalizeCode(record.regionCode);
+    let matched = null;
+    let ambiguous = [];
+    if (code && indexes.byCode.has(code)) {
+      matched = indexes.byCode.get(code);
+    } else if (record.province && record.regionName) {
+      const key = ImportCore.normalizeText(record.province) + "|" + ImportCore.normalizeText(record.regionName);
+      const candidates = indexes.byProvinceName.get(key) || [];
+      if (candidates.length === 1) matched = candidates[0];
+      if (candidates.length > 1) ambiguous = candidates;
+    } else if (record.regionName && indexes.byName) {
+      const candidates = indexes.byName.get(ImportCore.normalizeText(record.regionName)) || [];
+      if (candidates.length === 1) matched = candidates[0];
+      if (candidates.length > 1) ambiguous = candidates;
+    }
+    if (!matched && !ambiguous.length && !errors.length) return { status: "unmatched", matched: null, candidates: [], evidence: {} };
+    if (ambiguous.length) return { status: "ambiguous", matched: null, candidates: ambiguous, evidence: {} };
+    if (matched && seenTargets.has(matched.id)) return { status: "duplicate-target", matched, candidates: [], evidence: {} };
+    if (matched) seenTargets.add(matched.id);
+    return { status: "exact-code", matched, candidates: [], evidence: {} };
   }
 
   function recordFromRoles(cells, roles) {

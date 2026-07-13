@@ -116,11 +116,11 @@ function writeSyntheticXlsx(filePath) {
       name: "xl/worksheets/sheet1.xml",
       content: `<?xml version="1.0" encoding="UTF-8"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <dimension ref="A1:B3"/>
+  <dimension ref="A1:C3"/>
   <sheetData>
-    <row r="1"><c r="A1" t="inlineStr"><is><t>wilayah</t></is></c><c r="B1" t="inlineStr"><is><t>nilai</t></is></c></row>
-    <row r="2"><c r="A2" t="inlineStr"><is><t>Kota Surabaya</t></is></c><c r="B2"><v>125</v></c></row>
-    <row r="3"><c r="A3" t="inlineStr"><is><t>Kota Denpasar</t></is></c><c r="B3"><v>0</v></c></row>
+    <row r="1"><c r="A1" t="inlineStr"><is><t>wilayah</t></is></c><c r="B1" t="inlineStr"><is><t>provinsi</t></is></c><c r="C1" t="inlineStr"><is><t>nilai</t></is></c></row>
+    <row r="2"><c r="A2" t="inlineStr"><is><t>Kota Surabaya</t></is></c><c r="B2" t="inlineStr"><is><t>Jawa Timur</t></is></c><c r="C2"><v>125</v></c></row>
+    <row r="3"><c r="A3" t="inlineStr"><is><t>Kota Denpasar</t></is></c><c r="B3" t="inlineStr"><is><t>Bali</t></is></c><c r="C3"><v>0</v></c></row>
   </sheetData>
 </worksheet>`
     },
@@ -128,10 +128,10 @@ function writeSyntheticXlsx(filePath) {
       name: "xl/worksheets/sheet2.xml",
       content: `<?xml version="1.0" encoding="UTF-8"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <dimension ref="A1:B2"/>
+  <dimension ref="A1:C2"/>
   <sheetData>
-    <row r="1"><c r="A1" t="inlineStr"><is><t>wilayah</t></is></c><c r="B1" t="inlineStr"><is><t>nilai</t></is></c></row>
-    <row r="2"><c r="A2" t="inlineStr"><is><t>Kota Denpasar</t></is></c><c r="B2"><v>77</v></c></row>
+    <row r="1"><c r="A1" t="inlineStr"><is><t>wilayah</t></is></c><c r="B1" t="inlineStr"><is><t>provinsi</t></is></c><c r="C1" t="inlineStr"><is><t>nilai</t></is></c></row>
+    <row r="2"><c r="A2" t="inlineStr"><is><t>Kota Denpasar</t></is></c><c r="B2" t="inlineStr"><is><t>Bali</t></is></c><c r="C2"><v>77</v></c></row>
   </sheetData>
 </worksheet>`
     }
@@ -299,16 +299,37 @@ test("paste import previews mapping and waits for explicit apply", async ({ page
   await page.goto("/");
   await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
 
-  await page.locator("#importPaste").fill("wilayah\tnilai\nKota Surabaya\t125\nKota Denpasar\t0\n");
+  await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t0\n");
   await page.locator("#previewCsvBtn").click();
   await expect(page.locator("#importMapping")).toContainText("Paste lokal");
   await expect(page.locator("#map-regionName")).toHaveValue("wilayah");
+  await expect(page.locator("#map-province")).toHaveValue("provinsi");
   await expect(page.locator("#map-numericValue")).toHaveValue("nilai");
   await expect(page.locator("#csvPreview")).toContainText("2");
   await expect(page.locator("#highlightCount")).toHaveText("0");
 
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("2");
+});
+
+test("ambiguous import row can be resolved locally before apply", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+
+  await page.locator("#importPaste").fill("wilayah\tnilai\nBandung\t50\n");
+  await page.locator("#previewCsvBtn").click();
+  await expect(page.locator("#csvPreview")).toContainText("ambiguous");
+  await expect(page.locator("#applyCsvBtn")).toBeDisabled();
+
+  const candidateSelect = page.locator("[data-candidate-for]").first();
+  await expect(candidateSelect).toBeVisible();
+  await candidateSelect.selectOption({ index: 1 });
+  await page.locator("[data-resolve-row]").first().click();
+  await expect(page.locator("#csvPreview")).toContainText("user-resolved");
+  await expect(page.locator("#applyCsvBtn")).toBeEnabled();
+
+  await page.locator("#applyCsvBtn").click();
+  await expect(page.locator("#highlightCount")).toHaveText("1");
 });
 
 test("XLSX import lazy-loads parser and uses the shared preview pipeline", async ({ page }, testInfo) => {

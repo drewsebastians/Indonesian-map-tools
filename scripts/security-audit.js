@@ -50,6 +50,7 @@ function scanRuntimeExternalRequests() {
     "index.html",
     "assets/js/import-core.js",
     "assets/js/xlsx-import.js",
+    "assets/js/matching-engine.js",
     "assets/js/app.js",
     "assets/js/map.js",
     "assets/js/export.js",

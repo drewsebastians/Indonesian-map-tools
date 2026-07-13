@@ -175,6 +175,19 @@
         value: String(meta.value || "").slice(0, 80)
       };
     });
+    const importCorrections = {};
+    Object.entries(raw.importCorrections || {}).slice(0, 5000).forEach(([rowId, correction]) => {
+      if (!correction || typeof correction !== "object") return;
+      const action = String(correction.action || "");
+      if (!["resolve", "ignore"].includes(action)) return;
+      if (correction.registryVersion && correction.registryVersion !== REGISTRY_VERSION) return;
+      importCorrections[String(rowId).slice(0, 120)] = {
+        action,
+        targetId: String(correction.targetId || "").slice(0, 120),
+        registryVersion: REGISTRY_VERSION,
+        decidedAt: String(correction.decidedAt || "").slice(0, 40)
+      };
+    });
     return {
       appVersion: APP_VERSION,
       schemaVersion: PROJECT_SCHEMA,
@@ -190,6 +203,7 @@
       legendPosition: String(raw.legendPosition || "bottom-right"),
       groupNames,
       groupMeta,
+      importCorrections,
       exportSettings: raw.exportSettings || {},
       migrationReport: finalizeMigrationReport(migrationReport),
       savedAt: raw.savedAt || new Date().toISOString()
@@ -229,6 +243,7 @@
       legendPosition: state.legendPosition,
       groupNames: state.groupNames || {},
       groupMeta: state.groupMeta || {},
+      importCorrections: state.importCorrections || {},
       exportSettings: state.exportSettings || {},
       migrationReport: state.migrationReport || null,
       savedAt: new Date().toISOString()

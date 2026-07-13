@@ -94,6 +94,9 @@ test("buildProject stores schema, boundary, registry, and canonical region refer
     legendPosition: "bottom-right",
     groupNames: {},
     groupMeta: {},
+    importCorrections: {
+      row_1: { action: "resolve", targetId: "known-id", registryVersion: storage.REGISTRY_VERSION, decidedAt: "2026-07-13T00:00:00.000Z" }
+    },
     exportSettings: {}
   }, storage.createRegionAdapter(features));
 
@@ -101,6 +104,22 @@ test("buildProject stores schema, boundary, registry, and canonical region refer
   assert.equal(project.boundaryVersion, "IDN-ADM2-2020-geoboundaries-22746128");
   assert.equal(project.registryVersion, "IDN-ADM-REGISTRY-v1-2025-06-23");
   assert.equal(project.regionRefs["known-id"].legacyRegionId, "known-id");
+  assert.equal(project.importCorrections.row_1.targetId, "known-id");
+});
+
+test("sanitizeProject keeps only registry-current import corrections", () => {
+  const storage = loadProjectStorage();
+  const project = storage.sanitizeProject({
+    schemaVersion: "1.1",
+    highlights: {},
+    importCorrections: {
+      current: { action: "ignore", registryVersion: storage.REGISTRY_VERSION, decidedAt: "2026-07-13T00:00:00.000Z" },
+      stale: { action: "resolve", targetId: "known-id", registryVersion: "old" }
+    }
+  }, storage.createRegionAdapter([sampleFeature()]));
+
+  assert.deepEqual(Object.keys(project.importCorrections), ["current"]);
+  assert.equal(project.importCorrections.current.action, "ignore");
 });
 
 test("loadAutosave migrates legacy autosave through the same safe path", () => {

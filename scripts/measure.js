@@ -27,7 +27,8 @@ const runtimeFiles = [
 
 const onDemandFiles = [
   "data/indonesia-adm2-detailed.geojson",
-  "assets/vendor/read-excel-file/read-excel-file.min.js"
+  "assets/vendor/read-excel-file/read-excel-file.min.js",
+  "assets/js/matching-engine.js"
 ];
 
 const productionFiles = [

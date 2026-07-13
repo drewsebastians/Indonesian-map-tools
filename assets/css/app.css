@@ -483,6 +483,16 @@ summary {
   vertical-align: top;
 }
 
+.resolution-tools {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.resolution-tools button {
+  min-height: 32px;
+}
+
 .tag {
   display: inline-block;
   border-radius: 999px;

@@ -21,6 +21,7 @@
     legendPosition: "bottom-right",
     groupNames: {},
     groupMeta: {},
+    importCorrections: {},
     exportSettings: {},
     unresolvedHighlights: {},
     migrationReport: null,
@@ -32,6 +33,7 @@
   let pendingCsv = null;
   let pendingXlsx = null;
   let pendingImportSignal = null;
+  let matchingEnginePromise = null;
 
   const el = {};
   document.addEventListener("DOMContentLoaded", init);
@@ -529,7 +531,12 @@
         byProvinceName.get(key).push({ id: p.region_id, feature });
       }
     });
-    return { byCode, byProvinceName, byName };
+    return {
+      byCode,
+      byProvinceName,
+      byName,
+      matchingEngine: typeof MatchingEngine !== "undefined" ? MatchingEngine.buildIndexes(state.features) : null
+    };
   }
 
   async function readImportSource() {
@@ -557,6 +564,7 @@
       pendingImportSignal = { canceled: false };
       el.previewCsvBtn.disabled = true;
       el.previewCsvBtn.textContent = "Membaca...";
+      await ensureMatchingEngine();
       const source = await readImportSource();
       if (source.sourceType === "xlsx") {
         pendingXlsx = await XlsxImport.parseFile(source.file, {
@@ -565,7 +573,8 @@
           signal: pendingImportSignal
         });
         pendingCsv = CsvImport.validateParsed(pendingXlsx.parsed, buildIndexes(), pendingXlsx.parsed.mapping, {
-          locale: el.importLocale.value
+          locale: el.importLocale.value,
+          resolutions: state.importCorrections
         });
         renderXlsxSheetChooser();
       } else {
@@ -575,7 +584,8 @@
           sourceType: source.sourceType,
           sourceLabel: source.sourceLabel,
           delimiterOverride: el.importDelimiter.value,
-          localeOverride: el.importLocale.value
+          localeOverride: el.importLocale.value,
+          resolutions: state.importCorrections
         });
       }
       renderImportMapping();
@@ -587,6 +597,21 @@
       el.previewCsvBtn.disabled = false;
       el.previewCsvBtn.textContent = "Pratinjau Import";
     }
+  }
+
+  function ensureMatchingEngine() {
+    if (typeof MatchingEngine !== "undefined") return Promise.resolve(MatchingEngine);
+    if (matchingEnginePromise) return matchingEnginePromise;
+    matchingEnginePromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "./assets/js/matching-engine.js";
+      script.async = true;
+      script.dataset.lazyMatchingEngine = "true";
+      script.onload = () => typeof MatchingEngine !== "undefined" ? resolve(MatchingEngine) : reject(new Error("Matching engine gagal dimuat."));
+      script.onerror = () => reject(new Error("Matching engine gagal dimuat."));
+      document.head.appendChild(script);
+    });
+    return matchingEnginePromise;
   }
 
   function cancelImport() {
@@ -643,7 +668,8 @@
   function rerenderImportPreviewFromMapping() {
     if (!pendingCsv) return;
     pendingCsv = CsvImport.validateParsed(pendingCsv.parsed, buildIndexes(), buildMappingFromControls(), {
-      locale: el.importLocale.value
+      locale: el.importLocale.value,
+      resolutions: state.importCorrections
     });
     renderCsvPreview();
     el.applyCsvBtn.disabled = !pendingCsv.valid.length;
@@ -688,12 +714,59 @@
     const rows = pendingCsv.all.slice(0, 30).map((item) => {
       const status = item.errors.length ? item.errors.join("; ") : (item.warnings.length ? item.warnings.join("; ") : "Siap diterapkan");
       const target = item.matched ? displayName(item.matched.feature) : "-";
-      return `<tr><td>${item.rowNumber}</td><td>${escapeHtml(target)}</td><td>${escapeHtml(item.record.numericValue || "")}</td><td>${escapeHtml(item.record.category || "")}</td><td>${escapeHtml(status)}</td></tr>`;
+      const resolution = renderResolutionControls(item);
+      return `<tr><td>${item.rowNumber}</td><td>${escapeHtml(target)}${resolution}</td><td>${escapeHtml(item.record.numericValue || "")}</td><td>${escapeHtml(item.record.category || "")}</td><td>${escapeHtml(item.matchStatus || "")}<br>${escapeHtml(status)}</td></tr>`;
     }).join("");
     const errorButton = pendingCsv.invalid.length ? `<button type="button" class="secondary" id="downloadCsvErrors">Unduh laporan error</button>` : "";
-    el.csvPreview.innerHTML = `<div class="preview-block"><strong>${pendingCsv.valid.length}</strong> valid, <strong>${pendingCsv.warning.length}</strong> peringatan, <strong>${pendingCsv.invalid.length}</strong> perlu diperiksa.${errorButton}<table class="preview-table"><thead><tr><th>Baris</th><th>Wilayah</th><th>Nilai</th><th>Kategori</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const unresolved = pendingCsv.all.filter((item) => ["ambiguous", "unmatched", "duplicate-target", "invalid"].includes(item.matchStatus)).length;
+    el.csvPreview.innerHTML = `<div class="preview-block"><strong>${pendingCsv.valid.length}</strong> valid, <strong>${pendingCsv.warning.length}</strong> peringatan, <strong>${pendingCsv.invalid.length}</strong> perlu diperiksa, <strong>${unresolved}</strong> unresolved.${errorButton}<table class="preview-table"><thead><tr><th>Baris</th><th>Wilayah</th><th>Nilai</th><th>Kategori</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     const button = document.getElementById("downloadCsvErrors");
     if (button) button.addEventListener("click", () => downloadText("laporan-error-impor.csv", CsvImport.buildErrorCsv(pendingCsv), "text/csv"));
+    el.csvPreview.querySelectorAll("[data-resolve-row]").forEach((button) => button.addEventListener("click", resolveImportRow));
+    el.csvPreview.querySelectorAll("[data-ignore-row]").forEach((button) => button.addEventListener("click", ignoreImportRow));
+    el.csvPreview.querySelectorAll("[data-reset-row]").forEach((button) => button.addEventListener("click", resetImportRow));
+  }
+
+  function renderResolutionControls(item) {
+    if (!["ambiguous", "unmatched", "duplicate-target", "ignored", "user-resolved"].includes(item.matchStatus)) return "";
+    const candidates = (item.candidates || []).map((candidate) => {
+      const label = `${candidate.displayName} - ${candidate.province || "provinsi tidak tersedia"}${candidate.officialCode ? " - " + candidate.officialCode : ""}`;
+      return `<option value="${escapeAttr(candidate.id)}">${escapeHtml(label)}</option>`;
+    }).join("");
+    const select = candidates ? `<select aria-label="Kandidat baris ${item.rowNumber}" data-candidate-for="${escapeAttr(item.rowId)}"><option value="">Pilih kandidat</option>${candidates}</select><button type="button" class="secondary" data-resolve-row="${escapeAttr(item.rowId)}">Resolve</button>` : "";
+    return `<div class="resolution-tools">${select}<button type="button" class="secondary" data-ignore-row="${escapeAttr(item.rowId)}">Abaikan</button><button type="button" class="secondary" data-reset-row="${escapeAttr(item.rowId)}">Reset</button></div>`;
+  }
+
+  function resolveImportRow(event) {
+    const rowId = event.currentTarget.dataset.resolveRow;
+    const select = el.csvPreview.querySelector(`[data-candidate-for="${CSS.escape(rowId)}"]`);
+    const targetId = select && select.value;
+    if (!rowId || !targetId) return showError("Pilih kandidat wilayah terlebih dahulu.");
+    state.importCorrections[rowId] = {
+      action: "resolve",
+      targetId,
+      registryVersion: MatchingEngine.REGISTRY_VERSION,
+      decidedAt: new Date().toISOString()
+    };
+    rerenderImportPreviewFromMapping();
+  }
+
+  function ignoreImportRow(event) {
+    const rowId = event.currentTarget.dataset.ignoreRow;
+    if (!rowId) return;
+    state.importCorrections[rowId] = {
+      action: "ignore",
+      registryVersion: MatchingEngine.REGISTRY_VERSION,
+      decidedAt: new Date().toISOString()
+    };
+    rerenderImportPreviewFromMapping();
+  }
+
+  function resetImportRow(event) {
+    const rowId = event.currentTarget.dataset.resetRow;
+    if (!rowId) return;
+    delete state.importCorrections[rowId];
+    rerenderImportPreviewFromMapping();
   }
 
   function applyCsv() {
@@ -745,6 +818,7 @@
     state.legendPosition = project.legendPosition;
     state.groupNames = project.groupNames || {};
     state.groupMeta = project.groupMeta || {};
+    state.importCorrections = project.importCorrections || {};
     el.projectTitle.value = state.title;
     updateAfterHighlightChange();
     renderLegendEditor(false);
