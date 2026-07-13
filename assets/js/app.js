@@ -29,6 +29,7 @@
     uiMode: "basic",
     importRows: [],
     selectedDataRow: null,
+    visualization: null,
     highDetailCollection: null,
     highDetailFeatureById: new Map(),
     undo: []
@@ -38,6 +39,7 @@
   let pendingXlsx = null;
   let pendingImportSignal = null;
   let matchingEnginePromise = null;
+  let visualizationEnginePromise = null;
 
   const el = {};
   document.addEventListener("DOMContentLoaded", init);
@@ -53,11 +55,13 @@
       "migrationReportBtn", "dataTruthBadge",
       "exportRatio", "exportLabels", "transparentBg", "exportHighDetail", "pngSize", "exportSvgBtn", "exportPngBtn",
       "fitIndonesiaBtn", "loadingIndicator", "errorArea", "appShell", "controlPanel", "sidebarToggleBtn", "floatingExportBtn",
-      "workflowSteps", "workflowStatus", "basicModeBtn", "advancedModeBtn", "exampleBtn", "advancedImportOptions", "dataTablePanel", "dataTable", "dataTableFilter", "dataTableSort", "dataTableCount", "dataTableEmpty", "dataTableAnnouncement", "mapSelectionStatus"
+      "workflowSteps", "workflowStatus", "basicModeBtn", "advancedModeBtn", "exampleBtn", "advancedImportOptions", "dataTablePanel", "dataTable", "dataTableFilter", "dataTableSort", "dataTableCount", "dataTableEmpty", "dataTableAnnouncement", "mapSelectionStatus",
+      "vizMode", "vizClasses", "vizPalette", "vizReverse", "vizCenter", "vizBreaks", "vizNumberFormat", "vizPreviewBtn", "vizApplyBtn", "vizSummary", "vizLegendPreview"
     ].forEach((id) => { el[id] = document.getElementById(id); });
     mapApi = IndonesiaMap.createMap("map", { onSelect: handleFeatureSelected });
     setupEvents();
     setupColors();
+    setupVisualizationControls();
     renderWorkflow();
     setMode("basic");
     loadData();
@@ -68,6 +72,9 @@
     el.basicModeBtn.addEventListener("click", () => setMode("basic"));
     el.advancedModeBtn.addEventListener("click", () => setMode("advanced"));
     el.exampleBtn.addEventListener("click", useExample);
+    el.vizPreviewBtn.addEventListener("click", previewVisualization);
+    el.vizApplyBtn.addEventListener("click", applyVisualization);
+    [el.vizMode, el.vizClasses, el.vizPalette, el.vizReverse, el.vizCenter, el.vizBreaks, el.vizNumberFormat].forEach((input) => input.addEventListener("change", () => { updateVisualizationControlVisibility(); if (pendingVisualization) previewVisualization(); }));
     el.searchInput.addEventListener("input", renderSearch);
     el.provinceSelect.addEventListener("change", handleProvinceChange);
     el.regionSelect.addEventListener("change", () => selectRegion(el.regionSelect.value, true));
@@ -101,6 +108,93 @@
       if (button) setWorkflowStage(button.dataset.workflowStage, true);
     });
     window.addEventListener("resize", () => mapApi.invalidate());
+  }
+
+  let pendingVisualization = null;
+
+  function setupVisualizationControls() {
+    if (!el.vizPalette) return;
+    el.vizPalette.innerHTML = `<option value="safe-default">Kualitatif aman warna</option><option value="blue">Biru berurutan</option><option value="blue-orange">Biru–oranye divergen</option>`;
+    updateVisualizationControlVisibility();
+  }
+
+  function updateVisualizationControlVisibility() {
+    const method = el.vizMode && el.vizMode.value;
+    const centerLabel = document.querySelector("label[for='vizCenter']");
+    const center = el.vizCenter;
+    const breaksLabel = document.querySelector("label[for='vizBreaks']");
+    const breaks = el.vizBreaks;
+    if (centerLabel) centerLabel.hidden = method !== "diverging";
+    if (center) center.hidden = method !== "diverging";
+    if (breaksLabel) breaksLabel.hidden = method !== "manual";
+    if (breaks) breaks.hidden = method !== "manual";
+  }
+
+  function buildVisualizationOptions() {
+    updateVisualizationControlVisibility();
+    const method = el.vizMode.value;
+    return {
+      method,
+      classes: Number(el.vizClasses.value),
+      palette: el.vizPalette.value,
+      reverse: el.vizReverse.checked,
+      center: el.vizCenter.value === "" ? 0 : Number(el.vizCenter.value),
+      breaks: el.vizBreaks.value,
+      numberFormat: el.vizNumberFormat.value
+    };
+  }
+
+  async function previewVisualization() {
+    if (!state.importRows.length) return showError("Terapkan data yang valid sebelum membuat visualisasi.");
+    try {
+      await ensureVisualizationEngine();
+      pendingVisualization = VisualizationEngine.classify(state.importRows, buildVisualizationOptions());
+      el.vizApplyBtn.disabled = false;
+      el.vizSummary.innerHTML = `<span>${pendingVisualization.method}: ${Object.keys(pendingVisualization.assignments).length} wilayah berwarna, ${pendingVisualization.noData.length} tidak ada data.</span>${pendingVisualization.warnings.map((warning) => `<span class="status-line">${escapeHtml(warning)}</span>`).join("")}`;
+      el.vizLegendPreview.innerHTML = pendingVisualization.legend.map((item) => `<div class="legend-item"><span class="color-chip" style="background:${escapeAttr(item.color)}"></span><span>${escapeHtml(item.label)}</span></div>`).join("");
+    } catch (error) {
+      pendingVisualization = null;
+      el.vizApplyBtn.disabled = true;
+      el.vizSummary.textContent = error.message;
+      showError(error.message);
+    }
+  }
+
+  function ensureVisualizationEngine() {
+    if (typeof VisualizationEngine !== "undefined") return Promise.resolve(VisualizationEngine);
+    if (visualizationEnginePromise) return visualizationEnginePromise;
+    visualizationEnginePromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "./assets/js/visualization-engine.js";
+      script.async = true;
+      script.dataset.lazyVisualization = "true";
+      script.onload = () => typeof VisualizationEngine !== "undefined" ? resolve(VisualizationEngine) : reject(new Error("Mesin visualisasi gagal dimuat."));
+      script.onerror = () => reject(new Error("Mesin visualisasi gagal dimuat."));
+      document.head.appendChild(script);
+    });
+    return visualizationEnginePromise;
+  }
+
+  function applyVisualization() {
+    if (!pendingVisualization) return previewVisualization();
+    pushUndo();
+    state.visualization = pendingVisualization;
+    const byId = new Map(state.importRows.map((row) => [row.matchedId, row]));
+    Object.entries(pendingVisualization.assignments).forEach(([matchedId, assignment]) => {
+      const row = byId.get(matchedId);
+      if (!row) return;
+      row.color = assignment.color;
+      row.classKey = assignment.classKey;
+      state.highlights[matchedId] = {
+        color: assignment.color,
+        category: row.record.category || "",
+        value: row.record.numericValue || ""
+      };
+    });
+    updateAfterHighlightChange();
+    renderDataTable();
+    el.vizSummary.insertAdjacentHTML("afterbegin", `<span class="status-line">Visualisasi diterapkan. ${Object.keys(pendingVisualization.assignments).length} wilayah diberi warna.</span>`);
+    scheduleSave();
   }
 
   const WORKFLOW = [
@@ -581,6 +675,7 @@
   }
 
   function buildLegendItems() {
+    if (state.visualization && Array.isArray(state.visualization.legend) && state.visualization.legend.length) return state.visualization.legend;
     // Highlighted colors override the manual legend and use the editable group labels.
     const grouped = getColorGroups().map((group) => {
       return {
@@ -874,6 +969,9 @@
       errors: item.errors.slice(0, 4),
       warnings: item.warnings.slice(0, 4)
     }));
+    state.visualization = null;
+    pendingVisualization = null;
+    el.vizApplyBtn.disabled = true;
     el.dataTablePanel.hidden = false;
     state.selectedDataRow = null;
     el.dataTableFilter.value = "";
@@ -972,6 +1070,7 @@
     state.workflowStage = project.workflowStage || (Object.keys(state.highlights).length ? "visualize" : "input");
     state.uiMode = project.uiMode || "basic";
     state.importRows = Array.isArray(project.importRows) ? project.importRows : [];
+    state.visualization = project.visualization || null;
     state.selectedDataRow = null;
     el.projectTitle.value = state.title;
     setMode(state.uiMode);

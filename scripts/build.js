@@ -15,6 +15,7 @@ const requiredFiles = [
   "assets/js/import-core.js",
   "assets/js/xlsx-import.js",
   "assets/js/matching-engine.js",
+  "assets/js/visualization-engine.js",
   "assets/js/csv-import.js",
   "assets/js/export.js",
   "assets/js/map.js",

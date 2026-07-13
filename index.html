@@ -143,6 +143,41 @@
         <div id="csvPreview" class="import-preview"></div>
       </section>
 
+      <section class="panel-section" data-workflow-step="visualize">
+        <h2>Visualisasi dari data</h2>
+        <p class="notice">Pilih metode yang dapat dijelaskan. Nilai kosong atau tidak valid tetap ditampilkan sebagai tidak ada data.</p>
+        <label for="vizMode">Metode pewarnaan</label>
+        <select id="vizMode">
+          <option value="categorical">Kategori</option>
+          <option value="equal-interval">Interval sama</option>
+          <option value="quantile">Kuantil</option>
+          <option value="manual">Batas manual</option>
+          <option value="diverging">Divergen berpusat</option>
+        </select>
+        <label for="vizClasses">Jumlah kelas</label>
+        <input id="vizClasses" type="number" min="2" max="7" value="5" inputmode="numeric">
+        <label for="vizPalette">Palet warna</label>
+        <select id="vizPalette"></select>
+        <label class="check-row"><input id="vizReverse" type="checkbox"> Balik urutan warna</label>
+        <label for="vizCenter">Pusat divergen (opsional)</label>
+        <input id="vizCenter" type="number" step="any" placeholder="0">
+        <label for="vizBreaks">Batas manual (pisahkan koma)</label>
+        <input id="vizBreaks" type="text" placeholder="0, 25, 50, 75">
+        <label for="vizNumberFormat">Format angka legenda</label>
+        <select id="vizNumberFormat">
+          <option value="id-ID">Indonesia</option>
+          <option value="en-US">Internasional</option>
+          <option value="integer">Bilangan bulat</option>
+          <option value="decimal-2">2 angka desimal</option>
+        </select>
+        <div class="button-grid">
+          <button id="vizPreviewBtn" type="button" class="secondary">Pratinjau visualisasi</button>
+          <button id="vizApplyBtn" type="button" disabled>Terapkan visualisasi</button>
+        </div>
+        <div id="vizSummary" class="import-summary" aria-live="polite"></div>
+        <div id="vizLegendPreview" class="legend-editor" aria-live="polite"></div>
+      </section>
+
       <section class="panel-section">
         <h2>Proyek</h2>
         <p id="autosaveStatus" class="status-line">Autosave belum aktif.</p>

@@ -406,3 +406,21 @@ test("mobile layout keeps the map reachable before the control panel", async ({ 
   expect(positions.map).toBeLessThanOrEqual(positions.panel);
   await expect(page.locator("#map")).toBeVisible();
 });
+
+test("deterministic visualization preview applies a shared legend", async ({ page }) => {
+  const requests = [];
+  page.on("request", (request) => requests.push(request.url()));
+  await page.goto("/");
+  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await expect(page.locator("#vizMode")).toBeVisible();
+  await page.locator("#exampleBtn").click();
+  await page.locator("#applyCsvBtn").click();
+  await page.locator("#vizMode").selectOption("equal-interval");
+  await page.locator("#vizClasses").fill("3");
+  await page.locator("#vizPreviewBtn").click();
+  await expect(page.locator("#vizSummary")).toContainText(/wilayah berwarna/i);
+  await expect.poll(() => requests.some((url) => url.includes("visualization-engine.js"))).toBe(true);
+  await page.locator("#vizApplyBtn").click();
+  await expect(page.locator("#map .map-legend")).toContainText(/Legenda|Tidak ada data/i);
+  await expect(page.locator("#dataTable tbody tr").first()).toContainText(/exact|siap/i);
+});

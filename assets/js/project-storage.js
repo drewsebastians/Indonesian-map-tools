@@ -105,9 +105,34 @@
         matchedName: String((row && row.matchedName) || "").slice(0, 180),
         matchStatus: String((row && row.matchStatus) || "unmatched").slice(0, 60),
         errors: Array.isArray(row && row.errors) ? row.errors.slice(0, 4).map((item) => String(item).slice(0, 180)) : [],
-        warnings: Array.isArray(row && row.warnings) ? row.warnings.slice(0, 4).map((item) => String(item).slice(0, 180)) : []
+        warnings: Array.isArray(row && row.warnings) ? row.warnings.slice(0, 4).map((item) => String(item).slice(0, 180)) : [],
+        color: isColor(row && row.color) ? row.color : "",
+        classKey: String((row && row.classKey) || "").slice(0, 80)
       };
     });
+  }
+
+  function sanitizeVisualization(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const allowed = new Set(["categorical", "equal-interval", "quantile", "manual", "diverging"]);
+    if (!allowed.has(String(raw.method))) return null;
+    const legend = Array.isArray(raw.legend) ? raw.legend.slice(0, 40).filter((item) => item && isColor(item.color)).map((item) => ({ label: String(item.label || "Legenda").slice(0, 120), color: item.color, key: String(item.key || "").slice(0, 80) })) : [];
+    const assignments = {};
+    Object.entries(raw.assignments || {}).slice(0, 2000).forEach(([id, item]) => {
+      if (!item || !isColor(item.color)) return;
+      assignments[String(id).slice(0, 120)] = { classKey: String(item.classKey || "").slice(0, 80), color: item.color };
+    });
+    return {
+      version: String(raw.version || "IDN-VIS-v1").slice(0, 40),
+      paletteVersion: String(raw.paletteVersion || "IDN-PALETTE-v1").slice(0, 40),
+      method: String(raw.method),
+      options: raw.options && typeof raw.options === "object" ? { classes: Number(raw.options.classes) || 5, palette: String(raw.options.palette || "").slice(0, 60), reverse: Boolean(raw.options.reverse), center: Number.isFinite(Number(raw.options.center)) ? Number(raw.options.center) : 0, breaks: String(raw.options.breaks || "").slice(0, 200), numberFormat: String(raw.options.numberFormat || "id-ID").slice(0, 30), noDataColor: isColor(raw.options.noDataColor) ? raw.options.noDataColor : "#D9E0E6" } : {},
+      assignments,
+      legend,
+      warnings: Array.isArray(raw.warnings) ? raw.warnings.slice(0, 20).map((item) => String(item).slice(0, 240)) : [],
+      noData: Array.isArray(raw.noData) ? raw.noData.slice(0, 2000).map((item) => String(item).slice(0, 120)) : [],
+      center: Number.isFinite(Number(raw.center)) ? Number(raw.center) : null
+    };
   }
 
   function emptyMigrationReport(fromSchema) {
@@ -232,6 +257,7 @@
       workflowStage: ["input", "match", "visualize", "export"].includes(raw.workflowStage) ? raw.workflowStage : "input",
       uiMode: raw.uiMode === "advanced" ? "advanced" : "basic",
       importRows: sanitizeImportRows(raw.importRows),
+      visualization: sanitizeVisualization(raw.visualization),
       exportSettings: raw.exportSettings || {},
       migrationReport: finalizeMigrationReport(migrationReport),
       savedAt: raw.savedAt || new Date().toISOString()
@@ -275,6 +301,7 @@
       workflowStage: ["input", "match", "visualize", "export"].includes(state.workflowStage) ? state.workflowStage : "input",
       uiMode: state.uiMode === "advanced" ? "advanced" : "basic",
       importRows: sanitizeImportRows(state.importRows),
+      visualization: sanitizeVisualization(state.visualization),
       exportSettings: state.exportSettings || {},
       migrationReport: state.migrationReport || null,
       savedAt: new Date().toISOString()

@@ -51,6 +51,7 @@ function scanRuntimeExternalRequests() {
     "assets/js/import-core.js",
     "assets/js/xlsx-import.js",
     "assets/js/matching-engine.js",
+    "assets/js/visualization-engine.js",
     "assets/js/app.js",
     "assets/js/map.js",
     "assets/js/export.js",
@@ -90,6 +91,7 @@ function scanSafetyControls() {
   assertContains("assets/js/project-storage.js", "File proyek terlalu besar", "project JSON size limits");
   assertContains("assets/js/csv-import.js", "escapeFormula", "CSV formula injection escaping");
   assertContains("assets/js/export.js", "URL.revokeObjectURL", "download object URL cleanup");
+  assertContains("assets/js/visualization-engine.js", "IDN-PALETTE-v1", "versioned local palette registry");
   assertContains("assets/js/app.js", "indonesia-adm2-detailed.geojson", "explicit local detailed geometry path");
   assertContains("assets/js/app.js", "confirm(\"Gunakan geometri detail lokal", "explicit high-detail export confirmation");
 }
