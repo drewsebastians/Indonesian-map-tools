@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "batch3.preflight.v1",
+  "status": "pass",
+  "verifiedAt": "2026-07-13",
+  "verifiedCommit": "323cdc1d6b5939f57a95ca928417b1e8ee6cb481",
+  "stagingUrl": "https://mapnesia.andrew-sebastian91.workers.dev",
+  "checks": [
+    {"id":"clean-install","classification":"pass","command":"pnpm dlx npm@11.6.2 clean-install --ignore-scripts","evidencePaths":["package.json","package-lock.json"],"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"build","classification":"pass","command":"node scripts/build.js","evidencePaths":["scripts/build.js","wrangler.jsonc"],"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"data-license-reproducibility","classification":"pass","command":"node scripts/data-pipeline.js test; npm run data:verify-sources","evidencePaths":["data/source-manifest.json","data/license-manifest.json","artifacts/batch-2/closure.json"],"runHash":"215deb9d81f1ddfe40656dd2191d9ad872646863844971084b756167a4baac61","verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"geometry-stable-ids","classification":"pass","command":"python tests/run_data_tests.py","evidencePaths":["tests/run_data_tests.py","data/canonical-region-registry.json","data/crosswalk.json"],"counts":{"features":519,"canonicalRegions":519,"provinces":38,"ambiguous":53},"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"unit-migration","classification":"pass","command":"node --test --test-isolation=none tests/unit/*.test.js","evidencePaths":["tests/unit"],"passed":31,"failed":0,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"browser-smoke","classification":"pass","command":"node scripts/verify-batch1.js","evidencePaths":["tests/e2e/smoke.spec.js","artifacts/batch-1/first-user-two-column-chromium-desktop.json","artifacts/batch-1/first-user-two-column-chromium-mobile.json","artifacts/batch-1/first-user-two-column-firefox-desktop.json","artifacts/batch-1/first-user-two-column-webkit-desktop.json"],"passed":56,"failed":0,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"trust-content","classification":"pass","command":"node scripts/verify-batch1.js","evidencePaths":["tests/e2e/trust.spec.js","docs/batch-2/08-batch-2-closure.md"],"passed":12,"failed":0,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"accessibility","classification":"pass","command":"node scripts/verify-batch1.js","evidencePaths":["tests/e2e/a11y.spec.js"],"passed":8,"failed":0,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"performance","classification":"pass","command":"node scripts/check-performance-budgets.js","evidencePaths":["artifacts/batch-1/performance-budget-report.json"],"initialGzipBytes":611579,"simplifiedGeometryGzipBytes":518479,"shellJavascriptGzipBytes":81974,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"static-content","classification":"pass","command":"node scripts/check-static-content.js","evidencePaths":["scripts/check-static-content.js","docs/batch-2"],"pages":17,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"security-privacy","classification":"pass","command":"node scripts/security-audit.js","evidencePaths":["scripts/security-audit.js","tests/e2e"],"passed":8,"failed":0,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"staging-live","classification":"pass","command":"node scripts/verify-staging.js https://mapnesia.andrew-sebastian91.workers.dev","evidencePaths":["scripts/verify-staging.js","artifacts/batch-2/closure.json"],"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"first-user-two-column","classification":"pass","command":"playwright test tests/e2e/smoke.spec.js --grep \"two-column official-code\"","evidencePaths":["tests/e2e/smoke.spec.js","artifacts/batch-1/first-user-two-column-chromium-desktop.json","artifacts/batch-1/first-user-two-column-chromium-mobile.json","artifacts/batch-1/first-user-two-column-firefox-desktop.json","artifacts/batch-1/first-user-two-column-webkit-desktop.json","docs/batch-2/08-first-user-manual-protocol.md"],"blockingErrors":0,"verifiedCommit":"323cdc1d6b5939f57a95ca928417b1e8ee6cb481"},
+    {"id":"lint-typecheck","classification":"not-applicable","command":null,"evidencePaths":["package.json"],"reason":"No lint or typecheck scripts are defined."}
+  ],
+  "unresolvedOwnerActions":["Run the existing first-user manual protocol with at least one non-GIS tester on desktop and phone before production/domain rollout."],
+  "batch3RuntimeStarted": false
+}

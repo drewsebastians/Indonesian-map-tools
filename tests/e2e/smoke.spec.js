@@ -499,3 +499,31 @@ test("assisted first-user flow reaches a valid export within five minutes", asyn
   expect(marks.firstExportMs).toBeLessThan(300000);
   expect(errors).toEqual([]);
 });
+
+test("two-column official-code flow reaches a mapping export without ambiguity", async ({ page }, testInfo) => {
+  fs.mkdirSync(artifactDir, { recursive: true });
+  const started = Date.now();
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await page.locator("#importPaste").fill("kode\tnilai\n35.78\t125\n51.71\t77\n");
+  await page.locator("#previewCsvBtn").click();
+  await expect(page.locator("#applyCsvBtn")).toBeEnabled();
+  await page.locator("#applyCsvBtn").click();
+  await expect(page.locator("#highlightCount")).toHaveText("2");
+  const download = page.waitForEvent("download");
+  await page.locator("#exportMappingBtn").click();
+  const mapping = await download;
+  expect(mapping.suggestedFilename()).toMatch(/mapping\.csv$/);
+  const safeProjectName = testInfo.project.name.replace(/[^a-z0-9_-]+/gi, "-");
+  fs.writeFileSync(path.join(artifactDir, `first-user-two-column-${safeProjectName}.json`), `${JSON.stringify({
+    contract: "batch2.first-user-two-column.v1",
+    dataset: "synthetic-official-code-two-column",
+    rows: 2,
+    elapsedMs: Date.now() - started,
+    blockingErrors: 0,
+    pageErrors: errors
+  }, null, 2)}\n`);
+  expect(errors).toEqual([]);
+});

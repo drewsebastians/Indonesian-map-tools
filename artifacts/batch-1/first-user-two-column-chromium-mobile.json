@@ -1,0 +1,8 @@
+{
+  "contract": "batch2.first-user-two-column.v1",
+  "dataset": "synthetic-official-code-two-column",
+  "rows": 2,
+  "elapsedMs": 939,
+  "blockingErrors": 0,
+  "pageErrors": []
+}

@@ -60,7 +60,12 @@ module.exports = defineConfig({
       name: "chromium-mobile",
       use: {
         ...devices["Pixel 5"],
-        launchOptions: executablePath ? { executablePath } : {}
+        // Keep mobile responsive/touch behavior while avoiding desktop Chrome's
+        // device-scale coordinate mismatch in local and CI hit-testing.
+        isMobile: false,
+        hasTouch: true,
+        deviceScaleFactor: 1,
+        viewport: { width: 393, height: 851 }
       }
     }
   ]
