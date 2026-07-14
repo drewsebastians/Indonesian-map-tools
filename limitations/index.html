@@ -1,64 +1,64 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>Batasan Data dan Aplikasi</title>
+  <title>Data and app limitations</title>
   <link rel="stylesheet" href="../assets/css/content.css">
 </head>
 <body>
   <header class="site-header">
-    <nav class="site-inner site-nav" aria-label="Navigasi utama">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
       <a class="brand" href="../">Mapnesia</a>
-      <a href="../about/">Tentang</a>
-      <a href="../sources-licenses/">Sumber & Lisensi</a>
-      <a href="../data-methodology/">Metodologi Data</a>
-      <a href="../limitations/">Batasan</a>
-      <a href="../contact/">Kontak</a>
+      <a href="../about/">About</a>
+      <a href="../sources-licenses/">Sources and licenses</a>
+      <a href="../data-methodology/">Data method</a>
+      <a href="../limitations/">Limitations</a>
+      <a href="../contact/">Contact</a>
     </nav>
   </header>
   <main>
-    <p class="eyebrow">Terakhir ditinjau: 2026-07-12</p>
-    <h1>Batasan data dan aplikasi</h1>
-    <p class="lead">Mapnesia dibuat untuk peta presentasi dan laporan ringan. Peta ini bukan dokumen hukum, bukan sistem GIS resmi, dan bukan klaim batas administrasi terbaru.</p>
+    <p class="eyebrow">Last reviewed: 2026-07-12</p>
+    <h1>Data and app limitations</h1>
+    <p class="lead">Mapnesia is designed for presentation maps and lightweight reports. It is not a legal record, an official mapping system, or a claim about the latest administrative boundaries.</p>
 
     <div class="grid">
       <section class="card">
-        <h2>Snapshot 2020</h2>
-        <p>Geometri memakai snapshot ADM2 2020 dari geoBoundaries/HDX. Struktur provinsi Indonesia saat ini dicatat terpisah dalam registry v1.</p>
+        <h2>2020 boundary snapshot</h2>
+        <p>The map uses 2020 second-level administrative boundaries (ADM2) from geoBoundaries/HDX. Current information about Indonesia's provinces is kept in a separate 2025 region list.</p>
       </section>
       <section class="card">
-        <h2>519 fitur geometri</h2>
-        <p>Angka 519 adalah jumlah fitur pada file geometri, bukan klaim jumlah kabupaten/kota otonom terkini.</p>
+        <h2>519 mapped shapes</h2>
+        <p>The number 519 is the shape count in the boundary file. It is not a claim about the current number of autonomous regencies and cities.</p>
       </section>
       <section class="card">
-        <h2>53 metadata ambigu</h2>
-        <p>Nama wilayah yang tidak bisa dipasangkan secara aman tidak dipaksa. Warnanya tetap bisa digunakan, tetapi metadata resminya perlu review.</p>
+        <h2>53 records need more evidence</h2>
+        <p>Region names are not assigned official information when the match is uncertain. Their shapes can still be colored, but their official details need review.</p>
       </section>
       <section class="card">
-        <h2>Ekspor visual</h2>
-        <p>SVG/PNG memakai proyeksi browser untuk visualisasi, bukan pengukuran presisi atau penetapan batas. PDF saat ini adalah raster, bukan PDF vektor dengan teks selectable.</p>
+        <h2>Visual exports</h2>
+        <p>SVG and PNG exports are for visual use, not precise measurement or legal boundary decisions. The current PDF is a raster image, so its text cannot be selected.</p>
       </section>
     </div>
 
-    <h2>Batasan performa</h2>
-    <p>Startup normal memakai geometri sederhana agar ringan. Ekspor detail memuat file lokal sekitar 10,5 MB hanya setelah dipilih pengguna dan dapat menggunakan memori lebih besar.</p>
+    <h2>Performance limits</h2>
+    <p>The app starts with simplified boundaries to stay responsive. A detailed export loads a local file of about 10.5 MB only after you choose it and may use more memory.</p>
 
-    <h2>Batasan spreadsheet</h2>
-    <p>Mapnesia tidak menggabungkan beberapa baris sumber ke satu wilayah secara otomatis. Baris duplikat harus diselesaikan atau diabaikan pengguna. Guard XLSX membantu membatasi parsing browser, tetapi bukan pemindai malware. Project besar dapat melebihi localStorage; penyimpanan IndexedDB belum tersedia.</p>
+    <h2>Spreadsheet limits</h2>
+    <p>Mapnesia does not silently combine several source rows into one region. You must resolve or ignore duplicate rows. XLSX safety checks limit browser processing but do not scan files for malware. Very large projects can exceed browser storage.</p>
 
-    <h2>Batasan hukum dan lisensi</h2>
-    <p>Atribusi sumber data harus dipertahankan. Teks privacy/terms pada staging adalah draft operasional dan tidak menggantikan nasihat hukum profesional.</p>
+    <h2>Legal and license limits</h2>
+    <p>Keep all required data-source attribution. The staging privacy notice and terms are operational drafts and do not replace professional legal advice.</p>
 
     <div class="button-row">
-      <a class="button" href="../contact/#laporkan-data">Laporkan kesalahan data</a>
-      <a class="button secondary" href="../sources-licenses/">Lihat sumber dan lisensi</a>
+      <a class="button" href="../contact/#laporkan-data">Report a data issue</a>
+      <a class="button secondary" href="../sources-licenses/">View sources and licenses</a>
     </div>
   </main>
   <footer class="site-footer">
     <div class="site-inner">
-      <p class="meta"><a href="../">Map Studio</a> - <a href="../data-methodology/">Metodologi Data</a></p>
+      <p class="meta"><a href="../">Create a map</a> - <a href="../data-methodology/">Data method</a></p>
     </div>
   </footer>
 </body>

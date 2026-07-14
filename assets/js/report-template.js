@@ -10,20 +10,20 @@
 
   function buildReport() {
     const lines = [
-      "Laporan kesalahan data Mapnesia",
+      "Mapnesia data issue report",
       "",
       `App version: ${APP_VERSION}`,
       `Boundary version: ${BOUNDARY_VERSION}`,
       `Registry version: ${REGISTRY_VERSION}`,
-      `Kategori isu: ${value("issueCategory") || "(belum diisi)"}`,
-      `Geometry/legacy region ID: ${value("geometryId") || "(belum diisi)"}`,
-      `Canonical region ID: ${value("canonicalId") || "(belum diisi)"}`,
+      `Issue category: ${value("issueCategory") || "(not provided)"}`,
+      `Boundary/legacy region ID: ${value("geometryId") || "(not provided)"}`,
+      `Canonical region ID: ${value("canonicalId") || "(not provided)"}`,
       "",
-      "Deskripsi:",
-      value("issueDescription") || "(belum diisi)",
+      "Description:",
+      value("issueDescription") || "(not provided)",
       "",
-      "Catatan privasi:",
-      "Template ini tidak otomatis menyertakan isi CSV, isi proyek, nama file, atau data lain dari browser."
+      "Privacy note:",
+      "This template does not automatically include your CSV contents, project contents, file names, or any other browser data."
     ];
     return lines.join("\n");
   }
@@ -36,7 +36,7 @@
   async function copyReport() {
     const report = buildReport();
     await navigator.clipboard.writeText(report);
-    setStatus("Template laporan disalin ke clipboard.");
+    setStatus("The report template was copied to the clipboard.", "copied");
   }
 
   function downloadReport() {
@@ -44,15 +44,17 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "laporan-kesalahan-data-mapnesia.txt";
+    link.download = "mapnesia-data-issue-report.txt";
     link.click();
     URL.revokeObjectURL(url);
-    setStatus("Template laporan diunduh.");
+    setStatus("The report template was downloaded.", "downloaded");
   }
 
-  function setStatus(message) {
+  function setStatus(message, state) {
     const status = document.getElementById("reportStatus");
-    if (status) status.textContent = message;
+    if (!status) return;
+    status.textContent = message;
+    if (state) status.dataset.state = state;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -62,7 +64,7 @@
     });
     const copyButton = document.getElementById("copyReportBtn");
     const downloadButton = document.getElementById("downloadReportBtn");
-    if (copyButton) copyButton.addEventListener("click", () => copyReport().catch(() => setStatus("Clipboard tidak tersedia. Gunakan unduh laporan.")));
+    if (copyButton) copyButton.addEventListener("click", () => copyReport().catch(() => setStatus("The clipboard is not available. Nothing changed. Download the report instead.", "copy-failed")));
     if (downloadButton) downloadButton.addEventListener("click", downloadReport);
     refresh();
   });

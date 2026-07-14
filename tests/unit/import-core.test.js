@@ -57,15 +57,15 @@ test("enforces input limits before expensive import work", () => {
   assert.throws(() => ImportCore.parseTabularInput({
     text: "a,b\n1,2\n3,4",
     budget: { maxTextBytes: 5 }
-  }), /ukuran/);
+  }), /too large/i);
   assert.throws(() => ImportCore.parseTabularInput({
     text: "a,b\n" + "x,y\n".repeat(4),
     budget: { maxRows: 2, maxTextBytes: 1000, maxColumns: 50, maxCells: 100, maxSingleCellLength: 2000 }
-  }), /baris/);
+  }), /too many rows/i);
   assert.throws(() => ImportCore.parseTabularInput({
     text: "a\n" + "x".repeat(2001),
     budget: { maxSingleCellLength: 20, maxTextBytes: 10000, maxRows: 10, maxColumns: 10, maxCells: 100 }
-  }), /panjang/);
+  }), /too long/i);
 });
 
 test("redacts downloadable CSV formula prefixes", () => {

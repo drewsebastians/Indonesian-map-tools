@@ -92,7 +92,7 @@ function checkHeaders() {
 
 function checkPage(relativePath) {
   const html = read(relativePath);
-  if (!/<html lang="id">/i.test(html)) fail(`${relativePath} missing lang=id`);
+  if (!/<html lang="en">/i.test(html)) fail(`${relativePath} missing lang=en`);
   if (!/<main[\s>]/i.test(html)) fail(`${relativePath} missing semantic main`);
   if (!/noindex,nofollow,noarchive/i.test(html)) fail(`${relativePath} missing robots meta`);
   if (!html.includes("assets/css/content.css") && !relativePath.startsWith("guides/")) {

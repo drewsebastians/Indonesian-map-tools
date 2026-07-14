@@ -29,7 +29,7 @@ test("equal interval excludes no-data and handles equal values", () => {
   assert.equal(output.noData.length, 2);
   assert.equal(output.assignments["region-1"].classKey, "0");
   const equal = engine.classify(rows([5, 5, 5]), { method: "equal-interval", classes: 5, palette: "blue" });
-  assert.match(equal.warnings.join(" "), /semua nilai sama/i);
+  assert.match(equal.warnings.join(" "), /all values are the same/i);
   assert.equal(equal.legend.length, 1);
 });
 
@@ -37,13 +37,13 @@ test("quantile keeps tied values together and is row-order independent", () => {
   const engine = loadEngine();
   const a = engine.classify(rows([1, 1, 1, 2, 2, 2]), { method: "quantile", classes: 4, palette: "blue" });
   const b = engine.classify(rows([2, 1, 2, 1, 2, 1]), { method: "quantile", classes: 4, palette: "blue" });
-  assert.ok(a.warnings.some((item) => /berulang|efektif/i.test(item)));
+  assert.ok(a.warnings.some((item) => /repeated values|number of color groups/i.test(item)));
   assert.equal(a.legend.length, b.legend.length);
 });
 
 test("manual breaks reject invalid order and classify boundary inclusively", () => {
   const engine = loadEngine();
-  assert.throws(() => engine.classify(rows([1, 2]), { method: "manual", breaks: "10,10" }), /naik|duplikat/i);
+  assert.throws(() => engine.classify(rows([1, 2]), { method: "manual", breaks: "10,10" }), /unique numbers in increasing order/i);
   const output = engine.classify(rows([-1, 0, 10, 11]), { method: "manual", breaks: "0,10" });
   assert.equal(output.assignments["region-2"].classKey, "0");
   assert.equal(output.assignments["region-3"].classKey, "1");
@@ -55,5 +55,5 @@ test("diverging mode centers zero, uses odd classes, and discloses one-sided dat
   assert.equal(output.options.classes, 4);
   assert.equal(output.assignments["region-2"].classKey, "center");
   const oneSided = engine.classify(rows([1, 2]), { method: "diverging", center: 0, palette: "blue-orange" });
-  assert.ok(oneSided.warnings.some((item) => /satu sisi/i.test(item)));
+  assert.ok(oneSided.warnings.some((item) => /one side of the center/i.test(item)));
 });

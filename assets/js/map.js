@@ -73,7 +73,7 @@
     function labelText(feature) {
       const p = feature.properties || {};
       const item = highlights[p.region_id];
-      const parts = [p.display_name || p.geometry_source_name || p.region_name || "Wilayah"];
+      const parts = [p.display_name || p.geometry_source_name || p.region_name || "Region"];
       if (item && item.category) parts.push(item.category);
       if (item && item.value) parts.push(item.value);
       return parts.join(" - ");
@@ -225,7 +225,7 @@
       if (!visible || !items.length) return;
       const title = document.createElement("div");
       title.className = "map-legend-title";
-      title.textContent = "Legenda";
+      title.textContent = "Legend";
       legendContainer.appendChild(title);
       const list = document.createElement("div");
       list.className = "map-legend-list";

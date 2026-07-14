@@ -1,8 +1,50 @@
 <!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>CSV vs XLSX untuk Data Peta</title><link rel="stylesheet" href="../../assets/css/content.css"></head>
-<body><header class="site-header"><nav class="site-inner site-nav" aria-label="Navigasi utama"><a class="brand" href="../../">Mapnesia</a><a href="../../excel-to-map/">Excel to Map</a><a href="../../privacy/">Privasi</a></nav></header><main>
-<p class="eyebrow">Penulis: Tim Mapnesia · Terakhir ditinjau: 2026-07-13</p><h1>CSV vs XLSX untuk data peta</h1><p class="lead">Keduanya dapat dipakai; pilih format yang paling mudah Anda periksa sebelum impor.</p>
-<div class="grid"><section class="card"><h2>CSV/TSV</h2><p>Ringan, mudah dibagikan, dan biasanya paling cepat untuk tabel satu sheet. CSV memakai koma; TSV memakai tab sehingga nyaman untuk paste dari spreadsheet.</p></section><section class="card"><h2>XLSX</h2><p>Cocok bila Anda memiliki beberapa sheet atau perlu mempertahankan workbook. Mapnesia meminta Anda memilih sheet dan memeriksa struktur ZIP sebelum parser dijalankan.</p></section></div>
-<h2>Praktik aman</h2><ul><li>Gunakan satu baris header dan satu tabel per sheet.</li><li>Jangan gunakan file Excel untuk menjalankan makro; workbook bermakro, objek tertanam, external link, dan format tak didukung akan ditolak.</li><li>Pastikan angka memakai format yang konsisten. Di opsi lanjutan, pilih Indonesia atau Internasional bila deteksi otomatis ambigu.</li></ul>
-<section class="note soft"><h2>Batas pemrosesan</h2><p>Parser browser memiliki batas ukuran, jumlah baris, kolom, sel, dan rasio ZIP untuk menjaga perangkat tetap responsif. Ini adalah safeguard pemrosesan, bukan klaim perlindungan malware.</p></section><div class="button-row"><a class="button" href="../../">Coba impor data</a></div>
-</main><footer class="site-footer"><div class="site-inner"><p class="meta">Draft pratinjau staging; tidak diindeks.</p></div></footer></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>CSV or XLSX for map data?</title>
+  <link rel="stylesheet" href="../../assets/css/content.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
+      <a class="brand" href="../../">Mapnesia</a>
+      <a href="../../excel-to-map/">Excel to map</a>
+      <a href="../../privacy/">Privacy</a>
+    </nav>
+  </header>
+  <main>
+    <p class="eyebrow">By the Mapnesia team · Last reviewed: 2026-07-13</p>
+    <h1>CSV or XLSX for map data?</h1>
+    <p class="lead">Both formats work. Choose the one that is easiest for you to check before adding the data.</p>
+
+    <div class="grid">
+      <section class="card">
+        <h2>CSV or TSV</h2>
+        <p>These formats are lightweight, easy to share, and usually fastest for one table. CSV uses commas. TSV uses tabs, which makes it convenient when you paste data from a spreadsheet.</p>
+      </section>
+      <section class="card">
+        <h2>XLSX</h2>
+        <p>Use XLSX when your workbook has several sheets or you need to keep the workbook format. Mapnesia asks you to choose a sheet and checks the file structure before reading the table.</p>
+      </section>
+    </div>
+
+    <h2>Safe file practices</h2>
+    <ul>
+      <li>Use one header row and one table on each sheet.</li>
+      <li>Do not use the app to run Excel macros. Files with macros, embedded items, external links, or unsupported formats are rejected.</li>
+      <li>Use one number format throughout the file. In Advanced options, choose Indonesian or international number formatting if automatic detection is uncertain.</li>
+    </ul>
+
+    <section class="note soft">
+      <h2>Processing limits</h2>
+      <p>The app limits file size, rows, columns, cells, and compressed-file ratios to keep your device responsive. These checks do not scan a file for malware.</p>
+    </section>
+
+    <div class="button-row"><a class="button" href="../../">Upload spreadsheet</a></div>
+  </main>
+  <footer class="site-footer"><div class="site-inner"><p class="meta">Noindex staging draft.</p></div></footer>
+</body>
+</html>

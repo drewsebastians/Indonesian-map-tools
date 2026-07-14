@@ -176,18 +176,18 @@ test("parseFile supports deterministic sheet selection", async () => {
 
 test("inspectZip rejects macro-bearing workbooks before parser handoff", () => {
   const buffer = makeZip(xlsxXmlFiles([{ name: "xl/vbaProject.bin", content: "macro" }]));
-  assert.throws(() => XlsxImport.inspectZip(buffer), /tidak didukung/i);
+  assert.throws(() => XlsxImport.inspectZip(buffer), /cannot open safely/i);
 });
 
 test("parseFile rejects unsupported workbook extensions", async () => {
   const buffer = makeZip(xlsxXmlFiles());
   await assert.rejects(
     () => XlsxImport.parseFile(fileFromArrayBuffer("contoh.xlsm", buffer), { parser: parserStub }),
-    /Gunakan \.xlsx/
+    /Save the file as \.xlsx/i
   );
 });
 
 test("inspectZip rejects malformed archives", () => {
   const buffer = encoder.encode("not an xlsx").buffer;
-  assert.throws(() => XlsxImport.inspectZip(buffer), /terlalu kecil|bukan ZIP/i);
+  assert.throws(() => XlsxImport.inspectZip(buffer), /incomplete or damaged|not a valid XLSX/i);
 });

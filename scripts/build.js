@@ -79,6 +79,22 @@ fs.mkdirSync(dist, { recursive: true });
 
 requiredFiles.forEach(copyFile);
 
+function bundleProductContent() {
+  const contentPath = path.join(root, "assets/js/product-content.js");
+  if (!fs.existsSync(contentPath)) throw new Error("Required product content source is missing: assets/js/product-content.js");
+  const appPath = path.join(dist, "assets/js/app.js");
+  const indexPath = path.join(dist, "index.html");
+  const productContent = fs.readFileSync(contentPath, "utf8");
+  const app = fs.readFileSync(appPath, "utf8");
+  const index = fs.readFileSync(indexPath, "utf8");
+  const productScript = /\s*<script src="\.\/assets\/js\/product-content\.js"><\/script>/;
+  if (!productScript.test(index)) throw new Error("index.html is missing the product-content script marker required by the build.");
+  fs.writeFileSync(appPath, `${productContent}\n${app}`);
+  fs.writeFileSync(indexPath, index.replace(productScript, ""));
+}
+
+bundleProductContent();
+
 const produced = listFiles(dist).length;
 if (!produced) {
   throw new Error("Build produced no files.");

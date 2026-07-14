@@ -22,14 +22,14 @@
   }
 
   function assertNotCanceled(signal) {
-    if (isCanceled(signal)) throw new Error("Import XLSX dibatalkan.");
+    if (isCanceled(signal)) throw new Error("The XLSX import was canceled. Your current map has not changed. Choose a file when you are ready.");
   }
 
   function safeError(error) {
     const message = String(error && error.message ? error.message : error || "");
-    if (/password|encrypt/i.test(message)) return "Workbook terenkripsi/password-protected tidak didukung.";
-    if (/not found|invalid|zip|archive|unexpected|unsupported|corrupt|truncated/i.test(message)) return "File XLSX rusak atau tidak didukung.";
-    return "File XLSX tidak dapat dibaca dengan aman.";
+    if (/password|encrypt/i.test(message)) return "Password-protected workbooks are not supported. Your current map is safe. Save an unprotected .xlsx copy or paste the data.";
+    if (/not found|invalid|zip|archive|unexpected|unsupported|corrupt|truncated/i.test(message)) return "We could not read this XLSX file. Your current map is safe. Upload a valid .xlsx file without macros, or paste the data.";
+    return "We could not read this XLSX file safely. Your current map has not changed. Try another .xlsx file or paste the data.";
   }
 
   function loadParser(options = {}) {
@@ -44,15 +44,15 @@
     if (typeof readXlsxFile === "function") return Promise.resolve(readXlsxFile);
     if (parserPromise) return parserPromise;
     parserPromise = new Promise((resolve, reject) => {
-      if (typeof document === "undefined") return reject(new Error("Parser XLSX browser tidak tersedia."));
+      if (typeof document === "undefined") return reject(new Error("The spreadsheet reader is not available. Your current map is safe. Reload the page and try again, or paste the data."));
       const script = document.createElement("script");
       script.src = PARSER_URL;
       script.async = true;
       script.dataset.lazyXlsxParser = "true";
       script.onload = () => typeof readXlsxFile === "function"
         ? resolve(readXlsxFile)
-        : reject(new Error("Parser XLSX gagal dimuat."));
-      script.onerror = () => reject(new Error("Parser XLSX gagal dimuat."));
+        : reject(new Error("The spreadsheet reader could not load. Your current map is safe. Reload the page and try again, or paste the data."));
+      script.onerror = () => reject(new Error("The spreadsheet reader could not load. Your current map is safe. Reload the page and try again, or paste the data."));
       document.head.appendChild(script);
     });
     return parserPromise;
@@ -75,9 +75,9 @@
     const limits = Object.assign({}, DEFAULT_BUDGET, budget);
     const bytes = new Uint8Array(buffer);
     const view = new DataView(buffer);
-    if (bytes.length < 22) throw new Error("File XLSX terlalu kecil atau rusak.");
-    if (readUInt32(view, 0) !== 0x04034b50) throw new Error("File bukan ZIP/XLSX yang valid.");
-    if (bytes.length > limits.maxXlsxCompressedBytes) throw new Error("Ukuran file XLSX melebihi batas.");
+    if (bytes.length < 22) throw new Error("This XLSX file is incomplete or damaged. Your current map is safe. Choose a valid .xlsx file.");
+    if (readUInt32(view, 0) !== 0x04034b50) throw new Error("This is not a valid XLSX file. Your current map is safe. Choose a valid .xlsx file.");
+    if (bytes.length > limits.maxXlsxCompressedBytes) throw new Error("This XLSX file is too large. Your current map is safe. Use a smaller workbook or paste fewer rows.");
 
     let eocd = -1;
     const min = Math.max(0, bytes.length - 65558);
@@ -87,19 +87,19 @@
         break;
       }
     }
-    if (eocd < 0) throw new Error("Struktur ZIP/XLSX tidak lengkap.");
+    if (eocd < 0) throw new Error("This XLSX file is incomplete. Your current map is safe. Choose a valid .xlsx file.");
 
     const entryCount = readUInt16(view, eocd + 10);
     const centralDirectoryOffset = readUInt32(view, eocd + 16);
-    if (!entryCount || entryCount > limits.maxZipEntries) throw new Error("Jumlah entry XLSX melebihi batas.");
-    if (centralDirectoryOffset >= bytes.length) throw new Error("Struktur ZIP/XLSX rusak.");
+    if (!entryCount || entryCount > limits.maxZipEntries) throw new Error("This XLSX file contains too many parts. Your current map is safe. Use a simpler workbook without macros or external links.");
+    if (centralDirectoryOffset >= bytes.length) throw new Error("This XLSX file is damaged. Your current map is safe. Choose a valid .xlsx file.");
 
     const entries = [];
     let offset = centralDirectoryOffset;
     let estimatedUncompressedBytes = 0;
     for (let index = 0; index < entryCount; index += 1) {
       if (offset + 46 > bytes.length || readUInt32(view, offset) !== 0x02014b50) {
-        throw new Error("Central directory XLSX rusak.");
+        throw new Error("This XLSX file is damaged. Your current map is safe. Choose a valid .xlsx file.");
       }
       const compressionMethod = readUInt16(view, offset + 10);
       const compressedSize = readUInt32(view, offset + 20);
@@ -109,23 +109,23 @@
       const commentLength = readUInt16(view, offset + 32);
       const nameStart = offset + 46;
       const nameEnd = nameStart + nameLength;
-      if (nameEnd > bytes.length) throw new Error("Nama entry XLSX rusak.");
+      if (nameEnd > bytes.length) throw new Error("This XLSX file has a damaged file entry. Your current map is safe. Choose a valid .xlsx file.");
       const name = bytesToText(bytes.slice(nameStart, nameEnd)).replace(/\\/g, "/");
       estimatedUncompressedBytes += uncompressedSize;
       if (estimatedUncompressedBytes > limits.maxXlsxEstimatedUncompressedBytes) {
-        throw new Error("Ukuran XLSX setelah dibuka melebihi batas.");
+        throw new Error("This XLSX file is too large when opened. Your current map is safe. Use a smaller workbook or paste fewer rows.");
       }
       if (compressedSize > 0 && uncompressedSize / compressedSize > limits.maxCompressionRatio) {
-        throw new Error("Rasio kompresi XLSX mencurigakan.");
+        throw new Error("This XLSX file cannot be opened safely. Your current map has not changed. Save a new plain .xlsx copy and try again.");
       }
-      if (![0, 8].includes(compressionMethod)) throw new Error("Metode kompresi XLSX tidak didukung.");
+      if (![0, 8].includes(compressionMethod)) throw new Error("This XLSX file uses an unsupported compression method. Your current map is safe. Save a new plain .xlsx copy and try again.");
       entries.push({ name, compressedSize, uncompressedSize, compressionMethod });
       offset = nameEnd + extraLength + commentLength;
     }
 
     const names = entries.map((entry) => entry.name.toLowerCase());
     if (!names.includes("[content_types].xml") || !names.includes("xl/workbook.xml")) {
-      throw new Error("File bukan workbook XLSX valid.");
+      throw new Error("This is not a valid XLSX workbook. Your current map is safe. Choose a valid .xlsx file.");
     }
     const blocked = [
       /(^|\/)vbaProject\.bin$/i,
@@ -138,7 +138,7 @@
       /^encryptedpackage$/i
     ];
     const blockedEntry = entries.find((entry) => blocked.some((pattern) => pattern.test(entry.name)));
-    if (blockedEntry) throw new Error(`Konten XLSX tidak didukung: ${blockedEntry.name}`);
+    if (blockedEntry) throw new Error(`This XLSX file contains content we cannot open safely: ${blockedEntry.name}. Your current map has not changed. Save a plain .xlsx file without macros, embedded files, or external links.`);
 
     return {
       entryCount,
@@ -150,8 +150,8 @@
 
   function assertSupportedName(file) {
     const name = String(file && file.name ? file.name : "").toLowerCase();
-    if (/\.(xlsm|xlsb|xls|ods)$/.test(name)) throw new Error("Gunakan .xlsx. XLS, XLSB, XLSM, dan ODS belum didukung.");
-    if (!/\.xlsx$/.test(name)) throw new Error("Pilih file .xlsx yang valid.");
+    if (/\.(xlsm|xlsb|xls|ods)$/.test(name)) throw new Error("This file type is not supported. Your current map is safe. Save the file as .xlsx or paste the data.");
+    if (!/\.xlsx$/.test(name)) throw new Error("Choose a valid .xlsx file. Your current map has not changed.");
   }
 
   function cellToText(value) {
@@ -164,7 +164,7 @@
   function rowsToTsv(rows) {
     return rows.map((row) => row.map((cell) => {
       const text = cellToText(cell);
-      if (text.length > DEFAULT_BUDGET.maxSingleCellLength) throw new Error("Ada sel XLSX yang melebihi batas panjang.");
+      if (text.length > DEFAULT_BUDGET.maxSingleCellLength) throw new Error("A spreadsheet cell is too long to read safely. Your current map has not changed. Shorten the cell and try again.");
       return /[\t\r\n"]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
     }).join("\t")).join("\n");
   }
@@ -172,14 +172,14 @@
   function validateSheetData(sheet, budget = {}) {
     const limits = Object.assign({}, DEFAULT_BUDGET, budget);
     const rows = sheet.data || [];
-    if (!rows.length) throw new Error("Sheet XLSX kosong.");
-    if (rows.length - 1 > limits.maxRows) throw new Error("Jumlah baris XLSX melebihi batas.");
+    if (!rows.length) throw new Error("This spreadsheet sheet is empty. Your current map has not changed. Choose a sheet with data.");
+    if (rows.length - 1 > limits.maxRows) throw new Error("This spreadsheet has too many rows. Your current map has not changed. Use fewer rows and try again.");
     const columns = rows.reduce((max, row) => Math.max(max, row.length), 0);
-    if (columns > limits.maxColumns) throw new Error("Jumlah kolom XLSX melebihi batas.");
-    if ((rows.length - 1) * columns > limits.maxCells) throw new Error("Jumlah sel XLSX melebihi batas.");
+    if (columns > limits.maxColumns) throw new Error("This spreadsheet has too many columns. Your current map has not changed. Remove unneeded columns and try again.");
+    if ((rows.length - 1) * columns > limits.maxCells) throw new Error("This spreadsheet has too many cells. Your current map has not changed. Use fewer rows or columns and try again.");
     rows.forEach((row) => {
       row.forEach((cell) => {
-        if (cellToText(cell).length > limits.maxSingleCellLength) throw new Error("Ada sel XLSX yang melebihi batas panjang.");
+        if (cellToText(cell).length > limits.maxSingleCellLength) throw new Error("A spreadsheet cell is too long to read safely. Your current map has not changed. Shorten the cell and try again.");
       });
     });
   }
@@ -189,7 +189,7 @@
     const parsed = ImportCore.parseTabularInput({
       text: rowsToTsv(sheet.data || []),
       sourceType: "xlsx",
-      sourceLabel: options.sourceLabel || "File XLSX lokal",
+      sourceLabel: options.sourceLabel || "Local XLSX file",
       delimiterOverride: "tab",
       localeOverride: options.localeOverride || "auto",
       budget: options.budget
@@ -217,17 +217,17 @@
       throw new Error(safeError(error));
     }
     assertNotCanceled(options.signal);
-    if (!Array.isArray(sheets) || !sheets.length) throw new Error("Workbook XLSX tidak memiliki sheet yang bisa dibaca.");
-    if (sheets.length > budget.maxSheets) throw new Error("Jumlah sheet XLSX melebihi batas.");
+    if (!Array.isArray(sheets) || !sheets.length) throw new Error("This workbook has no readable sheets. Your current map is safe. Choose another .xlsx file or paste the data.");
+    if (sheets.length > budget.maxSheets) throw new Error("This workbook has too many sheets. Your current map is safe. Keep only the sheets you need and try again.");
     const usableSheets = sheets.filter((sheet) => Array.isArray(sheet.data) && sheet.data.length);
-    if (!usableSheets.length) throw new Error("Workbook XLSX tidak memiliki sheet berisi data.");
+    if (!usableSheets.length) throw new Error("This workbook has no sheets with data. Your current map is safe. Add data to a sheet or choose another file.");
     usableSheets.forEach((sheet) => validateSheetData(sheet, budget));
     const selectedSheetName = options.sheetName || usableSheets[0].sheet;
     const selectedSheet = usableSheets.find((sheet) => sheet.sheet === selectedSheetName) || usableSheets[0];
     return {
       contractVersion: "batch2.xlsxWorkbook.v1",
       sourceType: "xlsx",
-      sourceLabel: "File XLSX lokal",
+      sourceLabel: "Local XLSX file",
       selectedSheetName: selectedSheet.sheet,
       sheets: usableSheets.map((sheet) => ({
         name: sheet.sheet,
@@ -236,7 +236,7 @@
       })),
       zipSummary,
       parsed: parsedFromSheet(selectedSheet, {
-        sourceLabel: "File XLSX lokal",
+        sourceLabel: "Local XLSX file",
         localeOverride: options.localeOverride,
         budget
       })

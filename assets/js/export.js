@@ -23,18 +23,18 @@
 
   function slugify(value) {
     const slug = sanitizeText(value, 80).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    return slug || "peta-warna-indonesia";
+    return slug || "indonesia-region-map";
   }
 
   function buildExportSpec(features, state, options = {}) {
     const metadata = Object.assign({
-      title: state.title || "Peta Sorotan Wilayah Indonesia",
+      title: state.title || "Indonesia region map",
       subtitle: "",
       source: "",
       period: "",
       footnote: "",
-      legendTitle: "Legenda",
-      filenameSlug: "peta-warna-indonesia"
+      legendTitle: "Legend",
+      filenameSlug: "indonesia-region-map"
     }, state.exportMeta || {}, options.metadata || {});
     Object.keys(metadata).forEach((key) => { metadata[key] = sanitizeText(metadata[key], key === "title" ? 90 : key === "filenameSlug" ? 80 : 180); });
     const extent = options.extent === "national" ? "national" : "current-view";
@@ -48,7 +48,7 @@
       size: getSize(options),
       transparent: Boolean(options.transparent),
       labels: options.labels !== false,
-      attribution: "Data: geoBoundaries/HDX COD-AB ADM2 snapshot 2020; 519 fitur geometri; registry metadata v1 2025. Referensi visual; bukan penetapan batas hukum.",
+      attribution: "Data: geoBoundaries/HDX COD-AB ADM2 snapshot 2020; 519 boundary features; registry metadata v1 2025. For visual reference only; not a legal boundary decision.",
       boundaryVersion: "IDN-ADM2-2020-geoboundaries-22746128",
       registryVersion: "IDN-ADM-REGISTRY-v1-2025-06-23"
     };
@@ -109,7 +109,7 @@
 
   function displayName(feature) {
     const p = feature.properties || {};
-    return p.display_name || p.geometry_source_name || p.region_name || p.region_id || "Wilayah";
+    return p.display_name || p.geometry_source_name || p.region_name || p.region_id || "Region";
   }
 
   function labelText(feature, state) {
@@ -127,16 +127,16 @@
 
   function defaultGroupName(color) {
     const names = {
-      "#4472C4": "Group Warna Biru",
-      "#5B9BD5": "Group Warna Biru Muda",
-      "#E74C3C": "Group Warna Merah",
-      "#70AD47": "Group Warna Hijau",
-      "#FFC000": "Group Warna Kuning",
-      "#A64D79": "Group Warna Ungu",
-      "#00A388": "Group Warna Toska",
-      "#7F6000": "Group Warna Coklat"
+      "#4472C4": "Blue group",
+      "#5B9BD5": "Light blue group",
+      "#E74C3C": "Red group",
+      "#70AD47": "Green group",
+      "#FFC000": "Yellow group",
+      "#A64D79": "Purple group",
+      "#00A388": "Teal group",
+      "#7F6000": "Brown group"
     };
-    return names[color] || `Group Warna ${color}`;
+    return names[color] || `Color group ${color}`;
   }
 
   function buildLegendItems(state, features) {
@@ -193,11 +193,11 @@
     const legend = state.legendVisible ? buildLegend(state, size, spec.legendFeatures || features, spec.metadata.legendTitle) : "";
     const title = buildTitle(spec.metadata.title, size, spec.metadata.subtitle);
     const metadata = Object.assign({}, spec, { features: undefined });
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img" aria-label="${escapeXml(spec.metadata.title)}">\n${background}\n<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>\n<g font-family="Arial, Helvetica, sans-serif">${paths}\n${labels}\n${legend}</g>\n${title}\n<text x="${margin}" y="${size.height - 58}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.source || spec.attribution)}</text>\n<text x="${margin}" y="${size.height - 40}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.period || "")}</text>\n<text x="${margin}" y="${size.height - 22}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.footnote || spec.attribution)} Atribusi sumber wajib dipertahankan.</text>\n</svg>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img" aria-label="${escapeXml(spec.metadata.title)}">\n${background}\n<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>\n<g font-family="Arial, Helvetica, sans-serif">${paths}\n${labels}\n${legend}</g>\n${title}\n<text x="${margin}" y="${size.height - 58}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.source || spec.attribution)}</text>\n<text x="${margin}" y="${size.height - 40}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.period || "")}</text>\n<text x="${margin}" y="${size.height - 22}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.footnote || spec.attribution)} Keep the source credit with this map.</text>\n</svg>`;
   }
 
   function buildTitle(title, size, subtitle) {
-    const text = String(title || "Peta Sorotan Wilayah Indonesia").slice(0, 90);
+    const text = String(title || "Indonesia region map").slice(0, 90);
     const width = Math.min(size.width - 116, Math.max(360, text.length * 18));
     const x = (size.width - width) / 2;
     const sub = sanitizeText(subtitle, 180);
@@ -306,7 +306,7 @@
       const yy = y + 48 + row * rowHeight;
       return `<rect x="${xx + 14}" y="${yy - 12}" width="14" height="14" fill="${item.color}" stroke="#4b5563"/><text x="${xx + 38}" y="${yy}" font-size="13" fill="#1e2933">${escapeXml(item.label)}</text>`;
     }).join("");
-    return `<g><rect x="${x.toFixed(1)}" y="${y}" width="${width.toFixed(1)}" height="${height}" fill="#ffffff" stroke="#d8dee6"/><text x="${x + 14}" y="${y + 22}" font-size="15" font-weight="700" fill="#1e2933">${escapeXml(legendTitle || "Legenda")}</text>${rows}</g>`;
+    return `<g><rect x="${x.toFixed(1)}" y="${y}" width="${width.toFixed(1)}" height="${height}" fill="#ffffff" stroke="#d8dee6"/><text x="${x + 14}" y="${y + 22}" font-size="15" font-weight="700" fill="#1e2933">${escapeXml(legendTitle || "Legend")}</text>${rows}</g>`;
   }
 
   function downloadText(filename, text, type) {
@@ -351,12 +351,12 @@
       image.onload = () => {
         try {
           const canvas = document.createElement("canvas"); canvas.width = size.width; canvas.height = size.height;
-          const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("Browser tidak dapat membuat kanvas PDF.");
+          const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("The browser could not prepare the PDF. Your current map is safe. Try SVG or PNG instead.");
           ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, size.width, size.height); ctx.drawImage(image, 0, 0);
-          canvas.toBlob((blob) => { URL.revokeObjectURL(svgUrl); blob ? resolve({ blob, spec, size }) : reject(new Error("Browser tidak dapat menyiapkan PDF.")); }, "image/jpeg", 0.92);
+          canvas.toBlob((blob) => { URL.revokeObjectURL(svgUrl); blob ? resolve({ blob, spec, size }) : reject(new Error("The browser could not prepare the PDF. Your current map is safe. Try SVG or PNG instead.")); }, "image/jpeg", 0.92);
         } catch (error) { URL.revokeObjectURL(svgUrl); reject(error); }
       };
-      image.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error("Pratinjau PDF gagal dirender.")); };
+      image.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error("The PDF preview could not be created. Your current map is safe. Try SVG or PNG instead.")); };
       image.src = svgUrl;
     });
   }
@@ -398,7 +398,7 @@
       const values = [row.rowId, row.rowNumber, row.record && row.record.regionName, row.record && row.record.province, row.record && row.record.regionCode, row.matchedId || "", row.matchedName || "", row.matchStatus || "", row.matchStatus === "user-resolved" ? "yes" : "no", row.record && row.record.numericValue, row.record && row.record.category, row.classKey || assignment.classKey || "", row.color || assignment.color || "", "IDN-ADM2-2020-geoboundaries-22746128", "IDN-ADM-REGISTRY-v1-2025-06-23"].map((value) => `"${String(value == null ? "" : value).replace(/^[=+@-]/, "'").replace(/"/g, '""')}"`);
       lines.push(values.join(","));
     });
-    const filename = `${slugify((state.exportMeta && state.exportMeta.filenameSlug) || "peta-warna-indonesia")}-mapping.csv`;
+    const filename = `${slugify((state.exportMeta && state.exportMeta.filenameSlug) || "indonesia-region-map")}-mapping.csv`;
     downloadText(filename, lines.join("\n"), "text/csv;charset=utf-8");
     return lines.join("\n");
   }
@@ -406,7 +406,7 @@
   function renderPng(features, state, options, size, fallbackUsed) {
     return new Promise((resolve, reject) => {
       if (options.forceCanvasFailure) {
-        reject(new Error("Simulasi kegagalan canvas."));
+        reject(new Error("Simulated canvas failure."));
         return;
       }
       const svg = buildSvg(features, state, Object.assign({}, options, { pngSize: `${size.width}x${size.height}` }));
@@ -424,7 +424,7 @@
           canvas.width = size.width;
           canvas.height = size.height;
           const ctx = canvas.getContext("2d");
-          if (!ctx) throw new Error("Browser tidak dapat membuat canvas PNG.");
+          if (!ctx) throw new Error("The browser could not prepare the PNG. Your current map is safe. Try a smaller size or export SVG.");
           if (!options.transparent) {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, size.width, size.height);
@@ -433,13 +433,13 @@
           canvas.toBlob((png) => {
             if (!png) {
               cleanup();
-              reject(new Error("Browser tidak dapat membuat PNG."));
+              reject(new Error("The browser could not create the PNG. Your current map is safe. Try a smaller size or export SVG."));
               return;
             }
             const link = document.createElement("a");
             pngUrl = URL.createObjectURL(png);
             link.href = pngUrl;
-            link.download = "peta-warna-indonesia.png";
+            link.download = "indonesia-region-map.png";
             link.click();
             cleanup();
             resolve({ fallbackUsed, size });
@@ -451,7 +451,7 @@
       };
       image.onerror = () => {
         cleanup();
-        reject(new Error("SVG tidak dapat dirender menjadi PNG."));
+        reject(new Error("The PNG could not be created from the map. Your current map is safe. Try a smaller size or export SVG."));
       };
       image.src = url;
     });

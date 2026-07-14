@@ -1,62 +1,62 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>Metodologi Data</title>
+  <title>Data method</title>
   <link rel="stylesheet" href="../assets/css/content.css">
 </head>
 <body>
   <header class="site-header">
-    <nav class="site-inner site-nav" aria-label="Navigasi utama">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
       <a class="brand" href="../">Mapnesia</a>
-      <a href="../about/">Tentang</a>
-      <a href="../sources-licenses/">Sumber & Lisensi</a>
-      <a href="../data-methodology/">Metodologi Data</a>
-      <a href="../limitations/">Batasan</a>
-      <a href="../contact/">Kontak</a>
+      <a href="../about/">About</a>
+      <a href="../sources-licenses/">Sources and licenses</a>
+      <a href="../data-methodology/">Data method</a>
+      <a href="../limitations/">Limitations</a>
+      <a href="../contact/">Contact</a>
     </nav>
   </header>
   <main>
-    <p class="eyebrow">Terakhir ditinjau: 2026-07-12</p>
-    <h1>Metodologi data</h1>
-    <p class="lead">Batch 1 memilih kejelasan dan stabilitas lebih dulu: peta memakai snapshot geometri yang dipin, registry metadata dipisahkan, dan perubahan data harus melewati diff serta review.</p>
+    <p class="eyebrow">Last reviewed: 2026-07-12</p>
+    <h1>Data method</h1>
+    <p class="lead">The app keeps its boundary snapshot separate from current administrative information. Every data change must pass a recorded comparison and review.</p>
 
-    <h2>1. Snapshot geometri</h2>
-    <p>Geometri produksi berasal dari geoBoundaries Indonesia ADM2 boundary ID `IDN-ADM2-22746128`, merepresentasikan snapshot 2020. File sederhana dipakai untuk startup normal; file detail lokal hanya dimuat saat pengguna memilih ekspor detail.</p>
+    <h2>1. Boundary snapshot</h2>
+    <p>Production boundaries come from geoBoundaries Indonesia ADM2 boundary ID <code>IDN-ADM2-22746128</code>. ADM2 means second-level administrative boundary data. This source represents a 2020 snapshot. The app uses a simplified local file during normal startup and loads the detailed local file only for a detailed export.</p>
 
-    <h2>2. Matching metadata</h2>
-    <p>HDX tabular ADM2 dipakai untuk enrichment ketika nama ADM2 yang dinormalisasi cocok secara unik. Hasil Batch 1 mencatat 466 match unik dan 53 baris ambigu. Baris ambigu tetap bisa diwarnai, tetapi tidak diberi kode/nama/provinsi resmi secara paksa.</p>
+    <h2>2. Match administrative information</h2>
+    <p>HDX tabular ADM2 information is added only when a normalized ADM2 name has one safe match. The Batch 1 result recorded 466 unique matches and 53 rows with more than one possible match. Those 53 shapes can still be colored, but the app does not force an official code, name, or province onto them.</p>
 
-    <h2>3. Registry dan stable ID</h2>
-    <p>`canonical-provinces-v1.csv` menyimpan 38 provinsi saat ini. `canonical-regions-v1.csv` menyimpan 519 baris canonical region berbasis geometri. `crosswalk-region-ids-v1.csv` menjaga kompatibilitas proyek lama.</p>
+    <h2>3. Stable region IDs</h2>
+    <p><code>canonical-provinces-v1.csv</code> stores 38 current provinces. <code>canonical-regions-v1.csv</code> stores 519 stable region rows based on the boundary file. <code>crosswalk-region-ids-v1.csv</code> keeps older projects compatible. The filenames are retained because they are part of the data contract.</p>
 
-    <h2>4. Penyederhanaan peta</h2>
-    <p>Geometri startup disederhanakan dari file detail dengan Douglas-Peucker per ring pada toleransi `0.018` derajat. Ring kecil dipertahankan sejauh praktis; test mencakup beberapa fixture pulau kecil.</p>
+    <h2>4. Simplified boundaries</h2>
+    <p>The startup map is simplified from the detailed file with the Douglas-Peucker method at a tolerance of <code>0.018</code> degrees. Small island shapes are kept where practical, and automated checks cover several small-island examples.</p>
 
-    <h2>5. Reproducibility dan lisensi</h2>
-    <p>Pipeline offline memvalidasi source inventory, license manifest, checksum, diff data, dan reproduksi dua kali. Hasil terakhir: 10 artifact comparable direproduksi identik dengan hash `a9f6c8612e79d6325dd9415d329851313637c4cf998b54d787f6811637cd13e8`.</p>
+    <h2>5. Repeatable data and license checks</h2>
+    <p>The offline data process checks the source inventory, license manifest, file checksums, data differences, and two independent rebuilds. The latest recorded result reproduced 10 comparable files with the same hash: <code>a9f6c8612e79d6325dd9415d329851313637c4cf998b54d787f6811637cd13e8</code>.</p>
 
-    <h2>6. Data spreadsheet dan matching</h2>
-    <p>Paste, CSV, TSV, dan XLSX memasuki kontrak tabular yang sama. Kode wilayah yang terverifikasi diprioritaskan, lalu kombinasi nama dan provinsi. Nama ambigu, tidak cocok, duplikat, diabaikan, kosong, dan invalid tetap dicatat sebagai status berbeda; tidak ada kecocokan yang dipilih secara diam-diam.</p>
+    <h2>6. Spreadsheet data and region matches</h2>
+    <p>Pasted data, CSV, TSV, and XLSX files use the same table rules. A verified region code is checked first, followed by the region name and province. More than one match, no match, duplicates, ignored rows, empty values, and values that are not valid remain separate statuses. The app never chooses an uncertain match silently.</p>
 
-    <h2>7. Visualisasi dan ekspor</h2>
-    <p>Kategori, interval sama, kuantil, batas manual, dan divergen dihitung deterministik dari baris yang cocok dan valid. Nilai kosong bukan nol. Legenda yang sama dipakai peta dan ekspor. SVG, PNG, PDF raster, serta mapping CSV dibuat lokal di browser dengan atribusi boundary wajib.</p>
+    <h2>7. Colors and exports</h2>
+    <p>The app can color categories, equal ranges, ranked groups, manual ranges, or values around a midpoint. Only matched rows with valid values are included. An empty value is not zero. The map and export use the same legend. SVG, PNG, raster PDF, and match-report CSV files are created locally in the browser with the required boundary attribution.</p>
 
     <section class="note soft">
-      <h2>Review topology</h2>
-      <p>Batch 1 tidak mengklaim validasi topology legal-grade untuk overlap/gap. Validasi mendalam dengan native GIS tetap menjadi review gate sebelum penggantian boundary.</p>
+      <h2>Advanced boundary review</h2>
+      <p>Batch 1 did not claim a legal-grade review of overlaps or gaps between shapes. A specialist review with native mapping software remains required before the boundary source is replaced.</p>
     </section>
 
     <div class="button-row">
-      <a class="button" href="../guides/mengapa-jumlah-wilayah-peta-berbeda/">Mengapa jumlah wilayah berbeda?</a>
-      <a class="button secondary" href="../contact/#laporkan-data">Laporkan kesalahan data</a>
+      <a class="button" href="../guides/mengapa-jumlah-wilayah-peta-berbeda/">Why region counts differ</a>
+      <a class="button secondary" href="../contact/#laporkan-data">Report a data issue</a>
     </div>
   </main>
   <footer class="site-footer">
     <div class="site-inner">
-      <p class="meta"><a href="../sources-licenses/">Sumber & Lisensi</a> - <a href="../limitations/">Batasan</a> - <a href="../">Map Studio</a></p>
+      <p class="meta"><a href="../sources-licenses/">Sources and licenses</a> - <a href="../limitations/">Limitations</a> - <a href="../">Create a map</a></p>
     </div>
   </footer>
 </body>

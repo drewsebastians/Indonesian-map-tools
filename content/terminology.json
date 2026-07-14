@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "batch2r.terminology.v1",
+  "language": "en",
+  "style": ["sentence case", "common verbs", "active voice", "short sentences", "one instruction per sentence", "calm and non-blaming errors"],
+  "terms": [
+    {"preferred":"Region","alternatives":["administrative entity","feature"],"definition":"One of Indonesia's regencies or cities shown on the map.","firstUse":"Regions include Indonesia's regencies and cities.","scope":"product","tests":["Select a region","Unmatched regions"]},
+    {"preferred":"Highlight regions","alternatives":["manual coloring","apply color"],"definition":"Select one or more regions and give them a color.","firstUse":"Highlight regions one at a time when you do not need spreadsheet data.","scope":"workspace","tests":["Highlight region","Remove highlight"]},
+    {"preferred":"Map spreadsheet data","alternatives":["import pipeline","ingestion"],"definition":"Turn local spreadsheet rows into map colors.","firstUse":"Paste data or upload a spreadsheet. Your data stays on this device.","scope":"workspace and guides","tests":["Add data","Upload spreadsheet"]},
+    {"preferred":"Match regions","alternatives":["entity resolution","canonical matching"],"definition":"Connect spreadsheet rows to regions on the map.","firstUse":"Match regions before you create the map. Unmatched rows remain visible.","scope":"workspace","tests":["Match regions","Use these matches"]},
+    {"preferred":"Unmatched regions","alternatives":["unresolved entity","unresolved"],"definition":"Rows that are not yet connected to one region.","firstUse":"Unmatched regions do not change the map until you choose a match.","scope":"workspace and guides","tests":["Fix unmatched regions","Choose a match"]},
+    {"preferred":"Color by value","alternatives":["choropleth","numeric classification"],"definition":"Use numeric values to assign map colors.","firstUse":"Color by value to compare higher and lower numbers.","scope":"workspace","tests":["Even value ranges","Equal-sized groups"]},
+    {"preferred":"Color by category","alternatives":["categorical classification"],"definition":"Give each category a different color.","firstUse":"Color by category when each row contains a label such as High or Low.","scope":"workspace","tests":["Color by category"]},
+    {"preferred":"Design map","alternatives":["visualize","apply visualization"],"definition":"Choose colors, legend, title, and map settings.","firstUse":"Design map after the regions are matched.","scope":"workflow","tests":["Design map","Preview colors"]},
+    {"preferred":"Export map","alternatives":["render output"],"definition":"Download the map as SVG, PNG, or PDF.","firstUse":"Export map when the map and source details are ready.","scope":"workflow","tests":["Export SVG","Export PNG","Export PDF"]},
+    {"preferred":"Save project","alternatives":["persist project"],"definition":"Download a local project file that can be opened later.","firstUse":"Save project to keep a portable copy.","scope":"workspace","tests":["Save project","Open project"]},
+    {"preferred":"Open project","alternatives":["load project","restore project"],"definition":"Choose a saved local project file and open it after safety checks pass.","firstUse":"Open project replaces the current project only after the file passes safety checks.","scope":"workspace","tests":["Open project"]},
+    {"preferred":"Clear map","alternatives":["reset all"],"definition":"Remove highlights while keeping the page open.","firstUse":"Clear map removes every current highlight.","scope":"workspace","tests":["Clear map","Start over"]},
+    {"preferred":"Start over","alternatives":["clear project","reset project"],"definition":"Remove the current project and its browser backup after confirmation.","firstUse":"Start over when you want a clean workspace.","scope":"workspace","tests":["Start over"]},
+    {"preferred":"Build sales territories","alternatives":["territory runtime"],"definition":"Future workflow for grouping regions into a sales hierarchy.","firstUse":"Build sales territories from matched regions.","scope":"future Batch 3 entry point","tests":["Build sales territories"]},
+    {"preferred":"Analyze coverage","alternatives":["coverage engine"],"definition":"Future workflow for comparing current and target coverage.","firstUse":"Analyze coverage using data you provide.","scope":"future Batch 3 entry point","tests":["Analyze coverage"]}
+  ],
+  "advancedOnly": [
+    {"term":"ADM2","allowed":"source, license, methodology, and advanced boundary details only","plainAlternative":"regency and city boundaries"},
+    {"term":"geometry","allowed":"source, methodology, diagnostics, and developer evidence only","plainAlternative":"boundaries"},
+    {"term":"feature","allowed":"developer and source evidence only","plainAlternative":"region"},
+    {"term":"canonical registry","allowed":"developer and methodology evidence only","plainAlternative":"verified region list"},
+    {"term":"choropleth","allowed":"methodology article after a plain explanation only","plainAlternative":"color by value"},
+    {"term":"entity resolution","allowed":"developer evidence only","plainAlternative":"match regions"},
+    {"term":"import pipeline","allowed":"developer evidence only","plainAlternative":"add data"},
+    {"term":"unresolved entity","allowed":"developer evidence only","plainAlternative":"unmatched region"}
+  ],
+  "exemptions": {
+    "historicalPaths": ["docs/**", "artifacts/**", "CHANGELOG.md", "test-results/**", "playwright-report/**"],
+    "contracts": ["HTML IDs", "test IDs", "serialized keys", "schema IDs", "storage keys", "version IDs", "internal status codes"],
+    "officialData": ["Indonesian province names", "Indonesian regency and city names", "spreadsheet header aliases", "geoBoundaries", "HDX/OCHA COD-AB", "CC BY 3.0 IGO", "Kepmendagri source names"]
+  },
+  "brandPolicy": {"currentOldName":"Mapnesia","prompt2Severity":"warning","failureAfter":"Prompt 3"}
+}

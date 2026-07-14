@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "batch2r.terminology-audit.v1",
+  "generatedAt": "2026-07-14T06:13:40.962Z",
+  "status": "passed",
+  "language": "en",
+  "filesChecked": 29,
+  "activeHtml": [
+    "index.html",
+    "about/index.html",
+    "contact/index.html",
+    "privacy/index.html",
+    "terms/index.html",
+    "sources-licenses/index.html",
+    "data-methodology/index.html",
+    "limitations/index.html",
+    "changelog/index.html",
+    "excel-to-map/index.html",
+    "guides/mengapa-jumlah-wilayah-peta-berbeda/index.html",
+    "guides/cara-membuat-peta-kabupaten-kota-dari-excel/index.html",
+    "guides/memperbaiki-nama-wilayah/index.html",
+    "guides/csv-vs-xlsx-untuk-data-peta/index.html",
+    "guides/equal-interval-vs-quantile/index.html",
+    "guides/legenda-peta-tidak-menyesatkan/index.html",
+    "guides/ekspor-peta-ke-powerpoint/index.html",
+    "guides/contoh-peta-nilai-kota/index.html"
+  ],
+  "activeJs": [
+    "assets/js/product-content.js",
+    "assets/js/app.js",
+    "assets/js/csv-import.js",
+    "assets/js/import-core.js",
+    "assets/js/xlsx-import.js",
+    "assets/js/matching-engine.js",
+    "assets/js/visualization-engine.js",
+    "assets/js/map.js",
+    "assets/js/export.js",
+    "assets/js/project-storage.js",
+    "assets/js/report-template.js"
+  ],
+  "historicalExemptions": [
+    "docs/**",
+    "artifacts/**",
+    "CHANGELOG.md",
+    "test-results/**",
+    "playwright-report/**"
+  ],
+  "officialDataExemptions": [
+    "Indonesian province names",
+    "Indonesian regency and city names",
+    "spreadsheet header aliases",
+    "geoBoundaries",
+    "HDX/OCHA COD-AB",
+    "CC BY 3.0 IGO",
+    "Kepmendagri source names"
+  ],
+  "failures": [],
+  "warnings": [
+    {
+      "file": "about/index.html",
+      "code": "legacy-brand",
+      "count": 5
+    },
+    {
+      "file": "contact/index.html",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "privacy/index.html",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "terms/index.html",
+      "code": "legacy-brand",
+      "count": 2
+    },
+    {
+      "file": "sources-licenses/index.html",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "data-methodology/index.html",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "limitations/index.html",
+      "code": "legacy-brand",
+      "count": 3
+    },
+    {
+      "file": "changelog/index.html",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "excel-to-map/index.html",
+      "code": "legacy-brand",
+      "count": 2
+    },
+    {
+      "file": "guides/mengapa-jumlah-wilayah-peta-berbeda/index.html",
+      "code": "legacy-brand",
+      "count": 4
+    },
+    {
+      "file": "guides/cara-membuat-peta-kabupaten-kota-dari-excel/index.html",
+      "code": "legacy-brand",
+      "count": 2
+    },
+    {
+      "file": "guides/memperbaiki-nama-wilayah/index.html",
+      "code": "legacy-brand",
+      "count": 4
+    },
+    {
+      "file": "guides/csv-vs-xlsx-untuk-data-peta/index.html",
+      "code": "legacy-brand",
+      "count": 3
+    },
+    {
+      "file": "guides/equal-interval-vs-quantile/index.html",
+      "code": "legacy-brand",
+      "count": 3
+    },
+    {
+      "file": "guides/legenda-peta-tidak-menyesatkan/index.html",
+      "code": "legacy-brand",
+      "count": 3
+    },
+    {
+      "file": "guides/ekspor-peta-ke-powerpoint/index.html",
+      "code": "legacy-brand",
+      "count": 2
+    },
+    {
+      "file": "guides/contoh-peta-nilai-kota/index.html",
+      "code": "legacy-brand",
+      "count": 3
+    },
+    {
+      "file": "assets/js/product-content.js",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "assets/js/export.js",
+      "code": "legacy-brand",
+      "count": 1
+    },
+    {
+      "file": "assets/js/report-template.js",
+      "code": "legacy-brand",
+      "count": 2
+    }
+  ]
+}

@@ -40,17 +40,17 @@
   }
 
   function ensureSafeObject(value, depth = 0) {
-    if (depth > 25) throw new Error("Struktur file proyek terlalu dalam.");
+    if (depth > 25) throw new Error("This project file has too many nested sections. Your current project has not changed. Choose a valid project file.");
     if (!value || typeof value !== "object") return;
     if (Array.isArray(value)) {
-      if (value.length > 5000) throw new Error("File proyek terlalu besar.");
+      if (value.length > 5000) throw new Error("This project file is too large. Your current project has not changed. Choose a smaller project file.");
       value.forEach((item) => ensureSafeObject(item, depth + 1));
       return;
     }
     const keys = Object.keys(value);
-    if (keys.length > 5000) throw new Error("File proyek terlalu besar.");
+    if (keys.length > 5000) throw new Error("This project file is too large. Your current project has not changed. Choose a smaller project file.");
     keys.forEach((key) => {
-      if (DANGEROUS_KEYS.has(key)) throw new Error("File proyek mengandung struktur tidak aman.");
+      if (DANGEROUS_KEYS.has(key)) throw new Error("This project file contains an unsafe structure. Your current project has not changed. Choose a valid project file.");
       ensureSafeObject(value[key], depth + 1);
     });
   }
@@ -77,7 +77,7 @@
 
   function sanitizeHighlight(item) {
     const color = item && item.color;
-    if (!isColor(color)) throw new Error("Ada warna tidak valid di file proyek.");
+    if (!isColor(color)) throw new Error("This project file contains an invalid color. Your current project has not changed. Choose a valid project file or fix the color value.");
     return {
       color,
       category: String((item && item.category) || "").slice(0, 80),
@@ -116,7 +116,7 @@
     if (!raw || typeof raw !== "object") return null;
     const allowed = new Set(["categorical", "equal-interval", "quantile", "manual", "diverging"]);
     if (!allowed.has(String(raw.method))) return null;
-    const legend = Array.isArray(raw.legend) ? raw.legend.slice(0, 40).filter((item) => item && isColor(item.color)).map((item) => ({ label: String(item.label || "Legenda").slice(0, 120), color: item.color, key: String(item.key || "").slice(0, 80) })) : [];
+    const legend = Array.isArray(raw.legend) ? raw.legend.slice(0, 40).filter((item) => item && isColor(item.color)).map((item) => ({ label: String(item.label || "Legend").slice(0, 120), color: item.color, key: String(item.key || "").slice(0, 80) })) : [];
     const assignments = {};
     Object.entries(raw.assignments || {}).slice(0, 2000).forEach(([id, item]) => {
       if (!item || !isColor(item.color)) return;
@@ -142,8 +142,8 @@
       source: String(value.source || "").replace(/[\u0000-\u001F]/g, "").slice(0, 180),
       period: String(value.period || "").replace(/[\u0000-\u001F]/g, "").slice(0, 80),
       footnote: String(value.footnote || "").replace(/[\u0000-\u001F]/g, "").slice(0, 180),
-      legendTitle: String(value.legendTitle || "Legenda").replace(/[\u0000-\u001F]/g, "").slice(0, 80),
-      filenameSlug: String(value.filenameSlug || "peta-warna-indonesia").replace(/[^a-zA-Z0-9_-]+/g, "-").slice(0, 80) || "peta-warna-indonesia"
+      legendTitle: String(value.legendTitle || "Legend").replace(/[\u0000-\u001F]/g, "").slice(0, 80),
+      filenameSlug: String(value.filenameSlug || "indonesia-region-map").replace(/[^a-zA-Z0-9_-]+/g, "-").slice(0, 80) || "indonesia-region-map"
     };
   }
 
@@ -192,26 +192,26 @@
   }
 
   function sanitizeProject(raw, validIdsOrAdapter) {
-    if (!raw || typeof raw !== "object") throw new Error("File proyek tidak valid.");
+    if (!raw || typeof raw !== "object") throw new Error("This is not a valid project file. Your current project has not changed. Choose a valid project file.");
     ensureSafeObject(raw);
     const schemaVersion = String(raw.schemaVersion || "");
-    if (schemaVersion !== PROJECT_SCHEMA && !LEGACY_SCHEMAS.has(schemaVersion)) throw new Error("Versi file proyek belum didukung.");
+    if (schemaVersion !== PROJECT_SCHEMA && !LEGACY_SCHEMAS.has(schemaVersion)) throw new Error("This project file version is not supported. Your current project has not changed. Open a project saved by this version of the app.");
     const adapter = normalizeAdapter(validIdsOrAdapter);
     const highlights = {};
     const unresolvedHighlights = {};
     const regionRefs = {};
     const seen = new Set();
     const entries = Object.entries(raw.highlights || {});
-    if (entries.length > 2000) throw new Error("File proyek terlalu besar.");
+    if (entries.length > 2000) throw new Error("This project file is too large. Your current project has not changed. Choose a smaller project file.");
     const migrationReport = emptyMigrationReport(schemaVersion);
     entries.forEach(([id, item]) => {
-      if (seen.has(id)) throw new Error("Ada ID wilayah ganda di file proyek.");
+      if (seen.has(id)) throw new Error("This project file contains the same region ID more than once. Your current project has not changed. Choose a valid project file.");
       seen.add(id);
       const highlight = sanitizeHighlight(item);
       const ref = adapter.get(id);
       if (!ref) {
         unresolvedHighlights[id] = highlight;
-        migrationReport.missing.push({ legacyRegionId: id, reason: "ID wilayah tidak ditemukan di snapshot geometri aktif." });
+        migrationReport.missing.push({ legacyRegionId: id, reason: "This region ID is not in the current boundary snapshot." });
         return;
       }
       highlights[id] = highlight;
@@ -226,7 +226,7 @@
       if (schemaVersion === PROJECT_SCHEMA && raw.regionRefs && raw.regionRefs[id] && raw.regionRefs[id].canonicalRegionId === ref.canonicalRegionId) {
         migrationReport.unchanged.push({ legacyRegionId: id, canonicalRegionId: ref.canonicalRegionId });
       } else if (ref.status === "ambiguous_metadata") {
-        migrationReport.ambiguous.push({ legacyRegionId: id, canonicalRegionId: ref.canonicalRegionId, reason: "Metadata resmi ambigu; warna tetap dipertahankan pada geometri." });
+        migrationReport.ambiguous.push({ legacyRegionId: id, canonicalRegionId: ref.canonicalRegionId, reason: "The official region data has more than one match. The color stays on the same boundary." });
       } else {
         migrationReport.mapped.push({ legacyRegionId: id, canonicalRegionId: ref.canonicalRegionId });
       }
@@ -237,7 +237,7 @@
       manualHighlights[id] = sanitizeHighlight(item);
     });
     const legend = Array.isArray(raw.legend) ? raw.legend.filter((item) => item && isColor(item.color)).slice(0, 20).map((item) => ({
-      label: String(item.label || "Legenda").slice(0, 80),
+      label: String(item.label || "Legend").slice(0, 80),
       color: item.color
     })) : [];
     const groupNames = {};
@@ -273,7 +273,7 @@
       boundaryVersion: BOUNDARY_VERSION,
       registryVersion: REGISTRY_VERSION,
       sourceVersion: SOURCE_VERSION,
-      title: String(raw.title || "Peta Sorotan Wilayah Indonesia").slice(0, 90),
+      title: String(raw.title || "Indonesia region map").slice(0, 90),
       highlights,
       manualHighlights,
       regionRefs,

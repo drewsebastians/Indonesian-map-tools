@@ -1,57 +1,57 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>Sumber dan Lisensi</title>
+  <title>Sources and licenses</title>
   <link rel="stylesheet" href="../assets/css/content.css">
 </head>
 <body>
   <header class="site-header">
-    <nav class="site-inner site-nav" aria-label="Navigasi utama">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
       <a class="brand" href="../">Mapnesia</a>
-      <a href="../about/">Tentang</a>
-      <a href="../sources-licenses/">Sumber & Lisensi</a>
-      <a href="../data-methodology/">Metodologi Data</a>
-      <a href="../limitations/">Batasan</a>
-      <a href="../contact/">Kontak</a>
+      <a href="../about/">About</a>
+      <a href="../sources-licenses/">Sources and licenses</a>
+      <a href="../data-methodology/">Data method</a>
+      <a href="../limitations/">Limitations</a>
+      <a href="../contact/">Contact</a>
     </nav>
   </header>
   <main>
-    <p class="eyebrow">Terakhir ditinjau: 2026-07-12</p>
-    <h1>Sumber dan lisensi</h1>
-    <p class="lead">Halaman ini merangkum sumber yang digunakan aplikasi. Catatan lengkap tersimpan di `ATTRIBUTION.md`, `data/README.md`, `data/sources/source-inventory-v1.json`, dan `data/license-manifest-v1.json`.</p>
+    <p class="eyebrow">Last reviewed: 2026-07-12</p>
+    <h1>Sources and licenses</h1>
+    <p class="lead">This page summarizes the sources used by the app. Full records are available in <code>ATTRIBUTION.md</code>, <code>data/README.md</code>, <code>data/sources/source-inventory-v1.json</code>, and <code>data/license-manifest-v1.json</code>.</p>
 
     <section class="card">
-      <h2>Geometri peta</h2>
-      <p>Geometri produksi memakai geoBoundaries Indonesia ADM2 dari lineage HDX/OCHA COD-AB Indonesia. Snapshot yang dipakai merepresentasikan tahun 2020 dengan boundary ID `IDN-ADM2-22746128` dan 519 fitur geometri.</p>
-      <p>Lisensi yang tercatat di metadata sumber: CC BY 3.0 IGO / CC BY-IGO. Atribusi wajib dipertahankan pada aplikasi dan ekspor.</p>
+      <h2>Map boundaries</h2>
+      <p>Production boundaries use geoBoundaries Indonesia ADM2 from the HDX/OCHA COD-AB Indonesia lineage. ADM2 means second-level administrative boundary data. The selected source represents a 2020 snapshot with boundary ID <code>IDN-ADM2-22746128</code> and 519 mapped shapes.</p>
+      <p>The license recorded in the source metadata is CC BY 3.0 IGO / CC BY-IGO. The required attribution must remain in the app and its exports.</p>
     </section>
 
     <section class="card">
-      <h2>Metadata administrasi</h2>
-      <p>Registry v1 memisahkan metadata saat ini dari geometri 2020. Registry merujuk Kepmendagri 300.2.2-2138/2025 dan perubahan 300.2.2-2430/2025, tetapi tidak mendistribusikan lampiran resmi. Field kode resmi yang belum punya bukti baris tetap dikosongkan.</p>
+      <h2>Administrative information</h2>
+      <p>The 2025 region list keeps current administrative information separate from the 2020 boundaries. It refers to Kepmendagri 300.2.2-2138/2025 and amendment 300.2.2-2430/2025, but it does not redistribute the official attachments. An official-code field stays empty when there is not enough source evidence for that row.</p>
     </section>
 
     <section class="card">
-      <h2>Library dan aset</h2>
-      <p>Leaflet 1.9.4 disertakan lokal untuk rendering peta dan berlisensi BSD 2-Clause. Parser XLSX <code>read-excel-file</code> 9.3.1 disertakan lokal, lazy-loaded saat XLSX dipilih, dan berlisensi MIT. PDF dibuat oleh kode browser aplikasi tanpa CDN atau library PDF runtime tambahan. Package pengujian seperti Playwright, axe-core, dan Wrangler tercatat sebagai dependency pengembangan dan tidak ikut dikirim sebagai bundle runtime aplikasi.</p>
+      <h2>Libraries and assets</h2>
+      <p>Leaflet 1.9.4 is included locally for map display under the BSD 2-Clause License. The XLSX reader <code>read-excel-file</code> 9.3.1 is included locally, loaded only when an XLSX file is selected, and licensed under the MIT License. The app creates PDFs in the browser without a CDN or an additional PDF library. Development tools such as Playwright, axe-core, and Wrangler are not included in the files sent to app users.</p>
     </section>
 
     <section class="note soft">
-      <h2>Audit lisensi</h2>
-      <p>Production source/license gate terakhir mencatat 6 source records dan 18 license assets. Publikasi sebuah file di internet tidak dianggap cukup sebagai izin komersial atau redistribusi.</p>
+      <h2>License checks</h2>
+      <p>The latest production source-and-license check recorded 6 source records and 18 licensed assets. A file being publicly available online is not treated as permission for commercial use or redistribution.</p>
     </section>
 
     <div class="button-row">
-      <a class="button" href="../contact/#laporkan-data">Laporkan kesalahan data</a>
-      <a class="button secondary" href="../data-methodology/">Baca metodologi data</a>
+      <a class="button" href="../contact/#laporkan-data">Report a data issue</a>
+      <a class="button secondary" href="../data-methodology/">Read the data method</a>
     </div>
   </main>
   <footer class="site-footer">
     <div class="site-inner">
-      <p class="meta"><a href="../">Map Studio</a> - <a href="../limitations/">Batasan</a> - <a href="../privacy/">Privasi</a></p>
+      <p class="meta"><a href="../">Create a map</a> - <a href="../limitations/">Limitations</a> - <a href="../privacy/">Privacy</a></p>
     </div>
   </footer>
 </body>

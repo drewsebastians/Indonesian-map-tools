@@ -3,6 +3,10 @@ const path = require("node:path");
 const { expect, test } = require("@playwright/test");
 
 const artifactDir = path.resolve(__dirname, "..", "..", "artifacts", "batch-1");
+
+async function waitForAppReady(page) {
+  await expect(page.locator("#loadingIndicator")).toHaveAttribute("data-state", "ready", { timeout: 60000 });
+}
 const axePath = require.resolve("axe-core/axe.min.js");
 const axeSource = fs.readFileSync(axePath, "utf8");
 
@@ -15,7 +19,7 @@ async function injectAxe(page) {
 test("home page has no serious or critical automated accessibility violations", async ({ page }) => {
   fs.mkdirSync(artifactDir, { recursive: true });
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await injectAxe(page);
   const results = await page.evaluate(async () => {
     return window.axe.run(document, {

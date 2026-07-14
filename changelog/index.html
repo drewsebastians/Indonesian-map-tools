@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,53 +9,53 @@
 </head>
 <body>
   <header class="site-header">
-    <nav class="site-inner site-nav" aria-label="Navigasi utama">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
       <a class="brand" href="../">Mapnesia</a>
-      <a href="../about/">Tentang</a>
-      <a href="../sources-licenses/">Sumber & Lisensi</a>
-      <a href="../data-methodology/">Metodologi Data</a>
-      <a href="../limitations/">Batasan</a>
-      <a href="../contact/">Kontak</a>
+      <a href="../about/">About</a>
+      <a href="../sources-licenses/">Sources and licenses</a>
+      <a href="../data-methodology/">Data method</a>
+      <a href="../limitations/">Limitations</a>
+      <a href="../contact/">Contact</a>
     </nav>
   </header>
   <main>
-    <p class="eyebrow">Terakhir ditinjau: 2026-07-12</p>
+    <p class="eyebrow">Last reviewed: 2026-07-12</p>
     <h1>Changelog</h1>
-    <p class="lead">Ringkasan perubahan penting untuk staging Batch 1.</p>
+    <p class="lead">A summary of important changes recorded during the staging batches.</p>
 
     <h2>Batch 1</h2>
     <ul>
-      <li>Build statis allowlisted dan workflow CI dasar.</li>
-      <li>Migrasi staging ke Cloudflare Workers Static Assets dengan aturan noindex.</li>
-      <li>Startup lebih ringan: geometri detail tidak dimuat otomatis.</li>
-      <li>Export SVG/PNG, fallback PNG, dan performance budget otomatis.</li>
-      <li>Registry canonical v1: 38 provinsi, 519 canonical region rows, 53 metadata ambigu eksplisit.</li>
-      <li>Project schema 1.1 dengan migration report dan perlindungan prototype-pollution.</li>
-      <li>Pipeline data deterministik, source inventory, license manifest, diff report, dan reproducibility check.</li>
-      <li>Halaman trust: about, contact, privacy, terms, sources/licenses, methodology, limitations, changelog, dan guide jumlah wilayah.</li>
+      <li>Added an allowlisted static build and a basic CI workflow.</li>
+      <li>Moved staging to Cloudflare Workers Static Assets with noindex rules.</li>
+      <li>Reduced startup work by loading detailed boundaries only when requested.</li>
+      <li>Added SVG and PNG exports, a PNG fallback, and automated performance limits.</li>
+      <li>Added the version 1 stable region list: 38 provinces, 519 region rows, and 53 records that need more evidence.</li>
+      <li>Added project schema 1.1 with a migration report and prototype-pollution protection.</li>
+      <li>Added a repeatable data process, source inventory, license manifest, data-difference report, and reproducibility check.</li>
+      <li>Added trust pages for About, Contact, Privacy, Terms, Sources and licenses, Data method, Limitations, Changelog, and the region-count guide.</li>
     </ul>
 
-    <h2>Yang belum dirilis</h2>
+    <h2>Batch 2 development record</h2>
     <ul>
-      <li>Batch 2 preflight menyiapkan kontrak spreadsheet-to-map, fixture import sintetis, privacy threat model, dan resource budget.</li>
-      <li>Import core Batch 2 menambahkan preview paste/CSV/TSV lokal, mapping kolom, format angka Indonesia/internasional, dan kompatibilitas CSV lama.</li>
-      <li>XLSX import Batch 2 ditambahkan secara lazy-loaded: parser lokal berlisensi MIT, sheet chooser, guard ZIP/macro/embedded/external-link, dan handoff ke preview/mapping yang sama.</li>
-      <li>Matching v2 menambahkan engine deterministic lazy-loaded, status eksplisit per baris, kandidat ambigu lokal, resolve/ignore/reset, dan koreksi project-scoped.</li>
-      <li>Prompt 5 menambahkan workflow Input → Match → Visualize → Export, contoh lokal, mode Dasar/Lanjutan, tabel data dengan filter/sort, dan keterkaitan tabel-peta dua arah.</li>
-      <li>Prompt 6 menambahkan visualisasi kategori, interval sama, kuantil, batas manual, dan divergen; semuanya deterministik dengan palet lokal versi, legenda bersama, dan gaya tidak ada data.</li>
-      <li>Prompt 7 menambahkan spesifikasi ekspor bersama, metadata aman, cakupan nasional/tampilan saat ini, A3, PDF raster lokal, mapping CSV, dan persistensi field visualisasi/ekspor pada project JSON.</li>
-      <li>Fitur runtime Batch 2 berikutnya: klasifikasi choropleth deterministik, legend engine, export v2, dan project persistence lanjutan masih tahap berikutnya.</li>
-      <li>Custom domain, indexing, analytics, AdSense, akun pengguna, dan backend belum diaktifkan.</li>
+      <li>The Batch 2 preflight defined the spreadsheet-to-map contract, synthetic import examples, privacy threat model, and resource limits.</li>
+      <li>The Batch 2 import work added local paste, CSV, and TSV previews, column selection, Indonesian and international number formats, and support for older CSV files.</li>
+      <li>XLSX import was added as a locally loaded module with the MIT-licensed reader, sheet selection, ZIP and macro checks, embedded-item and external-link checks, and the same data preview used by other formats.</li>
+      <li>The second matching engine added clear row statuses, local suggestions for uncertain names, manual match and ignore controls, reset controls, and project-specific corrections.</li>
+      <li>Prompt 5 added the Input, Match, Visualize, and Export workflow, a local sample, Basic and Advanced modes, a sortable data table, and two-way links between the table and map.</li>
+      <li>Prompt 6 added category colors, equal ranges, ranked groups, manual ranges, and colors around a midpoint. These use versioned local palettes and the same legend and no-data style in the map and export.</li>
+      <li>Prompt 7 added shared export settings, safe metadata, national and current-view scope, A3, local raster PDF, match-report CSV, and saved color and export settings in project JSON.</li>
+      <li>At that point, later Batch 2 work still included deterministic value classes, a shared legend, the second export format, and expanded project saving.</li>
+      <li>The custom domain, search indexing, analytics, AdSense, user accounts, and backend remained disabled.</li>
     </ul>
 
     <div class="button-row">
-      <a class="button" href="../">Buka Map Studio</a>
-      <a class="button secondary" href="../limitations/">Baca batasan</a>
+      <a class="button" href="../">Create a map</a>
+      <a class="button secondary" href="../limitations/">Read the limitations</a>
     </div>
   </main>
   <footer class="site-footer">
     <div class="site-inner">
-      <p class="meta">Catatan teknis lengkap tetap ada di `CHANGELOG.md` dan `docs/batch-1/`.</p>
+      <p class="meta">Full technical records remain in <code>CHANGELOG.md</code> and <code>docs/batch-1/</code>.</p>
     </div>
   </footer>
 </body>

@@ -7,16 +7,19 @@
     sha256: "146653d488331086ddc43d159a261b01ea6dd08c7ed422e34a9886c3c690430c"
   };
   const quickColors = ["#4472C4", "#E74C3C", "#70AD47", "#FFC000", "#5B9BD5", "#A64D79", "#00A388", "#7F6000"];
+  const productText = (key, values) => window.ProductContent
+    ? window.ProductContent.text(key, values)
+    : key;
   const state = {
-    title: "Peta Sorotan Wilayah Indonesia",
+    title: "Indonesia region map",
     features: [],
     featureById: new Map(),
     highlights: {},
     manualHighlights: {},
     legend: [
-      { label: "Di atas target", color: "#70AD47" },
-      { label: "Perlu perhatian", color: "#FFC000" },
-      { label: "Di bawah target", color: "#E74C3C" }
+      { label: "Above target", color: "#70AD47" },
+      { label: "Needs attention", color: "#FFC000" },
+      { label: "Below target", color: "#E74C3C" }
     ],
     legendVisible: true,
     legendPosition: "bottom-right",
@@ -24,7 +27,7 @@
     groupMeta: {},
     importCorrections: {},
     exportSettings: {},
-    exportMeta: { subtitle: "", source: "", period: "", footnote: "", legendTitle: "Legenda", filenameSlug: "peta-warna-indonesia" },
+    exportMeta: { subtitle: "", source: "", period: "", footnote: "", legendTitle: "Legend", filenameSlug: "indonesia-region-map" },
     unresolvedHighlights: {},
     migrationReport: null,
     workflowStage: "input",
@@ -47,6 +50,7 @@
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
+    if (window.ProductContent) window.ProductContent.apply(document);
     [
       "projectTitle", "searchInput", "searchResults", "provinceSelect", "regionSelect", "selectedRegion",
       "colorPicker", "quickColors", "categoryInput", "valueInput", "applyColorBtn", "removeColorBtn",
@@ -70,7 +74,7 @@
   }
 
   function setupEvents() {
-    el.projectTitle.addEventListener("input", () => { state.title = el.projectTitle.value.trim() || "Peta Sorotan Wilayah Indonesia"; scheduleSave(); });
+    el.projectTitle.addEventListener("input", () => { state.title = el.projectTitle.value.trim() || "Indonesia region map"; scheduleSave(); });
     ["exportSubtitle", "exportSource", "exportPeriod", "exportFootnote", "exportLegendTitle", "exportFilenameSlug"].forEach((id) => el[id].addEventListener("input", () => { state.exportMeta[id.replace("export", "").replace(/^./, (char) => char.toLowerCase())] = el[id].value.slice(0, id === "exportFilenameSlug" ? 80 : 180); scheduleSave(); }));
     el.basicModeBtn.addEventListener("click", () => setMode("basic"));
     el.advancedModeBtn.addEventListener("click", () => setMode("advanced"));
@@ -87,7 +91,7 @@
     el.resetBtn.addEventListener("click", resetAll);
     el.showLegend.addEventListener("change", () => { state.legendVisible = el.showLegend.checked; refreshMapLegend(); scheduleSave(); });
     el.legendPosition.addEventListener("change", () => { state.legendPosition = el.legendPosition.value; refreshMapLegend(); scheduleSave(); });
-    el.addLegendBtn.addEventListener("click", () => { state.legend.push({ label: "Legenda baru", color: el.colorPicker.value }); renderLegendEditor(); refreshMapLegend(); scheduleSave(); });
+    el.addLegendBtn.addEventListener("click", () => { state.legend.push({ label: "New legend item", color: el.colorPicker.value }); renderLegendEditor(); refreshMapLegend(); scheduleSave(); });
     el.previewCsvBtn.addEventListener("click", previewCsv);
     el.applyCsvBtn.addEventListener("click", applyCsv);
     el.cancelImportBtn.addEventListener("click", cancelImport);
@@ -120,7 +124,7 @@
 
   function setupVisualizationControls() {
     if (!el.vizPalette) return;
-    el.vizPalette.innerHTML = `<option value="safe-default">Kualitatif aman warna</option><option value="blue">Biru berurutan</option><option value="blue-orange">Biru–oranye divergen</option>`;
+    el.vizPalette.innerHTML = `<option value="safe-default">Accessible colors</option><option value="blue">Light to dark blue</option><option value="blue-orange">Blue to orange around a midpoint</option>`;
     updateVisualizationControlVisibility();
   }
 
@@ -151,12 +155,16 @@
   }
 
   async function previewVisualization() {
-    if (!state.importRows.length) return showError("Terapkan data yang valid sebelum membuat visualisasi.");
+    if (!state.importRows.length) return showError(productText("ui.errors.addData"));
     try {
       await ensureVisualizationEngine();
       pendingVisualization = VisualizationEngine.classify(state.importRows, buildVisualizationOptions());
       el.vizApplyBtn.disabled = false;
-      el.vizSummary.innerHTML = `<span>${pendingVisualization.method}: ${Object.keys(pendingVisualization.assignments).length} wilayah berwarna, ${pendingVisualization.noData.length} tidak ada data.</span>${pendingVisualization.warnings.map((warning) => `<span class="status-line">${escapeHtml(warning)}</span>`).join("")}`;
+      const coloredCount = Object.keys(pendingVisualization.assignments).length;
+      el.vizSummary.dataset.state = "ready";
+      el.vizSummary.dataset.coloredCount = String(coloredCount);
+      el.vizSummary.dataset.noDataCount = String(pendingVisualization.noData.length);
+      el.vizSummary.innerHTML = `<span>${coloredCount} regions will be colored. ${pendingVisualization.noData.length} rows have no usable value.</span>${pendingVisualization.warnings.map((warning) => `<span class="status-line">${escapeHtml(warning)}</span>`).join("")}`;
       el.vizLegendPreview.innerHTML = pendingVisualization.legend.map((item) => `<div class="legend-item"><span class="color-chip" style="background:${escapeAttr(item.color)}"></span><span>${escapeHtml(item.label)}</span></div>`).join("");
     } catch (error) {
       pendingVisualization = null;
@@ -174,8 +182,8 @@
       script.src = "./assets/js/visualization-engine.js";
       script.async = true;
       script.dataset.lazyVisualization = "true";
-      script.onload = () => typeof VisualizationEngine !== "undefined" ? resolve(VisualizationEngine) : reject(new Error("Mesin visualisasi gagal dimuat."));
-      script.onerror = () => reject(new Error("Mesin visualisasi gagal dimuat."));
+      script.onload = () => typeof VisualizationEngine !== "undefined" ? resolve(VisualizationEngine) : reject(new Error(productText("ui.errors.visualizationLoad")));
+      script.onerror = () => reject(new Error(productText("ui.errors.visualizationLoad")));
       document.head.appendChild(script);
     });
     return visualizationEnginePromise;
@@ -202,15 +210,17 @@
     });
     updateAfterHighlightChange();
     renderDataTable();
-    el.vizSummary.insertAdjacentHTML("afterbegin", `<span class="status-line">Visualisasi diterapkan. ${Object.keys(pendingVisualization.assignments).length} wilayah diberi warna.</span>`);
+    const coloredCount = Object.keys(pendingVisualization.assignments).length;
+    el.vizSummary.dataset.state = "applied";
+    el.vizSummary.insertAdjacentHTML("afterbegin", `<span class="status-line">${escapeHtml(productText("ui.status.visualizationApplied", { count: coloredCount }))}</span>`);
     scheduleSave();
   }
 
   const WORKFLOW = [
-    { id: "input", label: "Input", target: "[data-workflow-step='input']" },
-    { id: "match", label: "Match", target: "#dataTablePanel" },
-    { id: "visualize", label: "Visualize", target: "[data-workflow-step='visualize']" },
-    { id: "export", label: "Export", target: "#exportSection" }
+    { id: "input", label: productText("ui.workflow.input"), target: "[data-workflow-step='input']" },
+    { id: "match", label: productText("ui.workflow.match"), target: "#dataTablePanel" },
+    { id: "visualize", label: productText("ui.workflow.visualize"), target: "[data-workflow-step='visualize']" },
+    { id: "export", label: productText("ui.workflow.export"), target: "#exportSection" }
   ];
 
   function renderWorkflow() {
@@ -221,15 +231,16 @@
       const classes = ["workflow-step", item.id === state.workflowStage ? "active" : "", complete ? "complete" : ""].filter(Boolean).join(" ");
       return `<button type="button" class="${classes}" data-workflow-stage="${item.id}" aria-current="${item.id === state.workflowStage ? "step" : "false"}">${index + 1}. ${item.label}</button>`;
     }).join("");
-    const status = state.workflowStage === "input" ? "Masukkan data dari paste atau file lokal." : state.workflowStage === "match" ? `${state.importRows.length || "Belum ada"} baris siap diperiksa di tabel.` : state.workflowStage === "visualize" ? `${Object.keys(state.highlights).length} wilayah tampil di peta.` : "Peta siap diekspor.";
-    el.workflowStatus.textContent = `Tahap ${Math.max(1, currentIndex + 1)} dari 4: ${status}`;
+    const status = state.workflowStage === "input" ? "Paste data or upload a spreadsheet." : state.workflowStage === "match" ? `${state.importRows.length || "No"} rows are ready to review.` : state.workflowStage === "visualize" ? `${Object.keys(state.highlights).length} regions are shown on the map.` : "Your map is ready to export.";
+    el.workflowStatus.dataset.stage = ({ input: "add-data", match: "match", visualize: "design", export: "export" })[state.workflowStage];
+    el.workflowStatus.textContent = `Step ${Math.max(1, currentIndex + 1)} of 4: ${status}`;
   }
 
   function setWorkflowStage(stage, focus) {
     const index = WORKFLOW.findIndex((item) => item.id === stage);
     if (index < 0) return;
-    if (stage === "match" && !pendingCsv && !state.importRows.length) return showError("Masukkan dan pratinjau data terlebih dahulu.");
-    if ((stage === "visualize" || stage === "export") && !Object.keys(state.highlights).length) return showError("Terapkan setidaknya satu baris yang valid terlebih dahulu.");
+    if (stage === "match" && !pendingCsv && !state.importRows.length) return showError(productText("ui.errors.addData"));
+    if ((stage === "visualize" || stage === "export") && !Object.keys(state.highlights).length) return showError("Add at least one matched row first. Your current map is safe. Match a region, then continue.");
     state.workflowStage = stage;
     renderWorkflow();
     scheduleSave();
@@ -252,7 +263,7 @@
   }
 
   async function useExample() {
-    el.importPaste.value = "wilayah\tprovinsi\tnilai\tkategori\nKota Surabaya\tJawa Timur\t125\tContoh tinggi\nKota Denpasar\tBali\t77\tContoh sedang\n";
+    el.importPaste.value = "region\tprovince\tvalue\tcategory\nKota Surabaya\tJawa Timur\t125\tHigh example\nKota Denpasar\tBali\t77\tMedium example\n";
     el.csvFile.value = "";
     setWorkflowStage("input", false);
     await previewCsv();
@@ -279,7 +290,7 @@
       button.className = "swatch";
       button.style.background = color;
       button.title = color;
-      button.setAttribute("aria-label", "Pilih warna " + color);
+      button.setAttribute("aria-label", "Choose color " + color);
       button.addEventListener("click", () => { el.colorPicker.value = color; });
       el.quickColors.appendChild(button);
     });
@@ -288,7 +299,7 @@
   async function loadData() {
     try {
       const response = await fetch(DATA_URL, { cache: "force-cache" });
-      if (!response.ok) throw new Error("Data peta tidak dapat dimuat.");
+      if (!response.ok) throw new Error(productText("ui.errors.mapLoad"));
       const collection = await response.json();
       state.features = collection.features || [];
       state.featureById = new Map(state.features.map((feature) => [feature.properties.region_id, feature]));
@@ -300,28 +311,35 @@
       renderHighlightList();
       renderGroupingEditor();
       refreshMapLegend();
-      el.loadingIndicator.textContent = `${state.features.length} wilayah dimuat dari snapshot batas ${BOUNDARY_VERSION} (geometri standar).`;
-      el.dataTruthBadge.textContent = `Batas: snapshot ADM2 2020 (${state.features.length} fitur geometri) · Registry: ${REGISTRY_VERSION}`;
+      el.loadingIndicator.dataset.state = "ready";
+      el.loadingIndicator.dataset.testid = window.ProductContent ? window.ProductContent.strings.testIdentifiers.appReady : "app-ready";
+      el.loadingIndicator.textContent = productText("ui.status.ready", { count: state.features.length });
+      el.dataTruthBadge.dataset.boundaryVersion = BOUNDARY_VERSION;
+      el.dataTruthBadge.dataset.registryVersion = REGISTRY_VERSION;
+      el.dataTruthBadge.textContent = window.ProductContent
+        ? window.ProductContent.strings.dataSource.boundaryPlain
+        : "Boundary snapshot: 2020; administrative names reviewed: 2025";
     } catch (error) {
       showError(error.message);
-      el.loadingIndicator.textContent = "Gagal memuat peta.";
+      el.loadingIndicator.dataset.state = "error";
+      el.loadingIndicator.textContent = productText("ui.errors.mapLoad");
     }
   }
 
   async function fetchGeoJson(url, expectedSha256) {
     const response = await fetch(url, { cache: "force-cache" });
-    if (!response.ok) throw new Error("Geometri detail tidak dapat dimuat.");
+    if (!response.ok) throw new Error("Detailed boundaries could not be loaded. Your map is still safe. Try the standard export.");
     const text = await response.text();
     if (/^version https:\/\/git-lfs.github.com\/spec\/v1/.test(text.trim())) {
-      throw new Error("URL mengarah ke Git LFS pointer, bukan GeoJSON asli.");
+      throw new Error("Detailed boundaries are unavailable. Your map is still safe. Try the standard export.");
     }
     if (expectedSha256) {
       const actualSha256 = await sha256(text);
-      if (actualSha256 !== expectedSha256) throw new Error("Checksum geometri detail tidak sesuai.");
+      if (actualSha256 !== expectedSha256) throw new Error("Detailed boundaries did not pass the safety check. Your map is still safe. Try the standard export.");
     }
     const collection = JSON.parse(text);
     if (!collection || collection.type !== "FeatureCollection" || !Array.isArray(collection.features)) {
-      throw new Error("Format geometri detail tidak valid.");
+      throw new Error("Detailed boundaries are not valid. Your map is still safe. Try the standard export.");
     }
     return collection;
   }
@@ -336,7 +354,7 @@
     if (state.highDetailCollection) return state.highDetailCollection;
     const detailedCollection = await fetchGeoJson(DETAILED_GEOMETRY.url, DETAILED_GEOMETRY.sha256);
     const merged = mergeDetailedGeometry({ type: "FeatureCollection", features: state.features }, detailedCollection);
-    if (merged.matched <= 450) throw new Error(`Geometri detail hanya cocok ${merged.matched}/${state.features.length}.`);
+    if (merged.matched <= 450) throw new Error(`Detailed boundaries were available for only ${merged.matched} of ${state.features.length} regions. Your map is still safe. Try the standard export.`);
     state.highDetailCollection = merged.collection;
     state.highDetailFeatureById = new Map((merged.collection.features || []).map((feature) => [feature.properties.region_id, feature]));
     return state.highDetailCollection;
@@ -403,7 +421,7 @@
   function restoreAutosave() {
     try {
       const saved = ProjectStorage.loadAutosave(ProjectStorage.createRegionAdapter(state.features));
-      if (saved && confirm("Ada autosave di browser ini. Buka autosave?")) {
+      if (saved && confirm("A saved copy is available in this browser. Open it?")) {
         applyProject(saved);
       }
     } catch (error) {
@@ -413,16 +431,16 @@
 
   function populateFilters() {
     const provinces = Array.from(new Set(state.features.map((f) => f.properties.province_name).filter(Boolean))).sort();
-    el.provinceSelect.innerHTML = `<option value="__all">Semua provinsi</option><option value="__unresolved">Belum terhubung provinsi</option>` + provinces.map((p) => `<option value="${escapeAttr(p)}">${escapeHtml(p)}</option>`).join("");
+    el.provinceSelect.innerHTML = `<option value="__all">All provinces</option><option value="__unresolved">Province not linked</option>` + provinces.map((p) => `<option value="${escapeAttr(p)}">${escapeHtml(p)}</option>`).join("");
     renderRegionOptions();
   }
 
   function renderRegionOptions() {
     const province = el.provinceSelect.value;
     const features = filteredFeatures(province);
-    el.regionSelect.innerHTML = `<option value="">Pilih wilayah...</option>` + features.map((feature) => {
+    el.regionSelect.innerHTML = `<option value="">Choose a region...</option>` + features.map((feature) => {
       const p = feature.properties;
-      const suffix = p.province_name ? ` - ${p.province_name}` : " - belum terhubung provinsi";
+      const suffix = p.province_name ? ` - ${p.province_name}` : " - province not linked";
       return `<option value="${escapeAttr(p.region_id)}">${escapeHtml(p.display_name + suffix)}</option>`;
     }).join("");
   }
@@ -466,7 +484,7 @@
 
   function displayName(feature) {
     const p = feature.properties;
-    const province = p.province_name || "Provinsi belum terhubung";
+    const province = p.province_name || "Province not linked";
     return `${p.display_name} - ${province}`;
   }
 
@@ -480,7 +498,7 @@
 
   function handleFeatureSelected(feature) {
     const p = feature.properties;
-    el.selectedRegion.innerHTML = `<strong>${escapeHtml(p.display_name)}</strong><br>${escapeHtml(p.province_name || "Provinsi belum terhubung")}<br><span class="tag">${escapeHtml(p.official_code || p.match_status)}</span>`;
+    el.selectedRegion.innerHTML = `<strong>${escapeHtml(p.display_name)}</strong><br>${escapeHtml(p.province_name || "Province not linked")}<br><span class="tag">${escapeHtml(p.official_code || "Official code not available")}</span>`;
     el.categoryInput.value = state.highlights[p.region_id]?.category || "";
     el.valueInput.value = state.highlights[p.region_id]?.value || "";
     if (state.highlights[p.region_id]) el.colorPicker.value = state.highlights[p.region_id].color;
@@ -490,17 +508,23 @@
   function selectDataRowForFeature(regionId) {
     const row = state.importRows.find((item) => item.matchedId === regionId);
     if (!row) {
-      if (el.mapSelectionStatus) el.mapSelectionStatus.textContent = "Wilayah dipilih dari peta; belum ada baris data yang cocok.";
+      if (el.mapSelectionStatus) {
+        el.mapSelectionStatus.dataset.state = "no-linked-row";
+        el.mapSelectionStatus.textContent = "Region selected on the map. No spreadsheet row is linked to it.";
+      }
       return;
     }
     state.selectedDataRow = row.rowId;
     renderDataTable();
-    if (el.mapSelectionStatus) el.mapSelectionStatus.textContent = `Baris ${row.rowNumber} dipilih dari peta.`;
+    if (el.mapSelectionStatus) {
+      el.mapSelectionStatus.dataset.state = "selected";
+      el.mapSelectionStatus.textContent = `Row ${row.rowNumber} was selected from the map.`;
+    }
   }
 
   function applySelectedColor() {
     const id = mapApi.selectedId;
-    if (!id) return showError("Pilih wilayah terlebih dahulu.");
+    if (!id) return showError(productText("ui.errors.chooseRegion"));
     pushUndo();
     state.manualHighlights[id] = {
       color: el.colorPicker.value,
@@ -513,7 +537,7 @@
 
   function removeSelectedColor() {
     const id = mapApi.selectedId;
-    if (!id) return showError("Pilih wilayah terlebih dahulu.");
+    if (!id) return showError(productText("ui.errors.chooseRegion"));
     if (!state.highlights[id]) return;
     pushUndo();
     delete state.highlights[id];
@@ -537,7 +561,7 @@
 
   function resetAll() {
     if (!Object.keys(state.highlights).length) return;
-    if (!confirm("Hapus semua warna dari peta?")) return;
+    if (!confirm("Clear every highlight from the map?")) return;
     pushUndo();
     state.highlights = {};
     state.manualHighlights = {};
@@ -559,13 +583,13 @@
     const ids = Object.keys(state.highlights);
     el.highlightCount.textContent = ids.length;
     if (!ids.length) {
-      el.highlightList.innerHTML = `<p class="status-line">Belum ada wilayah disorot.</p>`;
+      el.highlightList.innerHTML = `<p class="status-line">No regions are highlighted.</p>`;
       return;
     }
     el.highlightList.innerHTML = ids.sort((a, b) => displayName(state.featureById.get(a)).localeCompare(displayName(state.featureById.get(b)), "id")).map((id) => {
       const feature = state.featureById.get(id);
       const item = state.highlights[id];
-      return `<div class="highlight-item"><span class="color-chip" style="background:${item.color}"></span><button type="button" class="secondary" data-zoom="${escapeAttr(id)}">${escapeHtml(displayName(feature))}</button><button type="button" class="danger" data-remove="${escapeAttr(id)}">Hapus</button></div>`;
+      return `<div class="highlight-item"><span class="color-chip" style="background:${item.color}"></span><button type="button" class="secondary" data-zoom="${escapeAttr(id)}">${escapeHtml(displayName(feature))}</button><button type="button" class="danger" data-remove="${escapeAttr(id)}">Remove</button></div>`;
     }).join("");
     el.highlightList.querySelectorAll("[data-zoom]").forEach((button) => button.addEventListener("click", () => selectRegion(button.dataset.zoom, true)));
     el.highlightList.querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => {
@@ -581,10 +605,10 @@
     el.legendPosition.value = state.legendPosition;
     el.legendItems.innerHTML = state.legend.map((item, index) => `
       <div class="legend-item">
-        <input type="color" value="${escapeAttr(item.color)}" data-legend-color="${index}" aria-label="Warna legenda">
-        <input type="text" value="${escapeAttr(item.label)}" data-legend-label="${index}" aria-label="Nama legenda">
-        <button type="button" class="secondary" data-legend-up="${index}" aria-label="Naik">↑</button>
-        <button type="button" class="danger" data-legend-remove="${index}" aria-label="Hapus">×</button>
+        <input type="color" value="${escapeAttr(item.color)}" data-legend-color="${index}" aria-label="Legend color">
+        <input type="text" value="${escapeAttr(item.label)}" data-legend-label="${index}" aria-label="Legend name">
+        <button type="button" class="secondary" data-legend-up="${index}" aria-label="Move up">↑</button>
+        <button type="button" class="danger" data-legend-remove="${index}" aria-label="Remove">×</button>
       </div>`).join("");
     el.legendItems.querySelectorAll("[data-legend-color]").forEach((input) => input.addEventListener("input", () => { state.legend[Number(input.dataset.legendColor)].color = input.value; refreshMapLegend(); scheduleSave(); }));
     el.legendItems.querySelectorAll("[data-legend-label]").forEach((input) => input.addEventListener("input", () => { state.legend[Number(input.dataset.legendLabel)].label = input.value.slice(0, 80); refreshMapLegend(); scheduleSave(); }));
@@ -628,16 +652,16 @@
 
   function defaultGroupName(color) {
     const names = {
-      "#4472C4": "Group Warna Biru",
-      "#5B9BD5": "Group Warna Biru Muda",
-      "#E74C3C": "Group Warna Merah",
-      "#70AD47": "Group Warna Hijau",
-      "#FFC000": "Group Warna Kuning",
-      "#A64D79": "Group Warna Ungu",
-      "#00A388": "Group Warna Toska",
-      "#7F6000": "Group Warna Coklat"
+      "#4472C4": "Blue group",
+      "#5B9BD5": "Light blue group",
+      "#E74C3C": "Red group",
+      "#70AD47": "Green group",
+      "#FFC000": "Yellow group",
+      "#A64D79": "Purple group",
+      "#00A388": "Teal group",
+      "#7F6000": "Brown group"
     };
-    return names[color] || `Group Warna ${color}`;
+    return names[color] || `Color group ${color}`;
   }
 
   function normalizeColor(color) {
@@ -649,7 +673,7 @@
     const groups = getColorGroups();
     el.groupCount.textContent = groups.length;
     if (!groups.length) {
-      el.groupingList.innerHTML = `<p class="status-line">Belum ada grup warna.</p>`;
+      el.groupingList.innerHTML = `<p class="status-line">No color groups yet.</p>`;
       return;
     }
     el.groupingList.innerHTML = groups.map((group) => {
@@ -658,13 +682,13 @@
       return `<div class="grouping-item">
         <span class="color-chip" style="background:${group.color}"></span>
         <div>
-          <label for="group-${escapeAttr(group.color.slice(1))}">Nama grup</label>
+          <label for="group-${escapeAttr(group.color.slice(1))}">Group name</label>
           <input id="group-${escapeAttr(group.color.slice(1))}" type="text" value="${escapeAttr(getGroupName(group))}" maxlength="80" data-group-name="${escapeAttr(group.color)}">
-          <label for="group-category-${escapeAttr(group.color.slice(1))}">Kategori</label>
-          <input id="group-category-${escapeAttr(group.color.slice(1))}" type="text" value="${escapeAttr(meta.category || "")}" maxlength="80" placeholder="Opsional" data-group-category="${escapeAttr(group.color)}">
-          <label for="group-value-${escapeAttr(group.color.slice(1))}">Nilai</label>
-          <input id="group-value-${escapeAttr(group.color.slice(1))}" type="text" value="${escapeAttr(meta.value || "")}" maxlength="80" placeholder="Opsional" data-group-value="${escapeAttr(group.color)}">
-          <div class="grouping-meta">${group.ids.length} wilayah: ${escapeHtml(names.join(", "))}</div>
+          <label for="group-category-${escapeAttr(group.color.slice(1))}">Category</label>
+          <input id="group-category-${escapeAttr(group.color.slice(1))}" type="text" value="${escapeAttr(meta.category || "")}" maxlength="80" placeholder="Optional" data-group-category="${escapeAttr(group.color)}">
+          <label for="group-value-${escapeAttr(group.color.slice(1))}">Value</label>
+          <input id="group-value-${escapeAttr(group.color.slice(1))}" type="text" value="${escapeAttr(meta.value || "")}" maxlength="80" placeholder="Optional" data-group-value="${escapeAttr(group.color)}">
+          <div class="grouping-meta">${group.ids.length} regions: ${escapeHtml(names.join(", "))}</div>
         </div>
       </div>`;
     }).join("");
@@ -738,17 +762,17 @@
     if (file) {
       const name = file.name.toLowerCase();
       if (name.endsWith(".xlsx")) {
-        return { file, sourceType: "xlsx", sourceLabel: "File XLSX lokal" };
+        return { file, sourceType: "xlsx", sourceLabel: "Local XLSX file" };
       }
-      if (!/\.(csv|tsv|txt)$/.test(name) || file.size > 2_500_000) throw new Error("Gunakan file .csv, .tsv, .txt, atau .xlsx dengan ukuran wajar.");
+      if (!/\.(csv|tsv|txt)$/.test(name) || file.size > 2_500_000) throw new Error("This file cannot be read safely. Your current map is safe. Choose a .csv, .tsv, .txt, or .xlsx file under 2.5 MB.");
       return {
         text: await file.text(),
         sourceType: name.endsWith(".tsv") ? "tsv" : "csv",
-        sourceLabel: name.endsWith(".tsv") ? "File TSV lokal" : "File CSV lokal"
+        sourceLabel: name.endsWith(".tsv") ? "Local TSV file" : "Local CSV file"
       };
     }
-    if (!paste) throw new Error("Paste tabel atau pilih file CSV/TSV terlebih dahulu.");
-    return { text: el.importPaste.value, sourceType: "paste", sourceLabel: "Paste lokal" };
+    if (!paste) throw new Error(productText("ui.errors.addData"));
+    return { text: el.importPaste.value, sourceType: "paste", sourceLabel: "Pasted data" };
   }
 
   async function previewCsv() {
@@ -756,7 +780,7 @@
       if (pendingImportSignal) pendingImportSignal.canceled = true;
       pendingImportSignal = { canceled: false };
       el.previewCsvBtn.disabled = true;
-      el.previewCsvBtn.textContent = "Membaca...";
+      el.previewCsvBtn.textContent = productText("ui.status.reading");
       await ensureMatchingEngine();
       const source = await readImportSource();
       if (source.sourceType === "xlsx") {
@@ -789,7 +813,7 @@
       showError(error.message);
     } finally {
       el.previewCsvBtn.disabled = false;
-      el.previewCsvBtn.textContent = "Pratinjau Import";
+      el.previewCsvBtn.textContent = productText("ui.actions.previewData");
     }
   }
 
@@ -801,8 +825,8 @@
       script.src = "./assets/js/matching-engine.js";
       script.async = true;
       script.dataset.lazyMatchingEngine = "true";
-      script.onload = () => typeof MatchingEngine !== "undefined" ? resolve(MatchingEngine) : reject(new Error("Matching engine gagal dimuat."));
-      script.onerror = () => reject(new Error("Matching engine gagal dimuat."));
+      script.onload = () => typeof MatchingEngine !== "undefined" ? resolve(MatchingEngine) : reject(new Error("Region matching could not load. Your current map is safe. Reload the page and try again."));
+      script.onerror = () => reject(new Error("Region matching could not load. Your current map is safe. Reload the page and try again."));
       document.head.appendChild(script);
     });
     return matchingEnginePromise;
@@ -834,7 +858,7 @@
     }
     el.xlsxSheet.innerHTML = pendingXlsx.sheets.map((sheet) => {
       const selected = sheet.name === pendingXlsx.selectedSheetName ? " selected" : "";
-      return `<option value="${escapeAttr(sheet.name)}"${selected}>${escapeHtml(sheet.name)} (${sheet.rows} baris, ${sheet.columns} kolom)</option>`;
+      return `<option value="${escapeAttr(sheet.name)}"${selected}>${escapeHtml(sheet.name)} (${sheet.rows} rows, ${sheet.columns} columns)</option>`;
     }).join("");
     el.xlsxSheet.classList.remove("hidden");
     if (label) label.classList.remove("hidden");
@@ -872,26 +896,26 @@
 
   function renderImportMapping() {
     const roles = [
-      ["regionCode", "Kode wilayah"],
-      ["regionName", "Nama wilayah"],
-      ["province", "Provinsi"],
-      ["numericValue", "Nilai"],
-      ["category", "Kategori"],
-      ["source", "Sumber"],
-      ["period", "Periode"]
+      ["regionCode", "Official region code"],
+      ["regionName", "Region name"],
+      ["province", "Province"],
+      ["numericValue", "Value"],
+      ["category", "Category"],
+      ["source", "Source"],
+      ["period", "Period"]
     ];
-    const options = (selected) => `<option value="">Abaikan</option>` + pendingCsv.headers.map((header) => {
+    const options = (selected) => `<option value="">Ignore column</option>` + pendingCsv.headers.map((header) => {
       return `<option value="${escapeAttr(header)}"${header === selected ? " selected" : ""}>${escapeHtml(header)}</option>`;
     }).join("");
     const source = pendingCsv.importedSource;
     const warnings = source.warnings.length ? `<p class="status-line">${escapeHtml(source.warnings.map((item) => item.message).join(" "))}</p>` : "";
-    const sheetLine = source.sheetName ? `<span>Sheet: ${escapeHtml(source.sheetName)}.</span>` : "";
-    const xlsxLine = pendingXlsx ? `<span>XLSX: ${pendingXlsx.zipSummary.entryCount} entry, parser dimuat lazy.</span>` : "";
+    const sheetLine = source.sheetName ? `<span>Worksheet: ${escapeHtml(source.sheetName)}.</span>` : "";
+    const xlsxLine = pendingXlsx ? `<span>Spreadsheet ready.</span>` : "";
     el.importMapping.innerHTML = `
       <div class="preview-block">
         <div class="import-summary">
-          <span>${escapeHtml(source.sourceLabel)}: ${source.counts.rows} baris, ${source.counts.columns} kolom.</span>
-          <span>Delimiter: ${escapeHtml(source.detected.delimiter)}. Format angka: ${escapeHtml(el.importLocale.value)}.</span>
+          <span>${escapeHtml(source.sourceLabel)}: ${source.counts.rows} rows, ${source.counts.columns} columns.</span>
+          <span>Separator: ${escapeHtml(source.detected.delimiter)}. Number format: ${escapeHtml(el.importLocale.value)}.</span>
           ${sheetLine}
           ${xlsxLine}
         </div>
@@ -907,36 +931,65 @@
 
   function renderCsvPreview() {
     const rows = pendingCsv.all.slice(0, 30).map((item) => {
-      const status = item.errors.length ? item.errors.join("; ") : (item.warnings.length ? item.warnings.join("; ") : "Siap diterapkan");
+      const status = item.errors.length ? item.errors.join("; ") : (item.warnings.length ? item.warnings.join("; ") : "Ready to use");
       const target = item.matched ? displayName(item.matched.feature) : "-";
       const resolution = renderResolutionControls(item);
-      return `<tr><td>${item.rowNumber}</td><td>${escapeHtml(target)}${resolution}</td><td>${escapeHtml(item.record.numericValue || "")}</td><td>${escapeHtml(item.record.category || "")}</td><td>${escapeHtml(item.matchStatus || "")}<br>${escapeHtml(status)}</td></tr>`;
+      return `<tr data-match-status="${escapeAttr(visibleMatchState(item))}"><td>${item.rowNumber}</td><td>${escapeHtml(target)}${resolution}</td><td>${escapeHtml(item.record.numericValue || "")}</td><td>${escapeHtml(item.record.category || "")}</td><td>${escapeHtml(visibleMatchStatus(item.matchStatus))}<br>${escapeHtml(status)}</td></tr>`;
     }).join("");
-    const errorButton = pendingCsv.invalid.length ? `<button type="button" class="secondary" id="downloadCsvErrors">Unduh laporan error</button>` : "";
+    const errorButton = pendingCsv.invalid.length ? `<button type="button" class="secondary" id="downloadCsvErrors">Download issue report</button>` : "";
     const unresolved = pendingCsv.all.filter((item) => ["ambiguous", "unmatched", "duplicate-target", "invalid"].includes(item.matchStatus)).length;
-    el.csvPreview.innerHTML = `<div class="preview-block"><strong>${pendingCsv.valid.length}</strong> valid, <strong>${pendingCsv.warning.length}</strong> peringatan, <strong>${pendingCsv.invalid.length}</strong> perlu diperiksa, <strong>${unresolved}</strong> unresolved.${errorButton}<table class="preview-table"><thead><tr><th>Baris</th><th>Wilayah</th><th>Nilai</th><th>Kategori</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const unmatchedNotice = unresolved
+      ? `<p class="status-line" data-testid="unmatched-warning">${escapeHtml(productText("ui.warnings.unmatched", { count: unresolved }))} <button type="button" class="secondary" id="fixUnmatchedRows">${escapeHtml(productText("ui.actions.fixUnmatched"))}</button></p>`
+      : "";
+    el.csvPreview.dataset.matchStatus = unresolved ? "needs-review" : "ready";
+    el.csvPreview.dataset.validCount = String(pendingCsv.valid.length);
+    el.csvPreview.dataset.unmatchedCount = String(unresolved);
+    el.csvPreview.innerHTML = `${unmatchedNotice}<div class="preview-block"><strong>${pendingCsv.valid.length}</strong> ready, <strong>${pendingCsv.warning.length}</strong> warnings, <strong>${pendingCsv.invalid.length}</strong> need review.${errorButton}<table class="preview-table"><thead><tr><th>Row</th><th>Region</th><th>Value</th><th>Category</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     const button = document.getElementById("downloadCsvErrors");
-    if (button) button.addEventListener("click", () => downloadText("laporan-error-impor.csv", CsvImport.buildErrorCsv(pendingCsv), "text/csv"));
+    if (button) button.addEventListener("click", () => downloadText("import-issues.csv", CsvImport.buildErrorCsv(pendingCsv), "text/csv"));
+    const fixButton = document.getElementById("fixUnmatchedRows");
+    if (fixButton) fixButton.addEventListener("click", () => {
+      const firstControl = el.csvPreview.querySelector("[data-candidate-for], [data-ignore-row]");
+      if (firstControl) firstControl.focus();
+    });
     el.csvPreview.querySelectorAll("[data-resolve-row]").forEach((button) => button.addEventListener("click", resolveImportRow));
     el.csvPreview.querySelectorAll("[data-ignore-row]").forEach((button) => button.addEventListener("click", ignoreImportRow));
     el.csvPreview.querySelectorAll("[data-reset-row]").forEach((button) => button.addEventListener("click", resetImportRow));
   }
 
+  function visibleMatchStatus(status) {
+    if (["exact-code", "exact-name-province", "exact-alias-province", "normalized-name-province"].includes(status)) return "Matched";
+    return ({
+      "user-resolved": "Matched by you",
+      ambiguous: "Choose a match",
+      unmatched: "Unmatched",
+      "duplicate-target": "Duplicate region",
+      invalid: "Check this row",
+      ignored: "Ignored"
+    })[status] || "Not matched";
+  }
+
+  function visibleMatchState(item) {
+    if (item.errors.length || ["ambiguous", "duplicate-target", "invalid"].includes(item.matchStatus)) return "needs-review";
+    if (item.matchStatus === "unmatched") return "unmatched";
+    return item.matched ? "matched" : "needs-review";
+  }
+
   function renderResolutionControls(item) {
     if (!["ambiguous", "unmatched", "duplicate-target", "ignored", "user-resolved"].includes(item.matchStatus)) return "";
     const candidates = (item.candidates || []).map((candidate) => {
-      const label = `${candidate.displayName} - ${candidate.province || "provinsi tidak tersedia"}${candidate.officialCode ? " - " + candidate.officialCode : ""}`;
+      const label = `${candidate.displayName} - ${candidate.province || "province not available"}${candidate.officialCode ? " - " + candidate.officialCode : ""}`;
       return `<option value="${escapeAttr(candidate.id)}">${escapeHtml(label)}</option>`;
     }).join("");
-    const select = candidates ? `<select aria-label="Kandidat baris ${item.rowNumber}" data-candidate-for="${escapeAttr(item.rowId)}"><option value="">Pilih kandidat</option>${candidates}</select><button type="button" class="secondary" data-resolve-row="${escapeAttr(item.rowId)}">Resolve</button>` : "";
-    return `<div class="resolution-tools">${select}<button type="button" class="secondary" data-ignore-row="${escapeAttr(item.rowId)}">Abaikan</button><button type="button" class="secondary" data-reset-row="${escapeAttr(item.rowId)}">Reset</button></div>`;
+    const select = candidates ? `<select aria-label="Matches for row ${item.rowNumber}" data-candidate-for="${escapeAttr(item.rowId)}"><option value="">Choose a match</option>${candidates}</select><button type="button" class="secondary" data-resolve-row="${escapeAttr(item.rowId)}">Use this match</button>` : "";
+    return `<div class="resolution-tools">${select}<button type="button" class="secondary" data-ignore-row="${escapeAttr(item.rowId)}">Ignore row</button><button type="button" class="secondary" data-reset-row="${escapeAttr(item.rowId)}">Clear choice</button></div>`;
   }
 
   function resolveImportRow(event) {
     const rowId = event.currentTarget.dataset.resolveRow;
     const select = el.csvPreview.querySelector(`[data-candidate-for="${CSS.escape(rowId)}"]`);
     const targetId = select && select.value;
-    if (!rowId || !targetId) return showError("Pilih kandidat wilayah terlebih dahulu.");
+    if (!rowId || !targetId) return showError(productText("ui.errors.useMatch"));
     state.importCorrections[rowId] = {
       action: "resolve",
       targetId,
@@ -994,7 +1047,8 @@
     updateAfterHighlightChange();
     renderDataTable();
     setWorkflowStage("visualize", false);
-    el.csvPreview.insertAdjacentHTML("afterbegin", `<p class="status-line">${pendingCsv.valid.length} baris diterapkan.</p>`);
+    el.csvPreview.dataset.matchStatus = "ready";
+    el.csvPreview.insertAdjacentHTML("afterbegin", `<p class="status-line" data-testid="import-success">${escapeHtml(productText("ui.status.rowsAdded", { count: pendingCsv.valid.length }))}</p>`);
   }
 
   function renderDataTable() {
@@ -1017,13 +1071,14 @@
     });
     const visible = rows.slice(0, 200);
     el.dataTableCount.textContent = `${rows.length}${rows.length > 200 ? "+" : ""}`;
-    el.dataTableEmpty.textContent = rows.length > 200 ? `Menampilkan 200 dari ${rows.length} baris untuk menjaga kelancaran. Gunakan pencarian untuk menemukan baris lain.` : (rows.length ? "" : "Tidak ada baris yang cocok dengan pencarian.");
+    el.dataTableEmpty.textContent = rows.length > 200 ? productText("ui.warnings.limitedRows", { count: rows.length }) : (rows.length ? "" : "No rows match your search.");
     el.dataTableEmpty.hidden = rows.length > 0 && rows.length <= 200;
     el.dataTable.querySelector("tbody").innerHTML = visible.map((item) => {
       const selected = item.rowId === state.selectedDataRow ? " selected" : "";
       const issue = item.errors.length ? " issue" : (item.matchedId ? " ready" : "");
-      const status = item.errors.length ? item.errors[0] : (item.matchStatus || "-");
-      return `<tr tabindex="0" class="${selected}${item.matchedId ? "" : " unmatched"}" data-table-row="${escapeAttr(item.rowId)}" aria-selected="${item.rowId === state.selectedDataRow ? "true" : "false"}"><td>${item.rowNumber}</td><td>${escapeHtml(item.record.regionName || item.record.regionCode || "-")}</td><td>${escapeHtml(item.record.province || "-")}</td><td>${escapeHtml(item.matchedName || "Belum terhubung")}</td><td>${escapeHtml(item.record.numericValue || item.record.category || "-")}</td><td><span class="status-chip${issue}">${escapeHtml(status)}</span></td></tr>`;
+      const status = item.errors.length ? item.errors[0] : visibleMatchStatus(item.matchStatus);
+      const matchState = item.errors.length ? "needs-review" : (item.matchedId ? "matched" : "unmatched");
+      return `<tr tabindex="0" class="${selected}${item.matchedId ? "" : " unmatched"}" data-table-row="${escapeAttr(item.rowId)}" data-match-status="${matchState}" aria-selected="${item.rowId === state.selectedDataRow ? "true" : "false"}"><td>${item.rowNumber}</td><td>${escapeHtml(item.record.regionName || item.record.regionCode || "-")}</td><td>${escapeHtml(item.record.province || "-")}</td><td>${escapeHtml(item.matchedName || "Not matched")}</td><td>${escapeHtml(item.record.numericValue || item.record.category || "-")}</td><td><span class="status-chip${issue}">${escapeHtml(status)}</span></td></tr>`;
     }).join("");
     el.dataTable.querySelectorAll("[data-table-row]").forEach((row) => {
       row.addEventListener("click", () => selectDataRow(row.dataset.tableRow));
@@ -1037,32 +1092,34 @@
     state.selectedDataRow = rowId;
     if (row.matchedId && state.featureById.has(row.matchedId)) {
       mapApi.zoomTo(row.matchedId);
-      el.mapSelectionStatus.textContent = `Wilayah ${row.matchedName} dipilih dari baris ${row.rowNumber}.`;
-      el.dataTableAnnouncement.textContent = `Baris ${row.rowNumber}: ${row.matchedName} dipilih di peta.`;
+      el.mapSelectionStatus.dataset.state = "selected";
+      el.mapSelectionStatus.textContent = `${row.matchedName} was selected from row ${row.rowNumber}.`;
+      el.dataTableAnnouncement.textContent = `Row ${row.rowNumber}: ${row.matchedName} is selected on the map.`;
     } else {
-      el.mapSelectionStatus.textContent = `Baris ${row.rowNumber} belum memiliki wilayah yang cocok.`;
-      el.dataTableAnnouncement.textContent = `Baris ${row.rowNumber} belum memiliki wilayah yang cocok; peta tidak diubah.`;
+      el.mapSelectionStatus.dataset.state = "unmatched";
+      el.mapSelectionStatus.textContent = `Row ${row.rowNumber} has no matched region.`;
+      el.dataTableAnnouncement.textContent = `Row ${row.rowNumber} has no matched region. The map did not change.`;
     }
     renderDataTable();
   }
 
   function saveProject() {
-    ProjectStorage.downloadJson("peta-warna-indonesia-project.json", ProjectStorage.buildProject(state, ProjectStorage.createRegionAdapter(state.features)));
+    ProjectStorage.downloadJson("indonesia-region-map-project.json", ProjectStorage.buildProject(state, ProjectStorage.createRegionAdapter(state.features)));
   }
 
   async function openProject() {
     const file = el.projectFile.files[0];
     if (!file) return;
-    if (file.size > 1_000_000) return showError("File proyek terlalu besar.");
+    if (file.size > 1_000_000) return showError("This project file is too large. Your current project has not changed. Choose a project file under 1 MB.");
     try {
       const data = JSON.parse(await file.text());
       const project = ProjectStorage.sanitizeProject(data, ProjectStorage.createRegionAdapter(state.features));
       if (project.migrationReport && project.migrationReport.requiresUserReview) {
         const summary = project.migrationReport.summary;
-        const message = `File proyek perlu migrasi: ${summary.mapped} ID dipetakan, ${summary.ambiguous} ambigu, ${summary.missing} tidak ditemukan. Lanjut buka proyek dan simpan laporan migrasi?`;
+        const message = `This older project needs review: ${summary.mapped} regions were linked, ${summary.ambiguous} need a choice, and ${summary.missing} were not found. Open it and keep an update report?`;
         if (!confirm(message)) return;
       }
-      if (!confirm("Buka file proyek ini? Proyek aktif dan autosave browser akan diganti setelah berhasil dibuka.")) return;
+      if (!confirm("Open this project file? Your current project and browser backup will be replaced only after the file opens safely.")) return;
       applyProject(project);
     } catch (error) {
       showError(error.message);
@@ -1094,8 +1151,8 @@
     el.exportSource.value = state.exportMeta.source || "";
     el.exportPeriod.value = state.exportMeta.period || "";
     el.exportFootnote.value = state.exportMeta.footnote || "";
-    el.exportLegendTitle.value = state.exportMeta.legendTitle || "Legenda";
-    el.exportFilenameSlug.value = state.exportMeta.filenameSlug || "peta-warna-indonesia";
+    el.exportLegendTitle.value = state.exportMeta.legendTitle || "Legend";
+    el.exportFilenameSlug.value = state.exportMeta.filenameSlug || "indonesia-region-map";
     state.exportSettings = project.exportSettings || {};
     el.exportRatio.value = state.exportSettings.ratio || "16:9";
     el.exportExtent.value = state.exportSettings.extent || "national";
@@ -1113,7 +1170,7 @@
   }
 
   function clearProject() {
-    if (!confirm("Bersihkan proyek dan autosave di browser ini?")) return;
+    if (!confirm("Start over and remove the browser backup?")) return;
     pushUndo();
     state.highlights = {};
     state.manualHighlights = {};
@@ -1130,16 +1187,16 @@
       source: "",
       period: "",
       footnote: "",
-      legendTitle: "Legenda",
-      filenameSlug: "peta-warna-indonesia"
+      legendTitle: "Legend",
+      filenameSlug: "indonesia-region-map"
     };
     state.exportSettings = {};
     el.exportSubtitle.value = "";
     el.exportSource.value = "";
     el.exportPeriod.value = "";
     el.exportFootnote.value = "";
-    el.exportLegendTitle.value = "Legenda";
-    el.exportFilenameSlug.value = "peta-warna-indonesia";
+    el.exportLegendTitle.value = "Legend";
+    el.exportFilenameSlug.value = "indonesia-region-map";
     el.exportRatio.value = "16:9";
     el.exportExtent.value = "national";
     el.exportLabels.checked = true;
@@ -1149,34 +1206,38 @@
     el.dataTablePanel.hidden = true;
     ProjectStorage.clearAutosave();
     updateAfterHighlightChange();
-    el.autosaveStatus.textContent = "Autosave dibersihkan.";
+    el.autosaveStatus.dataset.state = "cleared";
+    el.autosaveStatus.textContent = "Browser backup removed.";
     updateMigrationReportUi();
   }
 
   function scheduleSave() {
     if (!state.features.length) return;
     const ok = ProjectStorage.autosave(state);
-    el.autosaveStatus.textContent = ok ? "Autosave tersimpan di browser ini." : "Autosave tidak tersedia.";
+    el.autosaveStatus.dataset.state = ok ? "saved" : "unavailable";
+    el.autosaveStatus.textContent = ok ? productText("ui.status.projectSaved") : "A browser backup is not available. Save a project file to keep your work.";
   }
 
   function updateMigrationReportUi() {
     const report = state.migrationReport;
     if (!report) {
       el.migrationReportBtn.hidden = true;
-      el.autosaveStatus.textContent = "Proyek dibuka di browser ini.";
+      el.autosaveStatus.dataset.state = "opened";
+      el.autosaveStatus.textContent = productText("ui.status.projectOpened");
       return;
     }
     const summary = report.summary || {};
     const unresolved = (summary.ambiguous || 0) + (summary.missing || 0) + (summary.unsupported || 0);
     el.migrationReportBtn.hidden = false;
+    el.autosaveStatus.dataset.state = unresolved ? "migration-review" : "opened";
     el.autosaveStatus.textContent = unresolved
-      ? `Proyek dibuka. ${unresolved} item perlu review; laporan migrasi tersedia.`
-      : `Proyek dibuka. Migrasi schema ${report.fromSchemaVersion} -> ${report.toSchemaVersion} selesai tanpa kehilangan diam-diam.`;
+      ? `Project opened. ${unresolved} regions need review. An update report is available.`
+      : "Project opened and updated without dropping saved regions.";
   }
 
   function downloadMigrationReport() {
     if (!state.migrationReport) return;
-    ProjectStorage.downloadJson("laporan-migrasi-proyek.json", state.migrationReport);
+    ProjectStorage.downloadJson("project-update-report.json", state.migrationReport);
   }
 
   async function exportSvg() {
@@ -1191,17 +1252,19 @@
         legendFeatures: state.features
       });
     } catch (error) {
-      showError("SVG gagal dibuat: " + error.message);
+      showError("The SVG could not be created. Your map is still safe. Try again or export PNG. " + error.message);
     }
   }
 
   async function exportPng() {
-    el.loadingIndicator.textContent = "Membuat PNG...";
+    el.loadingIndicator.dataset.state = "exporting";
+    el.loadingIndicator.textContent = "Creating PNG...";
     try {
       const payload = await getExportPayload();
       const pngPlan = MapExport.estimatePngCost({ pngSize: el.pngSize.value });
-      if (pngPlan.risky && !confirm(`Ekspor PNG ${pngPlan.width} x ${pngPlan.height} dapat memakai sekitar ${pngPlan.estimatedMegabytes} MB memori. Lanjutkan?`)) {
-        el.loadingIndicator.textContent = "Ekspor PNG dibatalkan.";
+      if (pngPlan.risky && !confirm(`A ${pngPlan.width} x ${pngPlan.height} PNG may use about ${pngPlan.estimatedMegabytes} MB of memory. Continue?`)) {
+        el.loadingIndicator.dataset.state = "ready";
+        el.loadingIndicator.textContent = "PNG export canceled. Your map has not changed.";
         return;
       }
       const result = await MapExport.exportPng(payload.features, state, {
@@ -1213,17 +1276,20 @@
         viewBounds: payload.viewBounds,
         legendFeatures: state.features
       });
+      el.loadingIndicator.dataset.state = "ready";
       el.loadingIndicator.textContent = result.fallbackUsed
-        ? `PNG selesai dibuat pada resolusi fallback ${result.size.width} x ${result.size.height}.`
-        : "PNG selesai dibuat.";
+        ? `PNG created at ${result.size.width} x ${result.size.height}.`
+        : productText("ui.status.pngCreated");
     } catch (error) {
-      showError("PNG gagal dibuat: " + error.message);
-      el.loadingIndicator.textContent = "Ekspor PNG gagal.";
+      showError(productText("ui.errors.pngExport"));
+      el.loadingIndicator.dataset.state = "ready";
+      el.loadingIndicator.textContent = "PNG was not created. Your map has not changed.";
     }
   }
 
   async function exportPdf() {
-    el.loadingIndicator.textContent = "Membuat PDF...";
+    el.loadingIndicator.dataset.state = "exporting";
+    el.loadingIndicator.textContent = "Creating PDF...";
     try {
       const payload = await getExportPayload();
       const result = await MapExport.exportPdf(payload.features, state, {
@@ -1234,15 +1300,17 @@
         viewBounds: payload.viewBounds,
         legendFeatures: state.features
       });
-      el.loadingIndicator.textContent = `PDF selesai (${result.rasterized ? "mode raster aman" : "vektor"}).`;
+      el.loadingIndicator.dataset.state = "ready";
+      el.loadingIndicator.textContent = productText("ui.status.pdfCreated");
     } catch (error) {
-      showError("PDF gagal dibuat: " + error.message);
-      el.loadingIndicator.textContent = "Ekspor PDF gagal.";
+      showError(productText("ui.errors.pdfExport"));
+      el.loadingIndicator.dataset.state = "ready";
+      el.loadingIndicator.textContent = "PDF was not created. Your map has not changed.";
     }
   }
 
   function exportMapping() {
-    if (!state.importRows.length) return showError("Belum ada data mapping untuk diekspor.");
+    if (!state.importRows.length) return showError("There is no region match table to download. Your map is safe. Add and match data first.");
     MapExport.exportMappingCsv(state.importRows, state);
   }
 
@@ -1262,11 +1330,11 @@
     const view = mapApi.getCurrentView();
     let featureById = state.featureById;
     if (el.exportHighDetail.checked) {
-      if (!confirm("Gunakan geometri detail lokal untuk ekspor? Data sekitar 10,5 MB akan dimuat hanya untuk ekspor ini.")) {
+      if (!confirm("Use detailed boundaries for this export? About 10.5 MB will be downloaded only for this export.")) {
         el.exportHighDetail.checked = false;
-        el.loadingIndicator.textContent = "Geometri detail dibatalkan; ekspor memakai geometri standar.";
+        el.loadingIndicator.textContent = "Detailed boundaries canceled. The export will use standard boundaries.";
       } else {
-        el.loadingIndicator.textContent = "Memuat geometri detail lokal untuk ekspor...";
+        el.loadingIndicator.textContent = "Loading detailed boundaries for this export...";
         await loadHighDetailCollection();
         featureById = state.highDetailFeatureById;
       }
@@ -1290,8 +1358,14 @@
   }
 
   function showError(message) {
-    el.errorArea.textContent = message;
-    setTimeout(() => { el.errorArea.textContent = ""; }, 7000);
+    const raw = String(message || "").trim();
+    el.errorArea.dataset.state = "error";
+    el.errorArea.dataset.testid = window.ProductContent ? window.ProductContent.strings.testIdentifiers.safeError : "safe-error";
+    el.errorArea.textContent = raw || productText("ui.errors.genericSafe");
+    setTimeout(() => {
+      el.errorArea.textContent = "";
+      el.errorArea.dataset.state = "idle";
+    }, 7000);
   }
 
   function escapeHtml(value) {

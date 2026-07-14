@@ -27,25 +27,25 @@
       const warnings = rawRow.issues.filter((issue) => issue.severity !== "error").map((issue) => issue.message);
       const code = ImportCore.normalizeCode(record.regionCode);
       const color = record.color || "#4472C4";
-      if (!record.regionCode && !record.regionName) errors.push("Isi kode wilayah atau nama wilayah.");
-      if (record.color && !ProjectStorage.isColor(color)) errors.push("Warna tidak valid.");
+      if (!record.regionCode && !record.regionName) errors.push("Add a region code or region name. Your current map is safe. Update this row and try again.");
+      if (record.color && !ProjectStorage.isColor(color)) errors.push("This color is not valid. Your current map is safe. Use a six-digit hex color, such as #4472C4.");
 
       let numberResult = null;
       if (roles.numericValue) {
         numberResult = ImportCore.parseLocaleNumber(record.numericValue, { locale: options.locale === "auto" ? "auto" : options.locale });
-        if (numberResult.kind === "invalid") errors.push("Nilai numerik tidak valid.");
-        if (numberResult.kind === "ambiguous") warnings.push("Format angka ambigu; pilih locale yang tepat.");
+        if (numberResult.kind === "invalid") errors.push("This number is not valid. Your current map is safe. Update the value or leave the cell empty.");
+        if (numberResult.kind === "ambiguous") warnings.push("This number may use the wrong separators. Nothing changed. Choose the matching number format before you continue.");
       }
 
       const match = matchedRows ? matchedRows[index] : legacyMatch(record, rawRow, indexes, seenTargets, errors);
       const matched = match && match.matched ? { id: match.matched.id, feature: match.matched.feature } : null;
       const ambiguous = match && match.candidates ? match.candidates : [];
       if (match) {
-        if (match.status === "ambiguous") errors.push("Nama wilayah ambigu; pilih kandidat atau tambahkan kode/provinsi yang lebih spesifik.");
-        if (match.status === "unmatched") errors.push("Wilayah tidak ditemukan.");
-        if (match.status === "invalid") errors.push("Baris tidak valid.");
-        if (match.status === "duplicate-target") errors.push("Duplikat target wilayah; pilih satu nilai atau abaikan salah satu baris.");
-        if (match.status === "ignored") warnings.push("Baris diabaikan.");
+        if (match.status === "ambiguous") errors.push("This name matches more than one region. Your current map is safe. Choose the correct region, or add a region code or province.");
+        if (match.status === "unmatched") errors.push("We could not match this region. Your current map is safe. Check the name or choose a match.");
+        if (match.status === "invalid") errors.push("This row is not valid. Your current map is safe. Check the row and try again.");
+        if (match.status === "duplicate-target") errors.push("Another row already matches this region. Your current map is safe. Keep one value or ignore one of the rows.");
+        if (match.status === "ignored") warnings.push("This row was ignored.");
       }
       return { rowId: rawRow.rowId, rowNumber, record, matched, ambiguous, errors, warnings, color, numberResult, matchStatus: match && match.status, matchEvidence: match && match.evidence, candidates: ambiguous };
     });

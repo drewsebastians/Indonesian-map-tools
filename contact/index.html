@@ -1,71 +1,71 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>Kontak dan Laporan Data</title>
+  <title>Contact and data reports</title>
   <link rel="stylesheet" href="../assets/css/content.css">
 </head>
 <body>
   <header class="site-header">
-    <nav class="site-inner site-nav" aria-label="Navigasi utama">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
       <a class="brand" href="../">Mapnesia</a>
-      <a href="../about/">Tentang</a>
-      <a href="../sources-licenses/">Sumber & Lisensi</a>
-      <a href="../data-methodology/">Metodologi Data</a>
-      <a href="../limitations/">Batasan</a>
-      <a href="../contact/">Kontak</a>
+      <a href="../about/">About</a>
+      <a href="../sources-licenses/">Sources and licenses</a>
+      <a href="../data-methodology/">Data method</a>
+      <a href="../limitations/">Limitations</a>
+      <a href="../contact/">Contact</a>
     </nav>
   </header>
   <main>
-    <p class="eyebrow">Terakhir ditinjau: 2026-07-12</p>
-    <h1>Kontak dan laporan data</h1>
-    <p class="lead">Saat ini belum ada alamat email atau kanal publik lain yang terverifikasi di repository. Karena itu, halaman ini menyediakan template laporan yang bisa disalin atau diunduh tanpa mengirim data apa pun otomatis.</p>
+    <p class="eyebrow">Last reviewed: 2026-07-12</p>
+    <h1>Contact and data reports</h1>
+    <p class="lead">No public email address or other contact channel has been verified in the repository. This page provides a report template that you can copy or download. It does not send anything automatically.</p>
 
     <section class="note soft">
-      <h2>Status kanal eksternal</h2>
-      <p>Owner perlu menentukan satu tujuan kontak publik sebelum fitur pelaporan dapat disebut lengkap. Sampai saat itu, jangan masukkan isi CSV, isi proyek, nama file, atau informasi pribadi ke laporan kecuali memang ingin dibagikan secara manual.</p>
+      <h2>Contact status</h2>
+      <p>The owner must choose a public contact destination before reports can be sent. Until then, do not add spreadsheet data, project contents, filenames, or personal information unless you intend to share it manually.</p>
     </section>
 
     <section id="laporkan-data">
-      <h2>Laporkan kesalahan data</h2>
-      <p>Isi hanya informasi yang relevan. Template otomatis menyertakan versi aplikasi, versi batas, dan versi registry, tetapi tidak membaca file proyek atau spreadsheet dari browser.</p>
+      <h2>Report a data issue</h2>
+      <p>Add only the information needed to explain the issue. The template includes the app, boundary, and region-list versions. It does not read your project file or spreadsheet.</p>
 
-      <label for="issueCategory">Kategori isu</label>
+      <label for="issueCategory">Issue category</label>
       <select id="issueCategory">
-        <option value="">Pilih kategori...</option>
-        <option>Nama wilayah</option>
-        <option>Kode wilayah</option>
-        <option>Provinsi/induk administrasi</option>
-        <option>Bentuk geometri</option>
-        <option>Wilayah hilang atau ambigu</option>
-        <option>Sumber atau atribusi</option>
+        <option value="">Choose a category...</option>
+        <option value="region-name">Region name</option>
+        <option value="region-code">Region code</option>
+        <option value="parent-region">Province or parent region</option>
+        <option value="boundary-shape">Boundary shape</option>
+        <option value="missing-or-ambiguous-region">Missing region or more than one match</option>
+        <option value="source-or-attribution">Source or attribution</option>
       </select>
 
-      <label for="geometryId">Geometry/legacy region ID</label>
-      <input id="geometryId" type="text" autocomplete="off" placeholder="Contoh: gb-22746128B65593111718524">
+      <label for="geometryId">Boundary shape ID (advanced)</label>
+      <input id="geometryId" type="text" autocomplete="off" placeholder="Example: gb-22746128B65593111718524">
 
-      <label for="canonicalId">Canonical region ID</label>
-      <input id="canonicalId" type="text" autocomplete="off" placeholder="Contoh: idn-adm2-gb-22746128b65593111718524">
+      <label for="canonicalId">Stable region ID (advanced)</label>
+      <input id="canonicalId" type="text" autocomplete="off" placeholder="Example: idn-adm2-gb-22746128b65593111718524">
 
-      <label for="issueDescription">Deskripsi</label>
-      <textarea id="issueDescription" maxlength="2000" placeholder="Jelaskan data yang menurut Anda perlu diperiksa, serta sumber pembanding bila ada."></textarea>
+      <label for="issueDescription">Description</label>
+      <textarea id="issueDescription" maxlength="2000" placeholder="Explain what should be checked and include a comparison source if you have one."></textarea>
 
-      <h3>Template laporan</h3>
+      <h3>Report template</h3>
       <div id="reportOutput" class="note report-output" aria-live="polite"></div>
       <div class="button-row">
-        <button id="copyReportBtn" type="button">Salin laporan</button>
-        <button id="downloadReportBtn" type="button" class="secondary">Unduh laporan</button>
+        <button id="copyReportBtn" type="button">Copy report</button>
+        <button id="downloadReportBtn" type="button" class="secondary">Download report</button>
       </div>
       <p id="reportStatus" class="meta" aria-live="polite"></p>
     </section>
 
-    <p class="meta">Kembali ke <a href="../">Map Studio</a> atau baca <a href="../data-methodology/">metodologi data</a>.</p>
+    <p class="meta">Return to <a href="../">Create a map</a> or read the <a href="../data-methodology/">data method</a>.</p>
   </main>
   <footer class="site-footer">
     <div class="site-inner">
-      <p class="meta">Tidak ada akun, backend, analytics, atau pengiriman formulir otomatis.</p>
+      <p class="meta">The app has no accounts, backend, analytics, or automatic form delivery.</p>
     </div>
   </footer>
   <script src="../assets/js/report-template.js"></script>

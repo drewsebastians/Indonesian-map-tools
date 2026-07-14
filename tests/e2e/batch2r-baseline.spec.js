@@ -12,7 +12,7 @@ test.setTimeout(300000);
 
 async function ready(page) {
   await page.goto("/", { waitUntil: "networkidle" });
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await expect(page.locator("#loadingIndicator")).toHaveAttribute("data-state", "ready", { timeout: 60000 });
 }
 
 async function capture(page, name, description, screenshots) {

@@ -138,9 +138,9 @@
         field += char;
         fieldStart = false;
       }
-      if (field.length > budget.maxSingleCellLength) throw new Error("Satu sel melebihi batas panjang yang diizinkan.");
+      if (field.length > budget.maxSingleCellLength) throw new Error("A cell is too long to read safely. Your current map has not changed. Shorten the cell and try again.");
     }
-    if (quoted) throw new Error("Input memiliki kutip yang belum ditutup.");
+    if (quoted) throw new Error("A quoted value is not closed. Your current map has not changed. Close the quote and try again.");
     row.push(field);
     rows.push(row);
     return rows.filter((items) => items.some((value) => String(value).trim() !== ""));
@@ -160,7 +160,7 @@
   function uniqueHeaders(headers) {
     const seen = new Map();
     return headers.map((header, index) => {
-      const base = String(header || `Kolom ${index + 1}`).trim() || `Kolom ${index + 1}`;
+      const base = String(header || `Column ${index + 1}`).trim() || `Column ${index + 1}`;
       const normalized = normalizeHeader(base);
       const count = (seen.get(normalized) || 0) + 1;
       seen.set(normalized, count);
@@ -184,7 +184,7 @@
           column: headers[index],
           role,
           confidence: exactIndex >= 0 ? "high" : "medium",
-          reason: exactIndex >= 0 ? "Header cocok dengan alias." : "Header mirip dengan alias."
+          reason: exactIndex >= 0 ? "The column name matches a known header." : "The column name is similar to a known header."
         });
       }
     });
@@ -197,21 +197,21 @@
   function parseTabularInput(options) {
     const budget = Object.assign({}, DEFAULT_BUDGET, options.budget || {});
     const rawText = String(options.text || "");
-    if (!rawText.trim()) throw new Error("Input kosong.");
-    if (byteLength(rawText) > budget.maxTextBytes) throw new Error("Input melebihi batas ukuran.");
+    if (!rawText.trim()) throw new Error("No data was added. Your current map is safe. Paste data or choose a file, then try again.");
+    if (byteLength(rawText) > budget.maxTextBytes) throw new Error("This data is too large to read safely. Your current map has not changed. Add fewer rows and try again.");
     const text = normalizeNewlines(rawText);
     const detection = options.delimiterOverride && options.delimiterOverride !== "auto"
       ? { delimiter: options.delimiterOverride, delimiterChar: delimiterChar(options.delimiterOverride), confidence: "manual", candidates: [] }
       : detectDelimiter(text);
     const records = parseDelimited(text, detection.delimiterChar, budget);
-    if (!records.length) throw new Error("Input tidak berisi baris data.");
+    if (!records.length) throw new Error("No data rows were found. Your current map has not changed. Check the file or pasted data and try again.");
     const originalHeaders = records[0].map((header) => String(header || "").trim());
     const headers = uniqueHeaders(originalHeaders);
-    if (!headers.length || headers.every((header) => !header.trim())) throw new Error("Header tidak ditemukan.");
-    if (headers.length > budget.maxColumns) throw new Error("Jumlah kolom melebihi batas.");
+    if (!headers.length || headers.every((header) => !header.trim())) throw new Error("No column headers were found. Your current map has not changed. Add a header row and try again.");
+    if (headers.length > budget.maxColumns) throw new Error("This data has too many columns. Your current map has not changed. Remove unneeded columns and try again.");
     const dataRows = records.slice(1);
-    if (dataRows.length > budget.maxRows) throw new Error("Jumlah baris melebihi batas.");
-    if (dataRows.length * headers.length > budget.maxCells) throw new Error("Jumlah sel melebihi batas.");
+    if (dataRows.length > budget.maxRows) throw new Error("This data has too many rows. Your current map has not changed. Add fewer rows and try again.");
+    if (dataRows.length * headers.length > budget.maxCells) throw new Error("This data has too many cells. Your current map has not changed. Add fewer rows or columns and try again.");
     const sourceType = options.sourceType || "paste";
     const sourceId = makeId("src", [sourceType, detection.delimiter, text.slice(0, 4096), records.length, headers.length]);
     const duplicateHeaderIssues = duplicateHeaderIssuesFor(originalHeaders);
@@ -220,7 +220,7 @@
       headers.forEach((header, columnIndex) => { cells[header] = String(items[columnIndex] || ""); });
       const issues = [];
       if (items.length !== headers.length) {
-        issues.push({ severity: "warning", code: "row.column_count_mismatch", message: "Jumlah sel berbeda dari jumlah header." });
+        issues.push({ severity: "warning", code: "row.column_count_mismatch", message: "This row has a different number of cells than the header row. Check the row before you continue." });
       }
       return {
         contractVersion: "batch2.rawRow.v1",
@@ -234,7 +234,7 @@
       };
     });
     const warnings = [];
-    if (detection.confidence === "low") warnings.push({ severity: "warning", code: "delimiter.low_confidence", message: "Delimiter terdeteksi dengan keyakinan rendah." });
+    if (detection.confidence === "low") warnings.push({ severity: "warning", code: "delimiter.low_confidence", message: "We are not sure which column separator this data uses. Check the preview or choose the separator." });
     warnings.push(...duplicateHeaderIssues);
     const importedSource = {
       contractVersion: "batch2.importedSource.v1",
@@ -271,7 +271,7 @@
     });
     return Array.from(counts.entries())
       .filter(([, count]) => count > 1)
-      .map(([header]) => ({ severity: "warning", code: "header.duplicate", message: `Header duplikat terdeteksi: ${header}.` }));
+      .map(([header]) => ({ severity: "warning", code: "header.duplicate", message: `The header \"${header}\" appears more than once. Rename one column before you continue.` }));
   }
 
   function normalizeText(value) {

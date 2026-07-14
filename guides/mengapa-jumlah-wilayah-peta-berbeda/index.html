@@ -1,59 +1,57 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>Mengapa Jumlah Wilayah Peta Berbeda?</title>
+  <title>Why map region counts can differ</title>
   <link rel="stylesheet" href="../../assets/css/content.css">
 </head>
 <body>
   <header class="site-header">
-    <nav class="site-inner site-nav" aria-label="Navigasi utama">
+    <nav class="site-inner site-nav" aria-label="Main navigation">
       <a class="brand" href="../../">Mapnesia</a>
-      <a href="../../about/">Tentang</a>
-      <a href="../../sources-licenses/">Sumber & Lisensi</a>
-      <a href="../../data-methodology/">Metodologi Data</a>
-      <a href="../../limitations/">Batasan</a>
-      <a href="../../contact/">Kontak</a>
+      <a href="../../about/">About</a>
+      <a href="../../sources-licenses/">Sources and licenses</a>
+      <a href="../../data-methodology/">Data method</a>
+      <a href="../../limitations/">Limitations</a>
+      <a href="../../contact/">Contact</a>
     </nav>
   </header>
   <main>
-    <p class="eyebrow">Terakhir ditinjau: 2026-07-12</p>
-    <h1>Mengapa jumlah wilayah di peta bisa berbeda?</h1>
-    <p class="lead">Perbedaan angka wilayah biasanya terjadi karena orang sedang menghitung hal yang berbeda: fitur geometri pada file peta, unit administrasi otonom, wilayah administratif khusus, atau metadata dari tahun sumber yang berbeda.</p>
+    <p class="eyebrow">Last reviewed: 2026-07-12</p>
+    <h1>Why map region counts can differ</h1>
+    <p class="lead">Region counts often differ because the sources count different things. A map file can count boundary shapes, while an official list counts administrative units from a particular year.</p>
 
-    <h2>Angka 519 di Mapnesia berarti apa?</h2>
-    <p>Di Mapnesia, 519 adalah jumlah fitur geometri ADM2 dalam snapshot geoBoundaries/HDX tahun 2020 yang dipakai aplikasi. Satu fitur geometri adalah satu objek polygon atau multipolygon di file peta, bukan selalu satu klaim kabupaten/kota otonom terkini.</p>
+    <h2>What does 519 mean in Mapnesia?</h2>
+    <p>The geoBoundaries/HDX 2020 source contains 519 second-level administrative boundary shapes (ADM2) for Indonesia. One mapped shape can be a single polygon or a group of polygons. It is not always the same as one current autonomous regency or city.</p>
 
-    <h2>Mengapa tidak memakai satu angka universal?</h2>
-    <p>Indonesia memiliki perubahan administrasi dari waktu ke waktu. Selain itu, dataset peta dapat memasukkan kota administrasi, kabupaten administrasi, wilayah kepulauan, atau snapshot sebelum pemekaran provinsi tertentu. Karena itu, angka dari peta 2020, daftar resmi tahun berjalan, dan statistik otonomi daerah dapat berbeda tanpa otomatis berarti salah.</p>
+    <h2>Why is there no single number?</h2>
+    <p>Indonesia's administrative structure changes over time. Map sources may also include administrative cities, administrative regencies, island areas, or a snapshot made before a province was divided. A 2020 map, a current official list, and regional-autonomy statistics can therefore show different totals without any one of them being automatically wrong.</p>
 
-    <h2>Contoh kasus non-satu-ke-satu</h2>
+    <h2>Examples that are not one-to-one</h2>
     <ul>
-      <li>Snapshot 2020 belum selalu sejalan dengan struktur 38 provinsi saat ini.</li>
-      <li>DKI Jakarta memiliki unit administratif yang berguna untuk visualisasi tetapi tidak sama maknanya dengan kabupaten/kota otonom biasa.</li>
-      <li>Beberapa nama wilayah muncul lebih dari sekali di metadata, sehingga 53 baris dibiarkan ambigu sampai ada bukti baris yang aman.</li>
-      <li>Papua-region split membuat geometri historis dan metadata terkini perlu dipisahkan.</li>
+      <li>The 2020 snapshot does not always match the current structure of 38 provinces.</li>
+      <li>DKI Jakarta contains administrative units that are useful on a map but do not have the same status as ordinary autonomous regencies and cities.</li>
+      <li>Some region names appear more than once in the source information. The app leaves 53 records without forced official details until stronger evidence is available.</li>
+      <li>Administrative changes in the Papua region mean that historical boundaries and current information must remain separate.</li>
     </ul>
 
-    <h2>Cara membaca peta ini</h2>
-    <p>Gunakan Mapnesia sebagai alat visual. Untuk keputusan hukum, regulasi, atau data resmi terbaru, cek dokumen sumber resmi yang relevan. Mapnesia menampilkan versi batas, versi registry, dan atribusi agar konteks peta tidak hilang saat diekspor.</p>
+    <h2>How to use this map</h2>
+    <p>Use Mapnesia as a visual tool. For legal decisions, regulations, or the latest official data, check the relevant official source. Mapnesia includes the boundary version, region-list version, and attribution so the map keeps its context when exported.</p>
 
     <section class="note soft">
-      <h2>Prinsip Batch 1</h2>
-      <p>Kami tidak mengubah angka atau menghapus pulau kecil hanya agar terlihat cocok dengan angka populer. Perbedaan dicatat, diuji, dan dijelaskan.</p>
+      <h2>Batch 1 principle</h2>
+      <p>The project does not change totals or remove small islands to match a popular number. Differences are recorded, tested, and explained.</p>
     </section>
 
     <div class="button-row">
-      <a class="button" href="../../">Buka Map Studio</a>
-      <a class="button secondary" href="../../contact/#laporkan-data">Laporkan kesalahan data</a>
+      <a class="button" href="../../">Create a map</a>
+      <a class="button secondary" href="../../contact/#laporkan-data">Report a data issue</a>
     </div>
   </main>
   <footer class="site-footer">
-    <div class="site-inner">
-      <p class="meta"><a href="../../data-methodology/">Metodologi Data</a> - <a href="../../sources-licenses/">Sumber & Lisensi</a> - <a href="../../limitations/">Batasan</a></p>
-    </div>
+    <div class="site-inner"><p class="meta"><a href="../../data-methodology/">Data method</a> - <a href="../../sources-licenses/">Sources and licenses</a> - <a href="../../limitations/">Limitations</a></p></div>
   </footer>
 </body>
 </html>

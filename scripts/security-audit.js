@@ -41,6 +41,10 @@ function assertContains(relativePath, text, label) {
   if (!read(relativePath).includes(text)) failures.push(`${relativePath} missing ${label}`);
 }
 
+function assertMatches(relativePath, pattern, label) {
+  if (!pattern.test(read(relativePath))) failures.push(`${relativePath} missing ${label}`);
+}
+
 function scanRuntimeExternalRequests() {
   if (!fs.existsSync(DIST)) {
     failures.push("dist missing; run build before security audit");
@@ -88,12 +92,12 @@ function scanHeaders() {
 
 function scanSafetyControls() {
   assertContains("assets/js/project-storage.js", "DANGEROUS_KEYS", "project JSON dangerous-key rejection");
-  assertContains("assets/js/project-storage.js", "File proyek terlalu besar", "project JSON size limits");
+  assertMatches("assets/js/project-storage.js", /project file is too large/i, "project JSON size limits");
   assertContains("assets/js/csv-import.js", "escapeFormula", "CSV formula injection escaping");
   assertContains("assets/js/export.js", "URL.revokeObjectURL", "download object URL cleanup");
   assertContains("assets/js/visualization-engine.js", "IDN-PALETTE-v1", "versioned local palette registry");
   assertContains("assets/js/app.js", "indonesia-adm2-detailed.geojson", "explicit local detailed geometry path");
-  assertContains("assets/js/app.js", "confirm(\"Gunakan geometri detail lokal", "explicit high-detail export confirmation");
+  assertMatches("assets/js/app.js", /confirm\([^)]*detailed[^)]*boundar/i, "explicit high-detail export confirmation");
 }
 
 function scanDocumentation() {

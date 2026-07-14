@@ -12,6 +12,10 @@ const forbiddenStartupPatterns = [
 ];
 const encoder = new TextEncoder();
 
+async function waitForAppReady(page) {
+  await expect(page.locator("#loadingIndicator")).toHaveAttribute("data-state", "ready", { timeout: 60000 });
+}
+
 function crc32(bytes) {
   let crc = 0xffffffff;
   for (const byte of bytes) {
@@ -156,9 +160,9 @@ test("load, color, save, SVG export, and smallest PNG export", async ({ page }) 
   });
 
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
-  await expect(page.locator("#dataTruthBadge")).toContainText(/snapshot ADM2 2020/i);
-  await expect(page.locator("#dataTruthBadge")).toContainText(/Registry/i);
+  await waitForAppReady(page);
+  await expect(page.locator("#dataTruthBadge")).toHaveAttribute("data-boundary-version", "IDN-ADM2-2020-geoboundaries-22746128");
+  await expect(page.locator("#dataTruthBadge")).toHaveAttribute("data-registry-version", "IDN-ADM-REGISTRY-v1-2025-06-23");
   await expect.poll(async () => page.locator(".leaflet-interactive").count()).toBeGreaterThan(500);
   const forbiddenStartup = requests.filter((request) => forbiddenStartupPatterns.some((pattern) => request.url.toLowerCase().includes(pattern)));
   expect(forbiddenStartup).toEqual([]);
@@ -181,21 +185,21 @@ test("load, color, save, SVG export, and smallest PNG export", async ({ page }) 
 
   const projectDownload = page.waitForEvent("download");
   await page.locator("#saveProjectBtn").click();
-  expect((await projectDownload).suggestedFilename()).toBe("peta-warna-indonesia-project.json");
+  expect((await projectDownload).suggestedFilename()).toBe("indonesia-region-map-project.json");
 
   const svgDownload = page.waitForEvent("download");
   await page.locator("#exportSvgBtn").click();
   const svg = await svgDownload;
-  expect(svg.suggestedFilename()).toBe("peta-warna-indonesia.svg");
+  expect(svg.suggestedFilename()).toBe("indonesia-region-map.svg");
   const svgText = fs.readFileSync(await svg.path(), "utf8");
   expect(svgText).toContain("IDN-ADM2-2020-geoboundaries-22746128");
-  expect(svgText).toContain("Referensi visual; bukan penetapan batas hukum");
+  expect(svgText).toContain("For visual reference only; not a legal boundary decision.");
 
   await page.locator("#exportLabels").uncheck();
   await page.locator("#pngSize").selectOption("1920x1080");
   const pngDownload = page.waitForEvent("download");
   await page.locator("#exportPngBtn").click();
-  expect((await pngDownload).suggestedFilename()).toBe("peta-warna-indonesia.png");
+  expect((await pngDownload).suggestedFilename()).toBe("indonesia-region-map.png");
 
   fs.writeFileSync(path.join(artifactDir, "smoke-network.json"), `${JSON.stringify({ requests, failed }, null, 2)}\n`);
   expect(pageErrors).toEqual([]);
@@ -207,7 +211,7 @@ test("startup labels are tiered on mobile and high-detail geometry is explicit",
   page.on("request", (request) => requests.push({ url: request.url(), method: request.method(), resourceType: request.resourceType() }));
   await page.setViewportSize({ width: 390, height: 760 });
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await expect.poll(async () => page.locator(".region-name-label").count()).toBeLessThan(80);
   expect(requests.some((request) => request.url.includes("indonesia-adm2-detailed.geojson"))).toBe(false);
 
@@ -224,18 +228,18 @@ test("startup labels are tiered on mobile and high-detail geometry is explicit",
   const download = page.waitForEvent("download");
   await page.locator("#exportSvgBtn").click();
   await detailedRequest;
-  expect((await download).suggestedFilename()).toBe("peta-warna-indonesia.svg");
+  expect((await download).suggestedFilename()).toBe("indonesia-region-map.svg");
 });
 
 test("PNG export supports largest, transparent, and fallback paths", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
 
   async function exportOneFeature(options) {
     return page.evaluate(async (exportOptions) => {
       const collection = await fetch("./data/indonesia-adm2-simplified.geojson").then((response) => response.json());
       return window.MapExport.exportPng([collection.features[0]], {
-        title: "Tes Ekspor",
+        title: "Export test",
         highlights: {},
         legend: [],
         legendVisible: false,
@@ -251,17 +255,17 @@ test("PNG export supports largest, transparent, and fallback paths", async ({ pa
 
   let download = page.waitForEvent("download");
   const largest = await exportOneFeature({ pngSize: "3840x2160" });
-  expect((await download).suggestedFilename()).toBe("peta-warna-indonesia.png");
+  expect((await download).suggestedFilename()).toBe("indonesia-region-map.png");
   expect(largest.fallbackUsed).toBe(false);
 
   download = page.waitForEvent("download");
   const transparent = await exportOneFeature({ pngSize: "1920x1080", transparent: true });
-  expect((await download).suggestedFilename()).toBe("peta-warna-indonesia.png");
+  expect((await download).suggestedFilename()).toBe("indonesia-region-map.png");
   expect(transparent.fallbackUsed).toBe(false);
 
   download = page.waitForEvent("download");
   const fallback = await exportOneFeature({ pngSize: "2560x1440", forceCanvasFailure: true });
-  expect((await download).suggestedFilename()).toBe("peta-warna-indonesia.png");
+  expect((await download).suggestedFilename()).toBe("indonesia-region-map.png");
   expect(fallback.fallbackUsed).toBe(true);
   expect(fallback.size).toEqual({ width: 1920, height: 1080 });
 });
@@ -272,7 +276,7 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
   page.on("dialog", (dialog) => dialog.accept());
 
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
 
   await page.locator("#csvFile").setInputFiles(sampleCsv);
   await page.locator("#previewCsvBtn").click();
@@ -285,7 +289,7 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
 
   await page.locator("#projectFile").setInputFiles(sampleProject);
   await expect(page.locator("#migrationReportBtn")).toBeVisible();
-  await expect(page.locator("#autosaveStatus")).toContainText(/Migrasi|Proyek dibuka/i);
+  await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", /opened|migration-review/);
   await expect(page.locator("#highlightCount")).toHaveText("1");
 
   for (let index = 0; index < 20; index += 1) {
@@ -297,11 +301,11 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
 
 test("paste import previews mapping and waits for explicit apply", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
 
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t0\n");
   await page.locator("#previewCsvBtn").click();
-  await expect(page.locator("#importMapping")).toContainText("Paste lokal");
+  await expect(page.locator("#importMapping")).toContainText("Pasted data");
   await expect(page.locator("#map-regionName")).toHaveValue("wilayah");
   await expect(page.locator("#map-province")).toHaveValue("provinsi");
   await expect(page.locator("#map-numericValue")).toHaveValue("nilai");
@@ -310,22 +314,25 @@ test("paste import previews mapping and waits for explicit apply", async ({ page
 
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("2");
+  await expect(page.locator("[data-testid='import-success']")).toHaveText("2 rows were added to the map.");
 });
 
 test("ambiguous import row can be resolved locally before apply", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
 
   await page.locator("#importPaste").fill("wilayah\tnilai\nBandung\t50\n");
   await page.locator("#previewCsvBtn").click();
-  await expect(page.locator("#csvPreview")).toContainText("ambiguous");
+  await expect(page.locator("#csvPreview")).toHaveAttribute("data-match-status", /needs-review|unmatched/);
+  await expect(page.locator("[data-testid='unmatched-warning']")).toContainText("Your map is still safe.");
+  await expect(page.locator("#fixUnmatchedRows")).toHaveText("Fix unmatched regions");
   await expect(page.locator("#applyCsvBtn")).toBeDisabled();
 
   const candidateSelect = page.locator("[data-candidate-for]").first();
   await expect(candidateSelect).toBeVisible();
   await candidateSelect.selectOption({ index: 1 });
   await page.locator("[data-resolve-row]").first().click();
-  await expect(page.locator("#csvPreview")).toContainText("user-resolved");
+  await expect(page.locator("#csvPreview")).toHaveAttribute("data-match-status", "ready");
   await expect(page.locator("#applyCsvBtn")).toBeEnabled();
 
   await page.locator("#applyCsvBtn").click();
@@ -341,12 +348,12 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
   page.on("request", (request) => requests.push(request.url()));
 
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   expect(requests.some((url) => url.includes("read-excel-file.min.js"))).toBe(false);
 
   await page.locator("#importPaste").fill("wilayah\tnilai\nKota Surabaya\t125\n");
   await page.locator("#previewCsvBtn").click();
-  await expect(page.locator("#importMapping")).toContainText("Paste lokal");
+  await expect(page.locator("#importMapping")).toContainText("Pasted data");
   expect(requests.some((url) => url.includes("read-excel-file.min.js"))).toBe(false);
 
   await page.locator("#importPaste").evaluate((textarea) => {
@@ -356,31 +363,31 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
   await page.locator("#csvFile").setInputFiles(xlsxPath);
   await expect.poll(() => page.locator("#csvFile").evaluate((input) => input.files.length)).toBe(1);
   await page.locator("#previewCsvBtn").click();
-  await expect(page.locator("#importMapping")).toContainText("File XLSX lokal");
-  await expect(page.locator("#importMapping")).toContainText("Sheet: Data");
+  await expect(page.locator("#importMapping")).toContainText("XLSX file");
+  await expect(page.locator("#importMapping")).toContainText("Worksheet: Data.");
   await expect(page.locator("#xlsxSheet")).toBeVisible();
   await expect(page.locator("#csvPreview")).toContainText("2");
   expect(requests.some((url) => url.includes("read-excel-file.min.js"))).toBe(true);
   expect(requests.filter((url) => /^https?:\/\//.test(url) && !url.startsWith("http://127.0.0.1:4173/"))).toEqual([]);
 
   await page.locator("#xlsxSheet").selectOption("Cadangan");
-  await expect(page.locator("#importMapping")).toContainText("Sheet: Cadangan");
+  await expect(page.locator("#importMapping")).toContainText("Worksheet: Cadangan.");
   await expect(page.locator("#csvPreview")).toContainText("1");
 });
 
 test("beginner workflow example keeps table and map selection linked", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
-  await expect(page.locator("#workflowSteps")).toContainText("Input");
+  await waitForAppReady(page);
+  await expect(page.locator("#workflowSteps")).toContainText("Add data");
   await page.locator("#exampleBtn").click();
-  await expect(page.locator("#workflowStatus")).toContainText(/Match|baris siap/i);
+  await expect(page.locator("#workflowStatus")).toHaveAttribute("data-stage", "match");
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#dataTablePanel")).toBeVisible();
   await expect(page.locator("#dataTable tbody tr")).toHaveCount(2);
-  await expect(page.locator("#workflowStatus")).toContainText(/Visualize|wilayah tampil/i);
+  await expect(page.locator("#workflowStatus")).toHaveAttribute("data-stage", "design");
 
   await page.locator("#dataTable tbody tr").first().click();
-  await expect(page.locator("#mapSelectionStatus")).toContainText(/dipilih/i);
+  await expect(page.locator("#mapSelectionStatus")).toHaveAttribute("data-state", "selected");
   await expect(page.locator("#dataTable tbody tr").first()).toHaveClass(/selected/);
 
   const surabayaPath = page.locator('.leaflet-interactive[aria-label*="Surabaya"]').first();
@@ -398,7 +405,7 @@ test("beginner workflow example keeps table and map selection linked", async ({ 
 test("mobile layout keeps the map reachable before the control panel", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 760 });
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   const positions = await page.evaluate(() => ({
     map: document.querySelector(".map-area").getBoundingClientRect().top,
     panel: document.querySelector(".control-panel").getBoundingClientRect().top
@@ -411,23 +418,23 @@ test("deterministic visualization preview applies a shared legend", async ({ pag
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await expect(page.locator("#vizMode")).toBeVisible();
   await page.locator("#exampleBtn").click();
   await page.locator("#applyCsvBtn").click();
   await page.locator("#vizMode").selectOption("equal-interval");
   await page.locator("#vizClasses").fill("3");
   await page.locator("#vizPreviewBtn").click();
-  await expect(page.locator("#vizSummary")).toContainText(/wilayah berwarna/i);
+  await expect(page.locator("#vizSummary")).toHaveAttribute("data-state", "ready");
   await expect.poll(() => requests.some((url) => url.includes("visualization-engine.js"))).toBe(true);
   await page.locator("#vizApplyBtn").click();
-  await expect(page.locator("#map .map-legend")).toContainText(/Legenda|Tidak ada data/i);
-  await expect(page.locator("#dataTable tbody tr").first()).toContainText(/exact|siap/i);
+  await expect(page.locator("#map .map-legend")).toContainText(/Legend|No data/i);
+  await expect(page.locator("#dataTable tbody tr").first()).toHaveAttribute("data-match-status", "matched");
 });
 
 test("numeric visualization returns blank values to the no-data map state", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t\n");
   await page.locator("#previewCsvBtn").click();
   await expect(page.locator("#applyCsvBtn")).toBeEnabled();
@@ -437,31 +444,31 @@ test("numeric visualization returns blank values to the no-data map state", asyn
   await page.locator("#vizPreviewBtn").click();
   await page.locator("#vizApplyBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("1");
-  await expect(page.locator("#map .map-legend")).toContainText(/Tidak ada data/i);
+  await expect(page.locator("#map .map-legend")).toContainText(/No data/i);
 });
 
 test("professional export writes PDF and mapping CSV with safe metadata", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await page.locator("#exampleBtn").click();
   await page.locator("#applyCsvBtn").click();
-  await page.locator("#exportSubtitle").fill("Ringkasan <aman>");
-  await page.locator("#exportSource").fill("Sumber lokal");
+  await page.locator("#exportSubtitle").fill("Safe summary <text>");
+  await page.locator("#exportSource").fill("Local source");
   await page.locator("#exportPeriod").fill("2025");
-  await page.locator("#exportFilenameSlug").fill("uji metadata / aman");
+  await page.locator("#exportFilenameSlug").fill("safe metadata test");
   await page.locator("#exportRatio").selectOption("a3");
   await page.locator("#exportExtent").selectOption("national");
 
   const mappingDownload = page.waitForEvent("download");
   await page.locator("#exportMappingBtn").click();
   const mapping = await mappingDownload;
-  expect(mapping.suggestedFilename()).toBe("uji-metadata-aman-mapping.csv");
+  expect(mapping.suggestedFilename()).toBe("safe-metadata-test-mapping.csv");
   expect(fs.readFileSync(await mapping.path(), "utf8")).toContain("Canonical_Region_ID");
 
   const pdfDownload = page.waitForEvent("download");
   await page.locator("#exportPdfBtn").click();
   const pdf = await pdfDownload;
-  expect(pdf.suggestedFilename()).toBe("uji-metadata-aman.pdf");
+  expect(pdf.suggestedFilename()).toBe("safe-metadata-test.pdf");
   const pdfBytes = fs.readFileSync(await pdf.path());
   expect(pdfBytes.subarray(0, 8).toString()).toBe("%PDF-1.4");
   expect(pdfBytes.toString("latin1")).toContain("IDN-ADM2-2020");
@@ -474,7 +481,7 @@ test("assisted first-user flow reaches a valid export within five minutes", asyn
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t77\n");
   await page.locator("#previewCsvBtn").click();
   await expect(page.locator("#csvPreview")).toContainText("2");
@@ -488,7 +495,7 @@ test("assisted first-user flow reaches a valid export within five minutes", asyn
   await page.locator("#vizApplyBtn").click();
   await expect(page.locator("#map .map-legend")).toBeVisible();
   marks.firstValidMapMs = Date.now() - started;
-  await page.locator("#exportSource").fill("Uji alur sintetis");
+  await page.locator("#exportSource").fill("Synthetic flow test");
   await page.locator("#exportPeriod").fill("2025");
   const download = page.waitForEvent("download");
   await page.locator("#exportSvgBtn").click({ force: true });
@@ -506,7 +513,7 @@ test("two-column official-code flow reaches a mapping export without ambiguity",
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await expect(page.locator("#loadingIndicator")).toContainText(/wilayah dimuat/i, { timeout: 60000 });
+  await waitForAppReady(page);
   await page.locator("#importPaste").fill("kode\tnilai\n35.78\t125\n51.71\t77\n");
   await page.locator("#previewCsvBtn").click();
   await expect(page.locator("#applyCsvBtn")).toBeEnabled();

@@ -168,7 +168,7 @@ test("loadAutosave migrates legacy autosave through the same safe path", () => {
 
 test("sanitizeProject rejects unsupported schema versions", () => {
   const storage = loadProjectStorage();
-  assert.throws(() => storage.sanitizeProject({ schemaVersion: "9.9", highlights: {} }, new Set()), /Versi file proyek/);
+  assert.throws(() => storage.sanitizeProject({ schemaVersion: "9.9", highlights: {} }, new Set()), /project file version is not supported/i);
 });
 
 test("sanitizeProject rejects invalid colors in valid region highlights", () => {
@@ -176,7 +176,7 @@ test("sanitizeProject rejects invalid colors in valid region highlights", () => 
   assert.throws(() => storage.sanitizeProject({
     schemaVersion: "1.0",
     highlights: { "known-id": { color: "javascript:alert(1)" } }
-  }, new Set(["known-id"])), /warna tidak valid/);
+  }, new Set(["known-id"])), /invalid color/i);
 });
 
 test("sanitizeProject rejects oversized highlight payloads", () => {
@@ -185,13 +185,13 @@ test("sanitizeProject rejects oversized highlight payloads", () => {
   for (let index = 0; index < 2001; index += 1) {
     highlights[`id-${index}`] = { color: "#4472C4" };
   }
-  assert.throws(() => storage.sanitizeProject({ schemaVersion: "1.0", highlights }, new Set()), /terlalu besar/);
+  assert.throws(() => storage.sanitizeProject({ schemaVersion: "1.0", highlights }, new Set()), /project file is too large/i);
 });
 
 test("sanitizeProject rejects prototype-pollution structures", () => {
   const storage = loadProjectStorage();
   const polluted = JSON.parse('{"schemaVersion":"1.0","highlights":{},"__proto__":{"polluted":true}}');
-  assert.throws(() => storage.sanitizeProject(polluted, new Set()), /tidak aman/);
+  assert.throws(() => storage.sanitizeProject(polluted, new Set()), /unsafe structure/i);
 });
 
 test("isColor only accepts six-digit hex colors", () => {

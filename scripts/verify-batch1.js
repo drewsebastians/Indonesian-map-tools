@@ -40,6 +40,7 @@ const python = pythonCommand();
 const playwright = playwrightCli();
 
 run("clean build", node, ["scripts/build.js"]);
+run("simple-English terminology audit", node, ["scripts/terminology-audit.js"]);
 run("data/license/reproducibility pipeline", node, ["scripts/data-pipeline.js", "test"]);
 run("geometry and registry tests", python, ["tests/run_data_tests.py"]);
 run("unit and migration tests", node, ["--test", "--test-isolation=none", "tests/unit/*.test.js"]);
