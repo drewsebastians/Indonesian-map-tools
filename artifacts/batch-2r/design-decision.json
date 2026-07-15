@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "approved",
+  "selectedOption": "option-a",
+  "ownerRequirements": {
+    "retainFromOtherOptions": {
+      "mobile": "option-c",
+      "errorHandling": "option-b"
+    },
+    "preferredPaletteDirection": "option-a",
+    "preferredDensity": null,
+    "rejectedPatterns": []
+  },
+  "requiredChanges": [
+    "Retain a USEFUL STARTING POINTS/templates section like Option C.",
+    "Retain the highlighted-region cross-workflow suggestion directing users to the spreadsheet workflow."
+  ],
+  "approvedPaletteDirection": "option-a",
+  "approvedDesktopPattern": "option-a-guided-rail",
+  "approvedMobilePattern": "option-c-map-first-sheets",
+  "approvedAt": "2026-07-15",
+  "verifiedCommit": "e5fa19b"
+}
