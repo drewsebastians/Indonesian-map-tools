@@ -8,9 +8,12 @@ const requiredFiles = [
   "_headers",
   ".nojekyll",
   "index.html",
+  "workspace/index.html",
   "robots.txt",
   "assets/css/app.css",
   "assets/css/content.css",
+  "assets/css/design-system.css",
+  "assets/js/public-shell.js",
   "assets/js/brand-config.js",
   "assets/js/app.js",
   "assets/js/import-core.js",
@@ -42,6 +45,7 @@ const requiredFiles = [
   "limitations/index.html",
   "changelog/index.html",
   "guides/mengapa-jumlah-wilayah-peta-berbeda/index.html",
+  "guides/index.html",
   "guides/cara-membuat-peta-kabupaten-kota-dari-excel/index.html",
   "guides/memperbaiki-nama-wilayah/index.html",
   "guides/csv-vs-xlsx-untuk-data-peta/index.html",
@@ -80,7 +84,7 @@ fs.mkdirSync(dist, { recursive: true });
 
 requiredFiles.forEach(copyFile);
 
-function bundleRootRuntime() {
+function bundleWorkspaceRuntime() {
   const earlyRuntimeModules = [
     "assets/js/brand-config.js",
     "assets/js/brand-migration.js"
@@ -89,7 +93,7 @@ function bundleRootRuntime() {
   const runtimeModules = [...earlyRuntimeModules, ...appRuntimeModules];
   const projectStoragePath = path.join(dist, "assets/js/project-storage.js");
   const appPath = path.join(dist, "assets/js/app.js");
-  const indexPath = path.join(dist, "index.html");
+  const indexPath = path.join(dist, "workspace", "index.html");
   const readModule = (relativePath) => {
     const sourcePath = path.join(root, relativePath);
     if (!fs.existsSync(sourcePath)) throw new Error(`Required root runtime source is missing: ${relativePath}`);
@@ -103,9 +107,9 @@ function bundleRootRuntime() {
 
   runtimeModules.forEach((relativePath) => {
     const filename = path.basename(relativePath).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const scriptMarker = new RegExp(`\\s*<script src="\\.\\/assets\\/js\\/${filename}"><\\/script>`);
+    const scriptMarker = new RegExp(`\\s*<script src="(?:\\.\\.\\/|\\.\\/)assets\\/js\\/${filename}"><\\/script>`);
     if (!scriptMarker.test(index)) {
-      throw new Error(`index.html is missing the ${path.basename(relativePath)} script marker required by the build.`);
+      throw new Error(`workspace/index.html is missing the ${path.basename(relativePath)} script marker required by the build.`);
     }
     index = index.replace(scriptMarker, "");
   });
@@ -118,7 +122,7 @@ function bundleRootRuntime() {
   fs.writeFileSync(indexPath, index);
 }
 
-bundleRootRuntime();
+bundleWorkspaceRuntime();
 
 const produced = listFiles(dist).length;
 if (!produced) {

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "batch2r.public-shell.v1",
+  "generatedAt": "2026-07-15T02:15:17.846Z",
+  "limits": {
+    "publicCssGzipBytes": 18000,
+    "publicJavaScriptGzipBytes": 4000,
+    "homepageHtmlGzipBytes": 6000
+  },
+  "measured": {
+    "publicCssGzipBytes": 3758,
+    "publicJavaScriptGzipBytes": 379,
+    "homepageHtmlGzipBytes": 2168
+  },
+  "checks": [
+    {
+      "name": "no-map-or-spreadsheet-runtime-in-homepage-html",
+      "passed": true,
+      "detail": "Homepage source contains no map, geometry, or spreadsheet runtime reference."
+    },
+    {
+      "name": "single-filled-primary-action",
+      "passed": true,
+      "detail": "Homepage has one filled primary button; secondary CTAs are explicitly styled."
+    },
+    {
+      "name": "publicCssGzipBytes",
+      "passed": true,
+      "detail": "3758 <= 18000"
+    },
+    {
+      "name": "publicJavaScriptGzipBytes",
+      "passed": true,
+      "detail": "379 <= 4000"
+    },
+    {
+      "name": "homepageHtmlGzipBytes",
+      "passed": true,
+      "detail": "2168 <= 6000"
+    }
+  ]
+}

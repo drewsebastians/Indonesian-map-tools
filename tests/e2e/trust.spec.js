@@ -51,7 +51,7 @@ test("report-error template copies only structured public fields", async ({ page
 });
 
 test("source/version links and unknown routes are handled", async ({ page, request }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await expect(page.locator("#loadingIndicator")).toHaveAttribute("data-state", "ready", { timeout: 60000 });
   await expect(page.locator("#dataTruthBadge")).toHaveAttribute("data-boundary-version", "IDN-ADM2-2020-geoboundaries-22746128");
   await page.locator("[data-testid='report-data-error-link']").click();

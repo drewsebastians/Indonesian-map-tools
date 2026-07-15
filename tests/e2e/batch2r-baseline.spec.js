@@ -11,7 +11,7 @@ fs.mkdirSync(docsDir, { recursive: true });
 test.setTimeout(300000);
 
 async function ready(page) {
-  await page.goto("/", { waitUntil: "networkidle" });
+  await page.goto("/workspace/", { waitUntil: "networkidle" });
   await expect(page.locator("#loadingIndicator")).toHaveAttribute("data-state", "ready", { timeout: 60000 });
 }
 

@@ -14,7 +14,8 @@
     maxSheets: 20,
     maxCompressionRatio: 80
   };
-  const PARSER_URL = "./assets/vendor/read-excel-file/read-excel-file.min.js";
+  const RUNTIME_BASE = window.location.pathname.startsWith("/workspace/") ? "../" : "./";
+  const PARSER_URL = `${RUNTIME_BASE}assets/vendor/read-excel-file/read-excel-file.min.js`;
   let parserPromise = null;
 
   function isCanceled(signal) {

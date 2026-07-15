@@ -8,6 +8,8 @@ Current staging remains at `https://mapnesia.andrew-sebastian91.workers.dev` and
 
 ## Current features
 
+- A lightweight public homepage at `/` with goal-led entry points, templates, examples, guides, and factual privacy/data trust points.
+- The production workspace remains at `/workspace/` while its Batch 2 mapping engines are preserved for the approved Prompt 6 redesign.
 - Local paste, CSV, TSV, and XLSX input through one import workflow.
 - Column matching, Indonesian and international number formats, and browser-side input limits.
 - Deterministic region matching; ambiguous names, unmatched names, duplicates, and ignored rows stay visible.
@@ -21,7 +23,7 @@ There is no backend, account system, analytics, external map tile service, runti
 
 ## How to use NusaCanvas
 
-1. Open the workspace and choose **Try a sample**, paste a table, or select a file.
+1. Open `/workspace/` and choose **Try a sample**, paste a table, or select a file.
 2. Preview the input and confirm the suggested columns.
 3. Fix uncertain region names or add a province or region code.
 4. Use the valid rows, choose a visualization, and check the map, table, and legend.
@@ -56,6 +58,7 @@ Use Node.js 24.x.
 npm ci
 npm run build
 npm run verify:batch1
+npm run verify:batch2r:public-shell
 ```
 
 `npm run build` copies only approved production assets to `dist/`. See `docs/development.md`, `docs/deployment-guide.md`, and the historical reports in `docs/batch-2/` for testing and staging details.

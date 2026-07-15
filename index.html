@@ -4,311 +4,125 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title data-brand-title>NusaCanvas — Create an Indonesia region map</title>
-  <meta name="description" data-brand-description content="NusaCanvas turns spreadsheet data into clear Indonesia regency and city maps in your browser.">
-  <link rel="stylesheet" href="./assets/vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="./assets/css/app.css">
+  <title>NusaCanvas — Create clear Indonesia maps</title>
+  <meta name="description" content="Turn Indonesia data into clear, presentation-ready maps in minutes. No GIS skills, account, or upload required.">
+  <link rel="stylesheet" href="./assets/css/design-system.css">
+  <link rel="stylesheet" href="./assets/css/content.css">
+  <script src="./assets/js/public-shell.js" defer></script>
 </head>
-<body>
-  <div id="appShell" class="app-shell">
-    <button id="sidebarToggleBtn" class="sidebar-toggle" type="button" aria-controls="controlPanel" aria-expanded="true" title="Show or hide map controls">☰</button>
-    <aside id="controlPanel" class="control-panel" aria-label="Map controls">
-      <header class="app-header">
-        <h1 data-brand-product>NusaCanvas</h1>
-        <p data-brand-positioning>Create clear Indonesia regency and city maps from spreadsheet data.</p>
-        <p>Regions include Indonesia's regencies and cities. Boundaries are for visual reference.</p>
-        <p id="dataTruthBadge" class="data-badge">Boundary snapshot: 2020 · Administrative names reviewed: 2025</p>
-        <nav class="trust-links" aria-label="Data and trust information">
-          <a href="./sources-licenses/">Sources and licenses</a>
-          <a href="./limitations/">Limitations</a>
-          <a href="./contact/#laporkan-data" data-testid="report-data-error-link">Report a data issue</a>
-        </nav>
-      </header>
-
-      <section class="panel-section">
-        <div class="workflow-intro">
-          <h2>Create a map</h2>
-          <p class="notice">Add data, match regions, design the map, then export it. Your data stays on this device.</p>
-          <div id="workflowSteps" class="workflow-steps" role="navigation" aria-label="Map creation steps"></div>
-          <p id="workflowStatus" class="status-line" aria-live="polite" data-stage="input">Step 1 of 4: Add data.</p>
-          <div class="mode-toggle" role="group" aria-label="Control mode">
-            <span>Mode:</span>
-            <button id="basicModeBtn" type="button" class="mode-button active" aria-pressed="true">Basic</button>
-            <button id="advancedModeBtn" type="button" class="mode-button secondary" aria-pressed="false">Advanced</button>
-          </div>
-          <button id="exampleBtn" type="button" class="secondary example-button" data-copy="ui.actions.trySample">Try a sample</button>
-        </div>
-      </section>
-
-      <section class="panel-section">
-        <label for="projectTitle">Map title</label>
-        <input id="projectTitle" type="text" maxlength="90" value="NusaCanvas Indonesia region map">
-        <label for="exportSubtitle">Subtitle</label>
-        <input id="exportSubtitle" type="text" maxlength="180" placeholder="Optional">
-        <label for="exportSource">Your data source</label>
-        <input id="exportSource" type="text" maxlength="180" placeholder="Optional. Boundary attribution is added automatically.">
-        <label for="exportPeriod">Period</label>
-        <input id="exportPeriod" type="text" maxlength="80" placeholder="Example: 2025">
-        <label for="exportFootnote">Footnote</label>
-        <input id="exportFootnote" type="text" maxlength="180" placeholder="Optional">
-        <label for="exportLegendTitle">Legend title</label>
-        <input id="exportLegendTitle" type="text" maxlength="80" value="Legend">
-        <label for="exportFilenameSlug">File name</label>
-        <input id="exportFilenameSlug" type="text" maxlength="80" value="nusacanvas-indonesia-map" inputmode="url">
-      </section>
-
-      <section class="panel-section" data-workflow-step="visualize">
-        <h2>Select a region</h2>
-        <label for="searchInput">Search regions</label>
-        <input id="searchInput" type="search" autocomplete="off" placeholder="Example: Surabaya">
-        <div id="searchResults" class="search-results" role="listbox" aria-label="Search results"></div>
-
-        <label for="provinceSelect">Province</label>
-        <select id="provinceSelect"></select>
-
-        <label for="regionSelect">Regency or city</label>
-        <select id="regionSelect"></select>
-
-        <div class="selected-region" id="selectedRegion">No region selected.</div>
-      </section>
-
-      <section class="panel-section" data-workflow-step="visualize">
-        <h2>Highlight regions manually</h2>
-        <p class="notice">Use this option to select and color one region at a time.</p>
-        <label for="colorPicker">Highlight color</label>
-        <div class="color-row">
-          <input id="colorPicker" type="color" value="#4472C4">
-          <div id="quickColors" class="quick-colors" aria-label="Quick color choices"></div>
-        </div>
-        <label for="categoryInput">Category</label>
-        <input id="categoryInput" type="text" maxlength="60" placeholder="Optional">
-        <label for="valueInput">Value</label>
-        <input id="valueInput" type="text" maxlength="60" placeholder="Optional">
-        <div class="button-grid">
-          <button id="applyColorBtn" type="button" data-copy="ui.actions.highlightRegion">Highlight region</button>
-          <button id="removeColorBtn" type="button" class="secondary" data-copy="ui.actions.removeHighlight">Remove highlight</button>
-          <button id="undoBtn" type="button" class="secondary" data-copy="ui.actions.undo">Undo</button>
-          <button id="resetBtn" type="button" class="danger" data-copy="ui.actions.clearMap">Clear map</button>
-        </div>
-      </section>
-
-      <section class="panel-section" data-workflow-step="visualize">
-        <div class="section-heading">
-          <h2>Highlighted regions</h2>
-          <span id="highlightCount" class="count-pill">0</span>
-        </div>
-        <div id="highlightList" class="highlight-list" aria-live="polite"></div>
-      </section>
-
-      <section class="panel-section" data-workflow-step="visualize">
-        <div class="section-heading">
-          <h2>Color groups</h2>
-          <span id="groupCount" class="count-pill">0</span>
-        </div>
-        <p class="notice">Regions with the same color are grouped together.</p>
-        <div id="groupingList" class="grouping-list" aria-live="polite"></div>
-      </section>
-
-      <section class="panel-section" data-workflow-step="visualize">
-        <h2>Legend</h2>
-        <label class="check-row"><input id="showLegend" type="checkbox" checked> Show legend</label>
-        <label for="legendPosition">Legend position</label>
-        <select id="legendPosition">
-          <option value="bottom-right">Bottom right</option>
-          <option value="bottom-left">Bottom left</option>
-          <option value="top-right">Top right</option>
-          <option value="top-left">Top left</option>
-        </select>
-        <div id="legendItems" class="legend-editor"></div>
-        <button id="addLegendBtn" type="button" class="secondary" data-copy="ui.actions.addLegend">Add legend item</button>
-      </section>
-
-      <section class="panel-section" data-workflow-step="input">
-        <h2>Add data</h2>
-        <p class="notice">Paste data or upload a CSV, TSV, or XLSX file. Your data stays in this browser.</p>
-        <label for="importPaste">Paste data</label>
-        <textarea id="importPaste" rows="5" spellcheck="false" placeholder="region&#9;value&#10;Kota Surabaya&#9;125"></textarea>
-        <label for="csvFile">Upload spreadsheet</label>
-        <input id="csvFile" type="file" accept=".csv,.tsv,.txt,.xlsx,text/csv,text/tab-separated-values,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" aria-label="Upload a CSV, TSV, or XLSX file">
-        <label for="xlsxSheet" class="hidden">Worksheet</label>
-        <select id="xlsxSheet" class="hidden" aria-label="Choose an XLSX worksheet"></select>
-        <details id="advancedImportOptions" class="advanced-options">
-          <summary>Advanced data options</summary>
-          <label for="importDelimiter">Separator</label>
-          <select id="importDelimiter">
-            <option value="auto">Detect automatically</option>
-            <option value="comma">Comma (,)</option>
-            <option value="semicolon">Semicolon (;)</option>
-            <option value="tab">Tab</option>
-          </select>
-          <label for="importLocale">Number format</label>
-          <select id="importLocale">
-            <option value="auto">Detect automatically</option>
-            <option value="id-ID">Indonesia: 1.234,56</option>
-            <option value="en-US">International: 1,234.56</option>
-          </select>
-        </details>
-        <div class="button-grid">
-          <button id="previewCsvBtn" type="button" data-copy="ui.actions.previewData">Match regions</button>
-          <button id="applyCsvBtn" type="button" class="secondary" disabled data-copy="ui.actions.useMatches">Use these matches</button>
-          <button id="cancelImportBtn" type="button" class="secondary" data-copy="ui.actions.cancel">Cancel</button>
-        </div>
-        <div id="importMapping" class="import-mapping" aria-live="polite"></div>
-        <div id="csvPreview" class="import-preview"></div>
-      </section>
-
-      <section class="panel-section" data-workflow-step="visualize">
-        <h2>Color spreadsheet data</h2>
-        <p class="notice">Choose how to use your values. Blank or invalid values remain visible as no data.</p>
-        <label for="vizMode">Color method</label>
-        <select id="vizMode">
-          <option value="categorical">Color by category</option>
-          <option value="equal-interval">Even value ranges</option>
-          <option value="quantile">Equal-sized groups</option>
-          <option value="manual">Custom ranges</option>
-          <option value="diverging">Above and below a midpoint</option>
-        </select>
-        <label for="vizClasses">Number of groups</label>
-        <input id="vizClasses" type="number" min="2" max="7" value="5" inputmode="numeric">
-        <label for="vizPalette">Color palette</label>
-        <select id="vizPalette"></select>
-        <label class="check-row"><input id="vizReverse" type="checkbox"> Reverse colors</label>
-        <label for="vizCenter">Midpoint (optional)</label>
-        <input id="vizCenter" type="number" step="any" placeholder="0">
-        <label for="vizBreaks">Custom limits (separate with commas)</label>
-        <input id="vizBreaks" type="text" placeholder="0, 25, 50, 75">
-        <label for="vizNumberFormat">Legend number format</label>
-        <select id="vizNumberFormat">
-          <option value="id-ID">Indonesian</option>
-          <option value="en-US">International</option>
-          <option value="integer">Whole numbers</option>
-          <option value="decimal-2">2 decimal places</option>
-        </select>
-        <div class="button-grid">
-          <button id="vizPreviewBtn" type="button" class="secondary" data-copy="ui.actions.previewColors">Preview colors</button>
-          <button id="vizApplyBtn" type="button" disabled data-copy="ui.actions.designMap">Design map</button>
-        </div>
-        <div id="vizSummary" class="import-summary" aria-live="polite"></div>
-        <div id="vizLegendPreview" class="legend-editor" aria-live="polite"></div>
-      </section>
-
-      <section class="panel-section">
-        <h2>Project</h2>
-        <p id="autosaveStatus" class="status-line" data-state="inactive">Browser backup is not active.</p>
-        <input id="projectFile" type="file" accept=".json,application/json" hidden>
-        <div class="button-grid">
-          <button id="saveProjectBtn" type="button" data-copy="ui.actions.saveProject">Save project</button>
-          <button id="openProjectBtn" type="button" class="secondary" data-copy="ui.actions.openProject">Open project</button>
-          <button id="migrationReportBtn" type="button" class="secondary" hidden>Download project update report</button>
-          <button id="recoverLegacyAutosaveBtn" type="button" class="secondary" hidden>Recover previous browser backup</button>
-          <button id="deleteLegacyAutosaveBtn" type="button" class="danger" hidden>Delete previous compatibility backup</button>
-          <button id="downloadStorageRecoveryBtn" type="button" class="secondary" hidden>Download replaced browser backup</button>
-          <button id="deleteStorageRecoveryBtn" type="button" class="danger" hidden>Delete replaced browser backup</button>
-          <button id="downloadUnreadableTargetBtn" type="button" class="secondary" hidden>Download unreadable current backup</button>
-          <button id="downloadUnreadableLegacyBtn" type="button" class="secondary" hidden>Download unreadable compatibility backup</button>
-          <button id="clearProjectBtn" type="button" class="danger" data-copy="ui.actions.startOver">Start over</button>
-        </div>
-      </section>
-
-      <section id="exportSection" class="panel-section" data-workflow-step="export">
-        <h2>Export map</h2>
-        <label for="exportRatio">Canvas ratio</label>
-        <select id="exportRatio">
-          <option value="16:9">16:9</option>
-          <option value="4:3">4:3</option>
-          <option value="a4">A4 landscape</option>
-          <option value="a3">A3 landscape</option>
-          <option value="1:1">Square</option>
-          <option value="bounds">Current map view</option>
-        </select>
-        <label for="exportExtent">Export area</label>
-        <select id="exportExtent">
-          <option value="national">All of Indonesia</option>
-          <option value="current-view">Current map view</option>
-        </select>
-        <label class="check-row"><input id="exportLabels" type="checkbox" checked> Include region names</label>
-        <label class="check-row"><input id="transparentBg" type="checkbox"> Transparent background</label>
-        <label class="check-row"><input id="exportHighDetail" type="checkbox"> Use detailed boundaries for export</label>
-        <p class="notice">This downloads about 10.5 MB only when you export and may use more memory.</p>
-        <label for="pngSize">PNG size</label>
-        <select id="pngSize">
-          <option value="1920x1080">1920 x 1080</option>
-          <option value="2560x1440">2560 x 1440</option>
-          <option value="3840x2160">3840 x 2160</option>
-        </select>
-        <div class="button-grid">
-          <button id="exportSvgBtn" type="button" data-copy="ui.actions.exportSvg">Export SVG</button>
-          <button id="exportPngBtn" type="button" data-copy="ui.actions.exportPng">Export PNG</button>
-          <button id="exportPdfBtn" type="button" data-copy="ui.actions.exportPdf">Export PDF</button>
-          <button id="exportMappingBtn" type="button" class="secondary" data-copy="ui.actions.exportMatches">Download region match table</button>
-        </div>
-      </section>
-
-      <section class="panel-section small-copy">
-        <h2>About this tool</h2>
-        <p>Create presentation-ready maps of Indonesia's regencies and cities.</p>
-        <details>
-          <summary>Sources and licenses</summary>
-          <p>Boundaries: geoBoundaries/HDX COD-AB Indonesia ADM2 snapshot 2020, 519 boundary records, CC BY 3.0 IGO. Administrative names use a separate 2025 region list. The number 519 is not a claim about today's legal count of autonomous regencies and cities. Read the <a href="./data-methodology/">data method</a> or the <a href="./guides/mengapa-jumlah-wilayah-peta-berbeda/">region-count guide</a>.</p>
-        </details>
-        <details>
-          <summary>Privacy</summary>
-          <p>Spreadsheets and projects are processed in your browser. There are no uploads, analytics, or user accounts. Read the <a href="./privacy/">privacy policy</a> and <a href="./terms/">terms of use</a>.</p>
-        </details>
-      </section>
-    </aside>
-
-    <main class="map-area">
-      <div class="map-toolbar">
-        <button id="fitIndonesiaBtn" type="button" class="secondary" data-copy="ui.actions.viewIndonesia">View all of Indonesia</button>
-        <span id="loadingIndicator" class="status-line" data-state="loading">Loading map…</span>
-        <span id="mapSelectionStatus" class="status-line" aria-live="polite"></span>
+<body class="public-page public-home">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header" data-public-header>
+    <nav class="site-inner site-nav" aria-label="Main navigation">
+      <a class="brand" href="./" aria-label="NusaCanvas home">NusaCanvas</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="public-navigation">Menu</button>
+      <div id="public-navigation" class="nav-links">
+        <a href="#create">Create</a>
+        <a href="#templates">Templates</a>
+        <a href="#examples">Examples</a>
+        <a href="./guides/">Guides</a>
+        <a href="./data-methodology/">Region data</a>
+        <a href="./about/">About</a>
+        <a class="nav-workspace" href="./workspace/">Open workspace</a>
       </div>
-      <div id="errorArea" class="error-area" role="alert"></div>
-      <div id="map" aria-label="Map of Indonesia"></div>
-      <section id="dataTablePanel" class="data-table-panel" aria-labelledby="dataTableTitle" hidden>
-        <div class="section-heading">
-          <div>
-            <h2 id="dataTableTitle">Your data</h2>
-            <p class="notice">Select a row to highlight its matched region on the map.</p>
-          </div>
-          <span id="dataTableCount" class="count-pill">0</span>
-        </div>
-        <div class="data-table-tools">
-          <label for="dataTableFilter">Search your data</label>
-          <input id="dataTableFilter" type="search" placeholder="Region, province, category…" autocomplete="off">
-          <label for="dataTableSort">Sort by</label>
-          <select id="dataTableSort">
-            <option value="row">Source order</option>
-            <option value="region">Region A–Z</option>
-            <option value="status">Status</option>
-            <option value="value">Value</option>
-          </select>
-        </div>
-        <div id="dataTableAnnouncement" class="sr-only" aria-live="polite"></div>
-        <div class="data-table-scroll">
-          <table id="dataTable" class="data-table">
-            <caption class="sr-only">Spreadsheet rows and region matches</caption>
-            <thead><tr><th scope="col">Row</th><th scope="col">Source region</th><th scope="col">Province</th><th scope="col">Matched region</th><th scope="col">Value or category</th><th scope="col">Status</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p id="dataTableEmpty" class="status-line">No data has been added.</p>
-      </section>
-    </main>
-    <button id="floatingExportBtn" class="floating-export-btn" type="button" hidden data-copy="ui.actions.exportPng">Export PNG</button>
-  </div>
+    </nav>
+  </header>
 
-  <script src="./assets/vendor/leaflet/leaflet.js"></script>
-  <script src="./assets/js/brand-config.js"></script>
-  <script src="./assets/js/brand-migration.js"></script>
-  <script src="./assets/js/product-content.js"></script>
-  <script src="./assets/js/project-storage.js"></script>
-  <script src="./assets/js/import-core.js"></script>
-  <script src="./assets/js/xlsx-import.js"></script>
-  <script src="./assets/js/csv-import.js"></script>
-  <script src="./assets/js/export.js"></script>
-  <script src="./assets/js/map.js"></script>
-  <script src="./assets/js/app.js"></script>
+  <main id="main-content">
+    <section class="hero site-inner" aria-labelledby="home-title">
+      <p class="eyebrow">Indonesia mapping, made clear</p>
+      <h1 id="home-title">Turn Indonesia data into clear, presentation-ready maps.</h1>
+      <p class="lead">Highlight regions, upload a spreadsheet, build sales territories, or analyze coverage — no GIS skills required.</p>
+      <div class="button-row">
+        <a class="button" href="./workspace/">Create a map</a>
+        <a class="button secondary" href="./workspace/?sample=1">Try a sample</a>
+      </div>
+      <p class="hero-note">Start in your browser. Nothing is uploaded.</p>
+    </section>
+
+    <section id="create" class="site-inner section-block" aria-labelledby="create-title">
+      <div class="section-heading-public">
+        <div>
+          <p class="eyebrow">Create</p>
+          <h2 id="create-title">Choose the map you need</h2>
+        </div>
+        <p class="section-summary">Begin with a simple task. You can refine the details after your map is taking shape.</p>
+      </div>
+      <div class="goal-grid">
+        <article class="goal-card">
+          <p class="goal-kicker">Available now</p>
+          <h3>Highlight regions</h3>
+          <p>Select Indonesia regencies or cities, add clear colors and labels, then export a map.</p>
+          <a class="text-action" href="./workspace/?goal=highlight">Highlight regions <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="goal-card goal-card-primary">
+          <p class="goal-kicker">Available now</p>
+          <h3>Map spreadsheet data</h3>
+          <p>Paste or upload a spreadsheet, match rows to regions, build a legend, and export.</p>
+          <a class="text-action" href="./workspace/?goal=spreadsheet">Map spreadsheet data <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="goal-card goal-card-upcoming">
+          <p class="goal-kicker">Upcoming</p>
+          <h3>Build sales territories</h3>
+          <p>Plan and present territory ideas once this workflow is ready. It is not available yet.</p>
+          <span class="status-tag">Upcoming</span>
+        </article>
+        <article class="goal-card goal-card-upcoming">
+          <p class="goal-kicker">Upcoming</p>
+          <h3>Analyze coverage</h3>
+          <p>Explore coverage using your own metrics once this workflow is ready. It is not available yet.</p>
+          <span class="status-tag">Upcoming</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="NusaCanvas trust points">
+      <div class="site-inner trust-grid">
+        <div><strong>Works in your browser</strong><span>No install required.</span></div>
+        <div><strong>No account required</strong><span>Open a workspace when you are ready.</span></div>
+        <div><strong>Your spreadsheet stays on your device</strong><span>No uploads or analytics.</span></div>
+        <div><strong>Indonesia region data with source details</strong><span><a href="./data-methodology/">Read the method</a></span></div>
+      </div>
+    </section>
+
+    <section id="templates" class="site-inner section-block split-section" aria-labelledby="template-title">
+      <div>
+        <p class="eyebrow">Useful starting points</p>
+        <h2 id="template-title">Start with a familiar example</h2>
+        <p class="section-summary">Use local examples to see the structure before you paste your own data.</p>
+      </div>
+      <div class="starting-points">
+        <a class="starting-point" href="./workspace/?sample=1"><strong>City values</strong><span>A small spreadsheet example with a legend.</span></a>
+        <a class="starting-point" href="./guides/contoh-peta-nilai-kota/"><strong>Read the example guide</strong><span>See how matching and color ranges work.</span></a>
+        <a class="starting-point" href="./sample/contoh-nilai-kota.csv"><strong>Download the sample CSV</strong><span>Open it in a spreadsheet app or paste it directly.</span></a>
+      </div>
+    </section>
+
+    <section id="examples" class="site-inner section-block example-band" aria-labelledby="example-title">
+      <div>
+        <p class="eyebrow">A simple path</p>
+        <h2 id="example-title">From spreadsheet to map in four clear steps</h2>
+      </div>
+      <ol class="process-list">
+        <li><strong>1. Add data</strong><span>Paste a table or choose a spreadsheet.</span></li>
+        <li><strong>2. Match regions</strong><span>Confirm each row points to the right place.</span></li>
+        <li><strong>3. Design map</strong><span>Choose clear colors, labels, and a legend.</span></li>
+        <li><strong>4. Export</strong><span>Download an image or document for your work.</span></li>
+      </ol>
+    </section>
+
+    <section class="site-inner section-block final-cta" aria-labelledby="final-cta-title">
+      <h2 id="final-cta-title">Ready to make your map?</h2>
+      <p>Start with regions or a spreadsheet. Your work stays in this browser.</p>
+      <a class="button secondary" href="./workspace/">Create a map</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-inner footer-grid">
+      <div><a class="brand" href="./">NusaCanvas</a><p class="meta">Clear Indonesia maps for presentations and everyday analysis.</p></div>
+      <nav aria-label="Footer navigation"><a href="./guides/">Guides</a><a href="./data-methodology/">Region data</a><a href="./sources-licenses/">Sources and licenses</a><a href="./privacy/">Privacy</a><a href="./terms/">Terms</a><a href="./contact/">Contact</a></nav>
+    </div>
+  </footer>
 </body>
 </html>

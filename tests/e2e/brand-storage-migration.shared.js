@@ -81,7 +81,7 @@ test("legacy browser backup moves once, keeps its recovery copy, and can be reco
   await seedLegacyAutosave(page, serialized);
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await expect(page.locator("#projectTitle")).toHaveValue(brand.defaults.projectTitle);
@@ -150,7 +150,7 @@ test("a browser storage write failure stays visible and never clears the previou
   await seedLegacyAutosave(page, serialized, { failTargetWrites: true });
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "migration-error");
@@ -174,7 +174,7 @@ test("an unreadable current backup waits for explicit recovery and exposes downl
   await seedLegacyAutosave(page, serialized, { targetRaw: corruptTarget });
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "migration-error");
@@ -205,7 +205,7 @@ test("an invalid current backup without a legacy source remains downloadable bef
   await seedLegacyAutosave(page, "", { targetRaw: corruptTarget, omitLegacy: true });
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "migration-error");
@@ -235,7 +235,7 @@ test("declining a valid startup restore preserves its exact bytes before the fir
   await seedLegacyAutosave(page, "", { targetRaw: currentRaw, omitLegacy: true });
   page.on("dialog", (dialog) => dialog.dismiss());
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await expect(page.locator("#projectTitle")).toHaveValue(brand.defaults.projectTitle);

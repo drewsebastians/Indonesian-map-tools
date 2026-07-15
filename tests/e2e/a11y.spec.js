@@ -18,7 +18,7 @@ async function injectAxe(page) {
 
 test("home page has no serious or critical automated accessibility violations", async ({ page }) => {
   fs.mkdirSync(artifactDir, { recursive: true });
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await injectAxe(page);
   const results = await page.evaluate(async () => {

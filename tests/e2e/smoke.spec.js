@@ -160,7 +160,7 @@ test("load, color, save, SVG export, and smallest PNG export", async ({ page }) 
     }
   });
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await expect(page).toHaveTitle(new RegExp(brand.productName, "i"));
   await expect(page.locator("h1")).toContainText(brand.productName);
@@ -215,7 +215,7 @@ test("startup labels are tiered on mobile and high-detail geometry is explicit",
   const requests = [];
   page.on("request", (request) => requests.push({ url: request.url(), method: request.method(), resourceType: request.resourceType() }));
   await page.setViewportSize({ width: 390, height: 760 });
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await expect.poll(async () => page.locator(".region-name-label").count()).toBeLessThan(80);
   expect(requests.some((request) => request.url.includes("indonesia-adm2-detailed.geojson"))).toBe(false);
@@ -237,12 +237,12 @@ test("startup labels are tiered on mobile and high-detail geometry is explicit",
 });
 
 test("PNG export supports largest, transparent, and fallback paths", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   async function exportOneFeature(options) {
     return page.evaluate(async (exportOptions) => {
-      const collection = await fetch("./data/indonesia-adm2-simplified.geojson").then((response) => response.json());
+      const collection = await fetch("../data/indonesia-adm2-simplified.geojson").then((response) => response.json());
       return window.MapExport.exportPng([collection.features[0]], {
         title: "Export test",
         highlights: {},
@@ -293,7 +293,7 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
   };
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await page.locator("#csvFile").setInputFiles(sampleCsv);
@@ -340,7 +340,7 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
 });
 
 test("paste import previews mapping and waits for explicit apply", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t0\n");
@@ -358,7 +358,7 @@ test("paste import previews mapping and waits for explicit apply", async ({ page
 });
 
 test("ambiguous import row can be resolved locally before apply", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
 
   await page.locator("#importPaste").fill("wilayah\tnilai\nBandung\t50\n");
@@ -387,7 +387,7 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
 
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   expect(requests.some((url) => url.includes("read-excel-file.min.js"))).toBe(false);
 
@@ -416,7 +416,7 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
 });
 
 test("beginner workflow example keeps table and map selection linked", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await expect(page.locator("#workflowSteps")).toContainText("Add data");
   await page.locator("#exampleBtn").click();
@@ -444,7 +444,7 @@ test("beginner workflow example keeps table and map selection linked", async ({ 
 
 test("mobile layout keeps the map reachable before the control panel", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 760 });
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   const positions = await page.evaluate(() => ({
     map: document.querySelector(".map-area").getBoundingClientRect().top,
@@ -457,7 +457,7 @@ test("mobile layout keeps the map reachable before the control panel", async ({ 
 test("deterministic visualization preview applies a shared legend", async ({ page }) => {
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await expect(page.locator("#vizMode")).toBeVisible();
   await page.locator("#exampleBtn").click();
@@ -473,7 +473,7 @@ test("deterministic visualization preview applies a shared legend", async ({ pag
 });
 
 test("numeric visualization returns blank values to the no-data map state", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t\n");
   await page.locator("#previewCsvBtn").click();
@@ -488,7 +488,7 @@ test("numeric visualization returns blank values to the no-data map state", asyn
 });
 
 test("professional export writes PDF and mapping CSV with safe metadata", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await page.locator("#exampleBtn").click();
   await page.locator("#applyCsvBtn").click();
@@ -520,7 +520,7 @@ test("assisted first-user flow reaches a valid export within five minutes", asyn
   const marks = {};
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t77\n");
   await page.locator("#previewCsvBtn").click();
@@ -552,7 +552,7 @@ test("two-column official-code flow reaches a mapping export without ambiguity",
   const started = Date.now();
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/workspace/");
   await waitForAppReady(page);
   await page.locator("#importPaste").fill("kode\tnilai\n35.78\t125\n51.71\t77\n");
   await page.locator("#previewCsvBtn").click();

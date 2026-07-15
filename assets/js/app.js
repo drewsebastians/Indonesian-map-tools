@@ -1,9 +1,13 @@
 (function () {
-  const DATA_URL = "./data/indonesia-adm2-simplified.geojson";
+  // The product shell lives at the root while the legacy Batch 2 workspace is
+  // intentionally served from /workspace/. Keep data and lazy engines rooted
+  // at the static app origin without duplicating either asset tree.
+  const RUNTIME_BASE = window.location.pathname.startsWith("/workspace/") ? "../" : "./";
+  const DATA_URL = `${RUNTIME_BASE}data/indonesia-adm2-simplified.geojson`;
   const BOUNDARY_VERSION = "IDN-ADM2-2020-geoboundaries-22746128";
   const REGISTRY_VERSION = "IDN-ADM-REGISTRY-v1-2025-06-23";
   const DETAILED_GEOMETRY = {
-    url: "./data/indonesia-adm2-detailed.geojson",
+    url: `${RUNTIME_BASE}data/indonesia-adm2-detailed.geojson`,
     sha256: "146653d488331086ddc43d159a261b01ea6dd08c7ed422e34a9886c3c690430c"
   };
   const quickColors = ["#4472C4", "#E74C3C", "#70AD47", "#FFC000", "#5B9BD5", "#A64D79", "#00A388", "#7F6000"];
@@ -198,7 +202,7 @@
     if (visualizationEnginePromise) return visualizationEnginePromise;
     visualizationEnginePromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "./assets/js/visualization-engine.js";
+      script.src = `${RUNTIME_BASE}assets/js/visualization-engine.js`;
       script.async = true;
       script.dataset.lazyVisualization = "true";
       script.onload = () => typeof VisualizationEngine !== "undefined" ? resolve(VisualizationEngine) : reject(new Error(productText("ui.errors.visualizationLoad")));
@@ -861,7 +865,7 @@
     if (matchingEnginePromise) return matchingEnginePromise;
     matchingEnginePromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "./assets/js/matching-engine.js";
+      script.src = `${RUNTIME_BASE}assets/js/matching-engine.js`;
       script.async = true;
       script.dataset.lazyMatchingEngine = "true";
       script.onload = () => typeof MatchingEngine !== "undefined" ? resolve(MatchingEngine) : reject(new Error("Region matching could not load. Your current map is safe. Reload the page and try again."));
