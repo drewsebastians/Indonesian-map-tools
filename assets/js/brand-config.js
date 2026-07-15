@@ -14,7 +14,7 @@
     productName: "NusaCanvas",
     positioning: "Create clear Indonesia regency and city maps from spreadsheet data.",
     futureCanonicalOrigin: "https://nusacanvas.space",
-    currentStagingOrigin: "https://mapnesia.andrew-sebastian91.workers.dev",
+    currentStagingOrigin: "https://nusacanvas-space.andrew-sebastian91.workers.dev",
     prompt10Targets: {
       repository: "drewsebastians/nusacanvas.space",
       stagingOrigin: "https://nusacanvas-space.andrew-sebastian91.workers.dev"
@@ -41,7 +41,8 @@
       title: "NusaCanvas — Create an Indonesia region map",
       description: "NusaCanvas turns spreadsheet data into clear Indonesia regency and city maps in your browser."
     },
-    remoteOperationsDeferredToPrompt: 10
+    remoteMigrationState: "prepared-authentication-required",
+    customDomainActivationDeferredToBatch: 5
   };
 
   config.apply = function apply(rootNode) {

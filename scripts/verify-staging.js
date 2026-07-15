@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 
-const baseUrl = (process.argv[2] || "https://mapnesia.andrew-sebastian91.workers.dev").replace(/\/+$/, "");
+const baseUrl = (process.argv[2] || "https://nusacanvas-space.andrew-sebastian91.workers.dev").replace(/\/+$/, "");
 
 const requiredPaths = [
   "/",

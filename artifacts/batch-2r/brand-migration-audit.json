@@ -1,18 +1,19 @@
 {
   "schemaVersion": "batch2r.brand-migration-audit.v1",
-  "generatedAt": "2026-07-15T05:01:46.519Z",
+  "generatedAt": "2026-07-15T05:23:21.124Z",
   "status": "passed",
   "expectedIdentity": {
     "productName": "NusaCanvas",
     "futureCanonicalOrigin": "https://nusacanvas.space",
-    "currentStagingOrigin": "https://mapnesia.andrew-sebastian91.workers.dev",
-    "currentWorkerName": "mapnesia",
-    "targetRepository": "drewsebastians/nusacanvas.space",
-    "targetReplacementStagingOrigin": "https://nusacanvas-space.andrew-sebastian91.workers.dev",
+    "currentStagingOrigin": "https://nusacanvas-space.andrew-sebastian91.workers.dev",
+    "currentWorkerName": "nusacanvas-space",
+    "repository": "drewsebastians/nusacanvas.space",
+    "preparedStagingOrigin": "https://nusacanvas-space.andrew-sebastian91.workers.dev",
     "packageName": "nusacanvas",
     "neutralStorageKey": "indonesia-region-map-autosave-v2"
   },
-  "remoteOperationsDeferredUntilPrompt10": true,
+  "remoteOperationsDeferredUntilPrompt10": false,
+  "remotePlatformMigrationState": "prepared-authentication-required",
   "customDomainActivated": false,
   "migrationCompatibility": {
     "legacyStorageKey": "peta-warna-indonesia-autosave-v1",
@@ -29,98 +30,31 @@
     "sourceDeletionAuthorized": false
   },
   "counts": {
-    "scannedFiles": 202,
+    "scannedFiles": 207,
     "failures": 0,
-    "warnings": 14,
-    "allowlistedReferences": 143
+    "warnings": 0,
+    "allowlistedReferences": 152
   },
   "failures": [],
-  "warnings": [
-    {
-      "file": ".github/workflows/deploy-cloudflare.yml",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "about/index.html",
-      "code": "prompt10-operational-identifier",
-      "reason": "current repository remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "assets/js/brand-config.js",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "docs/deployment-guide.md",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 4
-    },
-    {
-      "file": "docs/deployment-guide.md",
-      "code": "prompt10-worker-name",
-      "reason": "current Worker service name remains unchanged until Prompt 10",
-      "count": 2
-    },
-    {
-      "file": "MANUAL_UPLOAD_STEPS.md",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "package.json",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "README.md",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "scripts/verify-staging.js",
-      "code": "prompt10-operational-identifier",
-      "reason": "current Worker remains unchanged until Prompt 10",
-      "count": 1
-    },
-    {
-      "file": "wrangler.jsonc",
-      "code": "prompt10-worker-name",
-      "reason": "current Worker service name remains unchanged until Prompt 10",
-      "count": 1
-    }
-  ],
+  "warnings": [],
   "allowlistedReferences": [
     {
       "file": "artifacts/batch-2/closure.json",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
     },
     {
       "file": "artifacts/batch-2/preflight.json",
-      "code": "current-repository-origin",
+      "code": "retired-repository-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
     },
     {
       "file": "artifacts/batch-2/preflight.json",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
-    },
-    {
-      "file": "artifacts/batch-2r/current-string-inventory.json",
-      "code": "current-repository-origin",
-      "reason": "truthful historical evidence or an explicit migration note",
-      "count": 1
     },
     {
       "file": "artifacts/batch-2r/current-string-inventory.json",
@@ -141,14 +75,44 @@
       "count": 3
     },
     {
-      "file": "artifacts/batch-2r/preflight.json",
-      "code": "current-repository-origin",
+      "file": "artifacts/batch-2r/current-string-inventory.json",
+      "code": "retired-repository-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
     },
     {
+      "file": "artifacts/batch-2r/platform-migration.json",
+      "code": "old-product-name",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "artifacts/batch-2r/platform-migration.json",
+      "code": "retired-repository-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 2
+    },
+    {
+      "file": "artifacts/batch-2r/platform-migration.json",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "artifacts/batch-2r/preflight.json",
+      "code": "retired-repository-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "artifacts/batch-2r/staging-verification.json",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 2
+    },
+    {
       "file": "artifacts/batch-3/preflight.json",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
     },
@@ -178,19 +142,13 @@
     },
     {
       "file": "docs/batch-1/02-cloudflare-credential-blocker.md",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
     },
     {
       "file": "docs/batch-1/02-cloudflare-live-verification-blocker.md",
-      "code": "current-worker-origin",
-      "reason": "truthful historical evidence or an explicit migration note",
-      "count": 2
-    },
-    {
-      "file": "docs/batch-1/02-github-pages-shutdown-evidence.md",
-      "code": "current-repository-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
     },
@@ -201,14 +159,8 @@
       "count": 1
     },
     {
-      "file": "docs/batch-1/06-completion-report.md",
-      "code": "current-repository-origin",
-      "reason": "truthful historical evidence or an explicit migration note",
-      "count": 1
-    },
-    {
-      "file": "docs/batch-1/06-completion-report.md",
-      "code": "current-worker-origin",
+      "file": "docs/batch-1/02-github-pages-shutdown-evidence.md",
+      "code": "retired-repository-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
     },
@@ -219,8 +171,14 @@
       "count": 2
     },
     {
-      "file": "docs/batch-2/00-blockers.md",
-      "code": "current-worker-origin",
+      "file": "docs/batch-1/06-completion-report.md",
+      "code": "retired-repository-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "docs/batch-1/06-completion-report.md",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
     },
@@ -229,16 +187,16 @@
       "code": "old-product-name",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
+    },
+    {
+      "file": "docs/batch-2/00-blockers.md",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 2
     },
     {
       "file": "docs/batch-2/00-preflight-and-contract.md",
-      "code": "current-worker-origin",
-      "reason": "truthful historical evidence or an explicit migration note",
-      "count": 1
-    },
-    {
-      "file": "docs/batch-2/08-batch-2-closure.md",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
     },
@@ -255,6 +213,12 @@
       "count": 1
     },
     {
+      "file": "docs/batch-2/08-batch-2-closure.md",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
       "file": "docs/batch-2/contracts/spreadsheet-to-map-contracts.schema.json",
       "code": "old-future-url",
       "reason": "truthful historical evidence or an explicit migration note",
@@ -268,13 +232,13 @@
     },
     {
       "file": "docs/batch-2r/00-preflight-and-experience-contract.md",
-      "code": "current-repository-origin",
+      "code": "retired-repository-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
     },
     {
       "file": "docs/batch-2r/00-preflight-and-experience-contract.md",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
     },
@@ -310,18 +274,6 @@
     },
     {
       "file": "docs/batch-2r/03-legacy-reference-allowlist.md",
-      "code": "current-repository-origin",
-      "reason": "truthful historical evidence or an explicit migration note",
-      "count": 1
-    },
-    {
-      "file": "docs/batch-2r/03-legacy-reference-allowlist.md",
-      "code": "current-worker-origin",
-      "reason": "truthful historical evidence or an explicit migration note",
-      "count": 1
-    },
-    {
-      "file": "docs/batch-2r/03-legacy-reference-allowlist.md",
       "code": "legacy-storage-key",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 1
@@ -345,8 +297,38 @@
       "count": 2
     },
     {
+      "file": "docs/batch-2r/03-legacy-reference-allowlist.md",
+      "code": "retired-repository-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "docs/batch-2r/03-legacy-reference-allowlist.md",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "docs/batch-2r/10-platform-rename.md",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "docs/batch-2r/10-rollback-checklist.md",
+      "code": "old-product-name",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
+      "file": "docs/batch-2r/10-rollback-checklist.md",
+      "code": "retired-worker-origin",
+      "reason": "truthful historical evidence or an explicit migration note",
+      "count": 1
+    },
+    {
       "file": "docs/batch-3/00-preflight-and-contract.md",
-      "code": "current-worker-origin",
+      "code": "retired-worker-origin",
       "reason": "truthful historical evidence or an explicit migration note",
       "count": 2
     },
@@ -447,10 +429,12 @@
     "artifacts/batch-2r/current-experience-inventory.json",
     "artifacts/batch-2r/current-string-inventory.json",
     "artifacts/batch-2r/design-decision.json",
+    "artifacts/batch-2r/platform-migration.json",
     "artifacts/batch-2r/preflight.json",
     "artifacts/batch-2r/prototype-isolation.json",
     "artifacts/batch-2r/prototype-review.json",
     "artifacts/batch-2r/public-shell-verification.json",
+    "artifacts/batch-2r/staging-verification.json",
     "artifacts/batch-2r/terminology-audit.json",
     "artifacts/batch-2r/workspace-regression.json",
     "artifacts/batch-3/preflight.json",
@@ -530,6 +514,9 @@
     "docs/batch-2r/08-boundary-rendering-diagnosis.md",
     "docs/batch-2r/09-boundary-provider.md",
     "docs/batch-2r/09-future-boundary-pipeline.md",
+    "docs/batch-2r/10-domain-deferred.md",
+    "docs/batch-2r/10-platform-rename.md",
+    "docs/batch-2r/10-rollback-checklist.md",
     "docs/batch-2r/screenshots/baseline/README.md",
     "docs/batch-3/00-blockers.md",
     "docs/batch-3/00-preflight-and-contract.md",

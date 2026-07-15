@@ -6,12 +6,12 @@ const outputPath = path.join(root, "artifacts", "batch-2r", "brand-migration-aud
 
 const PRODUCT_NAME = "NusaCanvas";
 const FUTURE_CANONICAL_ORIGIN = "https://nusacanvas.space";
-const CURRENT_STAGING_ORIGIN = "https://mapnesia.andrew-sebastian91.workers.dev";
-const CURRENT_REPOSITORY = "drewsebastians/Indonesian-map-tools";
-const TARGET_REPOSITORY = "drewsebastians/nusacanvas.space";
-const TARGET_STAGING_ORIGIN = "https://nusacanvas-space.andrew-sebastian91.workers.dev";
+const CURRENT_STAGING_ORIGIN = "https://nusacanvas-space.andrew-sebastian91.workers.dev";
+const CURRENT_REPOSITORY = "drewsebastians/nusacanvas.space";
+const PREVIOUS_REPOSITORY = "drewsebastians/Indonesian-map-tools";
+const PREVIOUS_STAGING_ORIGIN = "https://mapnesia.andrew-sebastian91.workers.dev";
 const PACKAGE_NAME = "nusacanvas";
-const CURRENT_WORKER_NAME = "mapnesia";
+const CURRENT_WORKER_NAME = "nusacanvas-space";
 const NEUTRAL_STORAGE_KEY = "indonesia-region-map-autosave-v2";
 const LEGACY_STORAGE_KEY = "peta-warna-indonesia-autosave-v1";
 const LEGACY_NEUTRAL_EXPORT_PREFIX = "indonesia-region-map";
@@ -40,7 +40,9 @@ const historicalFiles = new Set([
   "docs/batch-2r/01-architecture-contract.md", "docs/batch-2r/01-current-experience-audit.md",
   "docs/batch-2r/01-current-journeys.md", "docs/batch-2r/02-simple-english-content-system.md",
   "docs/batch-2r/02-terminology-glossary.md", "docs/batch-2r/03-brand-and-storage-migration.md",
-  "docs/batch-2r/03-legacy-reference-allowlist.md", "scripts/build-batch2r-inventory.js"
+  "docs/batch-2r/03-legacy-reference-allowlist.md", "docs/batch-2r/10-platform-rename.md",
+  "docs/batch-2r/10-domain-deferred.md", "docs/batch-2r/10-rollback-checklist.md",
+  "scripts/build-batch2r-inventory.js"
 ]);
 
 const migrationTestPattern = /^tests\/(?:unit|e2e)\/[^/]*(?:brand|migration|project-storage)[^/]*\.(?:js|cjs|mjs)$/;
@@ -103,8 +105,8 @@ function recordAggregate(collection, entry) {
 
 function codeForMatch(value) {
   const lower = value.toLowerCase();
-  if (lower === CURRENT_STAGING_ORIGIN.toLowerCase()) return "current-worker-origin";
-  if (lower === CURRENT_REPOSITORY.toLowerCase() || lower === `https://github.com/${CURRENT_REPOSITORY}`.toLowerCase() || lower === `https://github.com/${CURRENT_REPOSITORY}.git`.toLowerCase()) return "current-repository-origin";
+  if (lower === PREVIOUS_STAGING_ORIGIN.toLowerCase()) return "retired-worker-origin";
+  if (lower === PREVIOUS_REPOSITORY.toLowerCase() || lower === `https://github.com/${PREVIOUS_REPOSITORY}`.toLowerCase() || lower === `https://github.com/${PREVIOUS_REPOSITORY}.git`.toLowerCase()) return "retired-repository-origin";
   if (lower === LEGACY_STORAGE_KEY) return "legacy-storage-key";
   if (lower.includes("drewsebastians.github.io/indonesian-map-tools")) return "old-future-url";
   if (/^https?:\/\//.test(lower) && lower.includes("mapnesia")) return "old-future-url";
@@ -113,26 +115,6 @@ function codeForMatch(value) {
   if (lower.startsWith("mapnesia-") || lower.startsWith("mapnesia_")) return "old-default-name";
   if (lower.startsWith("peta-warna-indonesia") || lower.startsWith("peta-warna-wilayah-indonesia") || lower.startsWith("peta-wilayah-indonesia")) return "old-default-name";
   return "legacy-reference";
-}
-
-function isOperationalReference(file, code, line, lines, index) {
-  const nearby = lines.slice(Math.max(0, index - 4), index + 2).join("\n");
-  if (file === "README.md" && code === "current-worker-origin") return /^Current staging remains at /.test(line);
-  if (file === "about/index.html" && code === "current-repository-origin") return /This repository is maintained as/.test(line);
-  if (file === "assets/js/brand-config.js" && code === "current-worker-origin") return /currentStagingOrigin\s*:/.test(line);
-  if (file === "package.json" && code === "current-worker-origin") return /"verify:staging"\s*:/.test(line);
-  if (file === "scripts/verify-staging.js" && code === "current-worker-origin") return /const\s+baseUrl\s*=/.test(line);
-  if (file === ".github/workflows/deploy-cloudflare.yml" && code === "current-worker-origin") return /Manual deploy fallback URL:/.test(line);
-  if (file === "MANUAL_UPLOAD_STEPS.md" && code === "current-worker-origin") return /only Batch 1 staging target/.test(nearby);
-  if (file === "wrangler.jsonc" && code === "old-product-name") return /^\s*"name"\s*:\s*"mapnesia"\s*,?\s*$/.test(line);
-  if (file === "docs/deployment-guide.md" && code === "current-worker-origin") {
-    return /PLAYWRIGHT_BASE_URL|returns HTTP 200/.test(line)
-      || (/^https:\/\/mapnesia\.andrew-sebastian91\.workers\.dev\s*$/.test(line) && /current staging deployment target/.test(nearby));
-  }
-  if (file === "docs/deployment-guide.md" && code === "old-product-name") {
-    return /wrangler deploy.*Worker `mapnesia`|Cloudflare dashboard for Worker `mapnesia`/.test(line);
-  }
-  return false;
 }
 
 function scanFile(relative, category) {
@@ -154,12 +136,6 @@ function scanFile(relative, category) {
         recordAggregate(allowlistedReferences, { file, code, reason: "exact compatibility token required for local recovery tests or migration" });
       } else if (canContainLegacyProjectDefault(file, code)) {
         recordAggregate(allowlistedReferences, { file, code, reason: "legacy project default recognized only by the local project-field migration" });
-      } else if (code === "current-worker-origin" && isOperationalReference(file, code, line, lines, index)) {
-        recordAggregate(warnings, { file, code: "prompt10-operational-identifier", reason: "current Worker remains unchanged until Prompt 10" });
-      } else if (code === "current-repository-origin" && isOperationalReference(file, code, line, lines, index)) {
-        recordAggregate(warnings, { file, code: "prompt10-operational-identifier", reason: "current repository remains unchanged until Prompt 10" });
-      } else if (code === "old-product-name" && value === "mapnesia" && isOperationalReference(file, code, line, lines, index)) {
-        recordAggregate(warnings, { file, code: "prompt10-worker-name", reason: "current Worker service name remains unchanged until Prompt 10" });
       } else {
         failures.push({ file, line: index + 1, column: match.index + 1, code, match: value });
       }
@@ -204,7 +180,7 @@ function validateDeploymentDeferral() {
   const source = fs.readFileSync(path.join(root, relative), "utf8");
   const workerName = source.match(/"name"\s*:\s*"([^"]+)"/);
   if (!workerName || workerName[1] !== CURRENT_WORKER_NAME) {
-    failures.push({ file: relative, line: 0, column: 0, code: "worker-rename-before-prompt10", match: workerName ? workerName[1] : "missing" });
+    failures.push({ file: relative, line: 0, column: 0, code: "worker-name-not-prepared", match: workerName ? workerName[1] : "missing" });
   }
   if (!/"workers_dev"\s*:\s*true/.test(source)) {
     failures.push({ file: relative, line: 0, column: 0, code: "workers-dev-disabled-before-prompt10", match: "workers_dev" });
@@ -235,8 +211,8 @@ function validateBrandConfig() {
     ["productName", brand && brand.productName, PRODUCT_NAME],
     ["futureCanonicalOrigin", brand && brand.futureCanonicalOrigin, FUTURE_CANONICAL_ORIGIN],
     ["currentStagingOrigin", brand && brand.currentStagingOrigin, CURRENT_STAGING_ORIGIN],
-    ["prompt10Targets.repository", brand && brand.prompt10Targets && brand.prompt10Targets.repository, TARGET_REPOSITORY],
-    ["prompt10Targets.stagingOrigin", brand && brand.prompt10Targets && brand.prompt10Targets.stagingOrigin, TARGET_STAGING_ORIGIN]
+    ["prompt10Targets.repository", brand && brand.prompt10Targets && brand.prompt10Targets.repository, CURRENT_REPOSITORY],
+    ["prompt10Targets.stagingOrigin", brand && brand.prompt10Targets && brand.prompt10Targets.stagingOrigin, CURRENT_STAGING_ORIGIN]
   ];
   for (const [property, actual, value] of expected) {
     if (actual !== value) {
@@ -313,12 +289,13 @@ const report = {
     futureCanonicalOrigin: FUTURE_CANONICAL_ORIGIN,
     currentStagingOrigin: CURRENT_STAGING_ORIGIN,
     currentWorkerName: CURRENT_WORKER_NAME,
-    targetRepository: TARGET_REPOSITORY,
-    targetReplacementStagingOrigin: TARGET_STAGING_ORIGIN,
+    repository: CURRENT_REPOSITORY,
+    preparedStagingOrigin: CURRENT_STAGING_ORIGIN,
     packageName: PACKAGE_NAME,
     neutralStorageKey: NEUTRAL_STORAGE_KEY
   },
-  remoteOperationsDeferredUntilPrompt10: true,
+  remoteOperationsDeferredUntilPrompt10: false,
+  remotePlatformMigrationState: "prepared-authentication-required",
   customDomainActivated,
   migrationCompatibility: {
     legacyStorageKey: LEGACY_STORAGE_KEY,
@@ -350,4 +327,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Brand migration audit passed: ${report.counts.scannedFiles} files; ${report.counts.warnings} Prompt 10 operational warning(s); ${report.counts.allowlistedReferences} allowlisted historical/migration reference(s).`);
+console.log(`Brand migration audit passed: ${report.counts.scannedFiles} files; ${report.counts.warnings} warning(s); ${report.counts.allowlistedReferences} allowlisted historical/migration reference(s).`);

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/indonesian-map-tools/license-manifest-schema-v1.json",
+  "$id": "https://example.invalid/nusacanvas/license-manifest-schema-v1.json",
   "title": "Indonesian Map Tools License Manifest v1",
   "type": "object",
   "required": ["schemaVersion", "manifestVersion", "projectLicense", "policy", "assets"],

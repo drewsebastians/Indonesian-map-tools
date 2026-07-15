@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "batch2r.platform-migration.v1",
+  "generatedAt": "2026-07-15T05:15:16.3892869Z",
+  "status": "partially-blocked",
+  "target": {
+    "product": "NusaCanvas",
+    "repository": "drewsebastians/nusacanvas.space",
+    "worker": "nusacanvas-space",
+    "stagingOrigin": "https://nusacanvas-space.andrew-sebastian91.workers.dev",
+    "futureProductionOrigin": "https://nusacanvas.space"
+  },
+  "previousIdentity": {
+    "repository": "drewsebastians/Indonesian-map-tools",
+    "worker": "mapnesia",
+    "stagingOrigin": "https://mapnesia.andrew-sebastian91.workers.dev"
+  },
+  "preflight": {
+    "localHeadBeforePrompt10": "19e75f820474513de5bfcb381dcf47180fc1b78f",
+    "remoteDefaultBranch": "main",
+    "remoteHeadAtCheck": "390c9de5c672714b70d368a4c04563e93733d036",
+    "remoteUrlAtCheck": "https://github.com/drewsebastians/Indonesian-map-tools.git",
+    "previousStagingVerifier": "passed at 2026-07-15T05:15:16.3892869Z",
+    "previousStagingDeploymentRevision": "unknown",
+    "previousWranglerConfigBlob": "a3ecf28182aef91cafe1cbae318f5fe8d646e147"
+  },
+  "operations": {
+    "localIdentity": {
+      "status": "prepared",
+      "verified": false,
+      "evidence": [
+        "wrangler.jsonc uses nusacanvas-space with workers_dev true",
+        "active deployment and staging references use the target identity",
+        "custom domain routes are absent"
+      ]
+    },
+    "githubRename": {
+      "status": "blocked",
+      "attempted": false,
+      "verified": false,
+      "reason": "GitHub CLI keyring token is invalid; repository-administration authentication is unavailable."
+    },
+    "gitRemote": {
+      "status": "blocked",
+      "attempted": false,
+      "verified": false,
+      "reason": "The repository has not been renamed, so origin correctly remains at the previous remote."
+    },
+    "cloudflareNewWorker": {
+      "status": "blocked",
+      "attempted": false,
+      "verified": false,
+      "reason": "Wrangler is not authenticated with the target Cloudflare account."
+    },
+    "oldWorkerRemovalOrDisablement": {
+      "status": "not-attempted",
+      "attempted": false,
+      "verified": false,
+      "reason": "The new Worker has not passed staging verification and no owner authorization for irreversible removal was supplied."
+    },
+    "customDomain": {
+      "status": "deferred",
+      "attempted": false,
+      "verified": true,
+      "reason": "No route, custom domain, DNS change, redirect, sitemap submission, or indexability change was made."
+    },
+    "noindex": {
+      "status": "partially-verified",
+      "previousStaging": "passed",
+      "newStaging": "not-run-authentication-blocked"
+    },
+    "tests": {
+      "status": "local-core-passed-remote-pending",
+      "completed": [
+        "brand migration audit passed with zero active legacy references",
+        "production build passed",
+        "70 unit and migration tests passed",
+        "data/license/reproducibility pipeline passed",
+        "geometry and registry tests passed",
+        "terminology audit passed"
+      ],
+      "incomplete": [
+        "The aggregate browser regression run did not complete before the local command timeout after its prerequisite suites passed; this does not replace the required live staging smoke test.",
+        "New staging verification and live smoke remain blocked until authenticated deployment."
+      ],
+      "requiredBeforeCompletion": [
+        "Complete the local browser regression suite.",
+        "npm run verify:staging after authenticated deployment",
+        "Run the live Playwright smoke test against the new workers.dev origin"
+      ]
+    }
+  },
+  "rollbackChecklist": "docs/batch-2r/10-rollback-checklist.md",
+  "domainDeferral": "docs/batch-2r/10-domain-deferred.md"
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "batch2r.staging-verification.v1",
+  "generatedAt": "2026-07-15T05:15:16.3892869Z",
+  "targetStagingOrigin": "https://nusacanvas-space.andrew-sebastian91.workers.dev",
+  "targetVerification": {
+    "status": "not-run",
+    "reason": "The target Worker was not deployed because Wrangler authentication is unavailable."
+  },
+  "previousStagingBaseline": {
+    "origin": "https://mapnesia.andrew-sebastian91.workers.dev",
+    "status": "passed",
+    "command": "node scripts/verify-staging.js https://mapnesia.andrew-sebastian91.workers.dev",
+    "checks": [
+      "required homepage, workspace-related assets, trust pages, and data assets returned HTTP 200",
+      "X-Robots-Tag, nosniff, and CSP headers were present",
+      "robots.txt blocked crawling",
+      "an unknown route returned HTTP 404"
+    ],
+    "deploymentRevision": "unknown"
+  },
+  "requiredBeforeCompletion": [
+    "Deploy nusacanvas-space from the committed configuration using authenticated Wrangler.",
+    "Run npm run verify:staging against the target workers.dev origin.",
+    "Run the live Playwright smoke test against the target origin.",
+    "Record target headers, cache policy, noindex, 404, and external-request checks."
+  ]
+}

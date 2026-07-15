@@ -4,7 +4,7 @@ NusaCanvas turns spreadsheet data into clear Indonesia regency and city maps. It
 
 Future production origin: `https://nusacanvas.space`. The custom domain is not attached or indexed yet.
 
-Current staging remains at `https://mapnesia.andrew-sebastian91.workers.dev` and is intentionally `noindex`. The existing GitHub repository and Cloudflare Worker identifiers stay unchanged until the planned remote-platform migration.
+The prepared staging identity is `https://nusacanvas-space.andrew-sebastian91.workers.dev` and remains intentionally `noindex`. Publishing to it requires the authenticated platform migration recorded in `docs/batch-2r/10-platform-rename.md`; the future custom domain is still not attached.
 
 ## Current features
 

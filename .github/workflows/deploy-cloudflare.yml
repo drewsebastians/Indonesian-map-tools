@@ -49,4 +49,4 @@ jobs:
           command: deploy
 
       - name: Record staging URL
-        run: echo "Manual deploy fallback URL: https://mapnesia.andrew-sebastian91.workers.dev" >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Manual deploy fallback URL: https://nusacanvas-space.andrew-sebastian91.workers.dev" >> "$GITHUB_STEP_SUMMARY"

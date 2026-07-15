@@ -6,15 +6,15 @@ The future canonical production origin is:
 https://nusacanvas.space
 ```
 
-That custom domain is not attached, routed, or indexable yet. Remote repository and Worker renames are deferred to the planned platform migration.
+That custom domain is not attached, routed, or indexable yet. It is Batch 5 work and must not be added to Cloudflare or DNS in this batch.
 
-The current staging deployment target remains the existing Cloudflare Workers Static Assets service:
+The prepared staging deployment target is the Cloudflare Workers Static Assets service:
 
 ```text
-https://mapnesia.andrew-sebastian91.workers.dev
+https://nusacanvas-space.andrew-sebastian91.workers.dev
 ```
 
-This staging URL is intentionally non-indexable. Its legacy token is an infrastructure identifier only; the active product identity is NusaCanvas.
+This staging URL is intentionally non-indexable. It must be deployed and verified by an authenticated platform operator before it is treated as live.
 
 ## Requirements
 
@@ -64,13 +64,13 @@ npm run verify:staging
 Then run the smoke workflow against the live staging URL:
 
 ```text
-PLAYWRIGHT_BASE_URL=https://mapnesia.andrew-sebastian91.workers.dev npm run test:e2e:smoke
+PLAYWRIGHT_BASE_URL=https://nusacanvas-space.andrew-sebastian91.workers.dev npm run test:e2e:smoke
 ```
 
 On Windows PowerShell:
 
 ```text
-$env:PLAYWRIGHT_BASE_URL = "https://mapnesia.andrew-sebastian91.workers.dev"
+$env:PLAYWRIGHT_BASE_URL = "https://nusacanvas-space.andrew-sebastian91.workers.dev"
 npm run test:e2e:smoke
 Remove-Item Env:PLAYWRIGHT_BASE_URL
 ```
@@ -98,8 +98,8 @@ the repository `postinstall` script builds `dist/` during dependency installatio
 
 - `npm run check` passes.
 - `npm run build` produces `dist/`.
-- `wrangler deploy` deploys Worker `mapnesia`.
-- `https://mapnesia.andrew-sebastian91.workers.dev` returns HTTP 200.
+- `wrangler deploy` deploys Worker `nusacanvas-space`.
+- `https://nusacanvas-space.andrew-sebastian91.workers.dev` returns HTTP 200.
 - Required CSS, JS, Leaflet, GeoJSON, and sample assets return HTTP 200.
 - Trust pages return HTTP 200: `/about/`, `/contact/`, `/privacy/`, `/terms/`, `/sources-licenses/`, `/data-methodology/`, `/limitations/`, `/changelog/`, and `/guides/mengapa-jumlah-wilayah-peta-berbeda/`.
 - Unknown paths return HTTP 404.
@@ -130,14 +130,14 @@ The staging `_headers` file keeps deployment updates conservative:
 
 ## Rollback
 
-1. Open the Cloudflare dashboard for Worker `mapnesia`.
+1. Open the Cloudflare dashboard for Worker `nusacanvas-space`.
 2. Review the Worker deployment/version history.
 3. Select the last known-good deployment.
 4. Roll back to that deployment.
 5. Run `npm run verify:staging`.
 6. Run the live smoke test with `PLAYWRIGHT_BASE_URL` set to the staging URL.
 
-Do not re-enable GitHub Pages as part of rollback. Keep rollback on Cloudflare so the staging path remains consistent.
+Do not re-enable GitHub Pages as part of rollback. Keep rollback on Cloudflare so the staging path remains consistent. Before the new Worker is verified, use the preserved rollback procedure in `docs/batch-2r/10-rollback-checklist.md` rather than treating the prepared target as live.
 
 ## GitHub Pages
 

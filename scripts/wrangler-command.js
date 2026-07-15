@@ -18,11 +18,12 @@ if (build.status !== 0) {
   process.exit(build.status || 1);
 }
 
-const command = process.platform === "win32" ? "wrangler.cmd" : "wrangler";
-const result = spawnSync(command, args, {
+const command = process.execPath;
+const commandArgs = [path.join(root, "node_modules", "wrangler", "bin", "wrangler.js"), ...args];
+const result = spawnSync(command, commandArgs, {
   cwd: root,
   stdio: "inherit",
-  shell: process.platform === "win32"
+  shell: false
 });
 
 if (result.error) {
