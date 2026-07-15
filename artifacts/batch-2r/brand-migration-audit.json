@@ -1,6 +1,6 @@
 {
   "schemaVersion": "batch2r.brand-migration-audit.v1",
-  "generatedAt": "2026-07-15T03:07:01.791Z",
+  "generatedAt": "2026-07-15T03:29:43.690Z",
   "status": "passed",
   "expectedIdentity": {
     "productName": "NusaCanvas",
@@ -29,7 +29,7 @@
     "sourceDeletionAuthorized": false
   },
   "counts": {
-    "scannedFiles": 180,
+    "scannedFiles": 185,
     "failures": 0,
     "warnings": 14,
     "allowlistedReferences": 143
@@ -513,6 +513,10 @@
     "docs/batch-2r/05-public-shell.md",
     "docs/batch-2r/06-workflow-state-contract.md",
     "docs/batch-2r/06-workspace-architecture.md",
+    "docs/batch-2r/07-content-and-state-patterns.md",
+    "docs/batch-2r/07-feature-discovery-contract.md",
+    "docs/batch-2r/07-future-workflow-handoff.md",
+    "docs/batch-2r/07-owner-manual-protocol.md",
     "docs/batch-2r/screenshots/baseline/README.md",
     "docs/batch-3/00-blockers.md",
     "docs/batch-3/00-preflight-and-contract.md",
@@ -574,6 +578,7 @@
     "terms/index.html",
     "tests/e2e/a11y.spec.js",
     "tests/e2e/batch2r-baseline.spec.js",
+    "tests/e2e/batch2r-guidance.spec.js",
     "tests/e2e/batch2r-prototypes.spec.js",
     "tests/e2e/batch2r-public-shell.spec.js",
     "tests/e2e/batch2r-workspace.spec.js",
