@@ -24,6 +24,8 @@ No backend, database, API key, external tiles, analytics, or CDN dependency is r
 - `project-storage.js`: project schema, JSON validation, local autosave, visualization, manual colors, and export metadata.
 - `export.js`: shared export specification for SVG, PNG, raster PDF, and mapping CSV.
 - `report-template.js`: data-error report copy/download helper used only on `/contact/`.
+- `workspace-shell.js`: temporary presentation state for the NusaCanvas guided rail, drawer, goal entry, success/recovery messaging, and map-first mobile sheets. It does not own durable project data.
+- `boundary-provider.js`: local-only versioned boundary adapter and compatibility metadata for lite/detailed tiers.
 
 ## Registry and project versioning
 
@@ -48,6 +50,12 @@ This avoids destructive geometry renaming while giving saved projects a forward 
 7. If the user explicitly selects high-detail export, the browser fetches the pinned local `data/indonesia-adm2-detailed.geojson` file, verifies its checksum, and uses it only for that export. The on-screen map remains on the simplified snapshot.
 
 All paths are relative so the app works from the Cloudflare Workers staging host and future custom domain.
+
+## Experience and boundary presentation
+
+The active desktop workspace follows the owner-approved Option A direction: one compact workflow rail, a dominant map, and a contextual rather than permanent third inspector. The phone experience follows Option C: map-first controls with collapsed, medium, and expanded sheets. The core Batch 2 engines remain unchanged behind this presentation layer.
+
+Boundary fills render without independent polygon strokes. A single exact-coordinate shared boundary mesh renders neutral borders once, and selected regions receive a separate rounded presentation outline. This changes the presentation only: the local 2020 source geometry, all 519 features, stable IDs, provider manifest, and project compatibility rules remain authoritative. Detailed geometry remains an explicit export-only request.
 
 ## Network Inventory
 

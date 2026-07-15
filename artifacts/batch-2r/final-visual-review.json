@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "batch2r.final-visual-review.v1",
+  "generatedAt": "2026-07-15T07:06:06.124Z",
+  "status": "passed-owner-review-required",
+  "approvedDirection": {
+    "desktop": "Option A guided rail and dominant map",
+    "mobile": "Option C map-first sheets",
+    "errorHandling": "Option B explicit recovery treatment",
+    "requiredRetainedElements": [
+      "Useful starting points",
+      "Manual-highlight to spreadsheet handoff"
+    ]
+  },
+  "classifications": {
+    "intended": [
+      "Desktop uses one compact workflow rail, a dominant map, a contextual data drawer, and one clear action per workflow step.",
+      "Mobile uses collapsed, medium, and expanded safe-area-aware sheets while keeping the map reachable.",
+      "The manual-highlighting path keeps the required spreadsheet cross-workflow handoff.",
+      "Useful starting points remain on the public homepage.",
+      "Recoverable errors retain the current input and explain the next action.",
+      "Boundary fills are separated from one neutral shared mesh; selected outlines use rounded presentation strokes."
+    ],
+    "acceptableDeviation": [
+      "Production uses live local boundary geometry and actual workflow controls rather than the synthetic prototype map/table fixtures.",
+      "The public homepage is a separate lightweight entry point, so its visual hierarchy is purpose-built rather than a pixel copy of a prototype.",
+      "Renderer-specific antialiasing may differ between Chromium, Firefox, and WebKit; the intended stroke hierarchy is tested in each browser."
+    ],
+    "defects": [],
+    "ownerDecisionNeeded": [
+      "Approve the implemented production composition against the selected Option A desktop and Option C mobile direction.",
+      "Review the shared-boundary appearance at national, Java/Jakarta, island, eastern Indonesia, and high-DPI views.",
+      "Record any final copy, density, or mobile-sheet feedback using docs/batch-2r/11-owner-validation-protocol.md."
+    ]
+  },
+  "screenshots": [
+    "artifacts/batch-2r/final-screenshots/homepage-desktop.png",
+    "artifacts/batch-2r/final-screenshots/homepage-mobile.png",
+    "artifacts/batch-2r/final-screenshots/goal-selection-desktop.png",
+    "artifacts/batch-2r/final-screenshots/manual-highlighting-desktop.png",
+    "artifacts/batch-2r/final-screenshots/add-data-desktop.png",
+    "artifacts/batch-2r/final-screenshots/match-regions-desktop.png",
+    "artifacts/batch-2r/final-screenshots/design-map-desktop.png",
+    "artifacts/batch-2r/final-screenshots/export-desktop.png",
+    "artifacts/batch-2r/final-screenshots/export-success-desktop.png",
+    "artifacts/batch-2r/final-screenshots/loading-desktop.png",
+    "artifacts/batch-2r/final-screenshots/error-recovery-desktop.png",
+    "artifacts/batch-2r/final-screenshots/data-drawer-desktop.png",
+    "artifacts/batch-2r/final-screenshots/advanced-mode-desktop.png",
+    "artifacts/batch-2r/final-screenshots/mobile-sheet-medium.png",
+    "artifacts/batch-2r/final-screenshots/mobile-sheet-expanded.png",
+    "artifacts/batch-2r/final-screenshots/mobile-sheet-collapsed.png",
+    "artifacts/batch-2r/final-screenshots/mobile-core-success.png"
+  ],
+  "boundaryEvidence": [
+    "artifacts/batch-2r/boundary-rendering/after/bali-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/chromium-desktop-high-dpr.png",
+    "artifacts/batch-2r/boundary-rendering/after/chromium-mobile-high-dpr.png",
+    "artifacts/batch-2r/boundary-rendering/after/greater-jakarta-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/jakarta-chromium-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/jakarta-chromium-mobile.png",
+    "artifacts/batch-2r/boundary-rendering/after/jakarta-firefox-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/jakarta-webkit-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/java-single-pass-mesh.png",
+    "artifacts/batch-2r/boundary-rendering/after/maluku-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/national-chromium-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/national-chromium-mobile.png",
+    "artifacts/batch-2r/boundary-rendering/after/national-firefox-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/national-webkit-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/nusa-tenggara-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/papua-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/small-islands-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/after/sulawesi-desktop.png",
+    "artifacts/batch-2r/boundary-rendering/before/java-independent-strokes.png",
+    "artifacts/batch-2r/boundary-rendering/exports/boundary-polish.pdf",
+    "artifacts/batch-2r/boundary-rendering/exports/boundary-polish.png",
+    "artifacts/batch-2r/boundary-rendering/exports/boundary-polish.svg"
+  ],
+  "automatedCoverage": {
+    "noHorizontalOverflow": true,
+    "mobileSheetStates": true,
+    "keyboardAction": true,
+    "statusAnnouncements": true,
+    "crossBrowserBoundaryViews": [
+      "chromium-desktop",
+      "chromium-mobile",
+      "firefox-desktop",
+      "webkit-desktop"
+    ]
+  },
+  "ownerApprovalRecorded": false
+}

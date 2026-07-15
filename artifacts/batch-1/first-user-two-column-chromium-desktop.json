@@ -2,7 +2,7 @@
   "contract": "batch2.first-user-two-column.v1",
   "dataset": "synthetic-official-code-two-column",
   "rows": 2,
-  "elapsedMs": 1341,
+  "elapsedMs": 1149,
   "blockingErrors": 0,
   "pageErrors": []
 }

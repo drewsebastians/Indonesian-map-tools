@@ -1,0 +1,266 @@
+{
+  "schemaVersion": "batch2r.final-test-matrix.v1",
+  "generatedAt": "2026-07-15T07:06:06.124Z",
+  "status": "passed-with-external-platform-and-clean-install-limitations",
+  "environment": {
+    "node": "v24.14.0",
+    "cleanInstall": {
+      "status": "environment-limited",
+      "detail": "The supplied Node 24 runtime has no npm executable. npm ci could not be run without changing the lockfile through a different package manager; existing lockfile-resolved dependencies were used for all local gates."
+    }
+  },
+  "localRuns": [
+    {
+      "name": "build, data/source/license/reproducibility, geometry/stable IDs, 70 unit/migration tests, content, security, performance",
+      "status": "passed",
+      "evidence": "final local non-browser quality gate on 2026-07-15"
+    },
+    {
+      "name": "Chromium desktop smoke, trust, accessibility, public shell, workspace, guidance, XLSX/import, storage migration",
+      "status": "passed",
+      "passed": 34,
+      "skipped": 0,
+      "evidence": "Playwright final closure run on 2026-07-15"
+    },
+    {
+      "name": "Final owner-journey automation",
+      "status": "passed",
+      "passed": 3,
+      "skipped": 0,
+      "evidence": "tests/e2e/batch2r-closure.spec.js; desktop manual/spreadsheet/recovery and mobile core path"
+    },
+    {
+      "name": "Cross-browser boundary rendering/export",
+      "status": "passed",
+      "passed": 8,
+      "skipped": 8,
+      "evidence": "The 8 skips are project-scoped duplicates; Chromium captures full fixtures/exports, Firefox/WebKit capture national/Jakarta, and Chromium mobile captures mobile/high-DPI."
+    },
+    {
+      "name": "Automated accessibility",
+      "status": "passed",
+      "evidence": "axe-core 4.12.1 found no serious or critical violations on workspace and trust-page checks; keyboard, status, focus, reflow, and overflow smoke assertions also passed."
+    }
+  ],
+  "evidenceChecks": [
+    {
+      "name": "owner-design-decision",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/design-decision.json"
+    },
+    {
+      "name": "active-brand-audit",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/brand-migration-audit.json"
+    },
+    {
+      "name": "simple-english-terminology-audit",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/terminology-audit.json"
+    },
+    {
+      "name": "workspace-regression",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/workspace-regression.json"
+    },
+    {
+      "name": "boundary-rendering-regression",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/boundary-rendering-benchmark.json"
+    },
+    {
+      "name": "data-source-license-reproducibility",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-1/{data-test,license-gate,reproducibility}-report.json"
+    },
+    {
+      "name": "security-privacy-audit",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-1/security-audit-report.json"
+    },
+    {
+      "name": "final-desktop-journey",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-journey-evidence.json"
+    },
+    {
+      "name": "final-journey-exports",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-journey-evidence.json"
+    },
+    {
+      "name": "public-shell-performance",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/public-shell-verification.json"
+    },
+    {
+      "name": "hard-performance-budget",
+      "category": "automated",
+      "status": "passed",
+      "evidence": "artifacts/batch-1/performance-budget-report.json"
+    },
+    {
+      "name": "exists:docs/batch-2r/11-closure.md",
+      "category": "deliverable",
+      "status": "passed",
+      "evidence": "docs/batch-2r/11-closure.md"
+    },
+    {
+      "name": "exists:docs/batch-2r/11-owner-validation-protocol.md",
+      "category": "deliverable",
+      "status": "passed",
+      "evidence": "docs/batch-2r/11-owner-validation-protocol.md"
+    },
+    {
+      "name": "exists:docs/batch-2r/11-batch-3-resumption-checklist.md",
+      "category": "deliverable",
+      "status": "passed",
+      "evidence": "docs/batch-2r/11-batch-3-resumption-checklist.md"
+    },
+    {
+      "name": "final-screenshot:homepage-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/homepage-desktop.png"
+    },
+    {
+      "name": "final-screenshot:homepage-mobile.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/homepage-mobile.png"
+    },
+    {
+      "name": "final-screenshot:goal-selection-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/goal-selection-desktop.png"
+    },
+    {
+      "name": "final-screenshot:manual-highlighting-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/manual-highlighting-desktop.png"
+    },
+    {
+      "name": "final-screenshot:add-data-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/add-data-desktop.png"
+    },
+    {
+      "name": "final-screenshot:match-regions-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/match-regions-desktop.png"
+    },
+    {
+      "name": "final-screenshot:design-map-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/design-map-desktop.png"
+    },
+    {
+      "name": "final-screenshot:export-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/export-desktop.png"
+    },
+    {
+      "name": "final-screenshot:export-success-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/export-success-desktop.png"
+    },
+    {
+      "name": "final-screenshot:loading-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/loading-desktop.png"
+    },
+    {
+      "name": "final-screenshot:error-recovery-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/error-recovery-desktop.png"
+    },
+    {
+      "name": "final-screenshot:data-drawer-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/data-drawer-desktop.png"
+    },
+    {
+      "name": "final-screenshot:advanced-mode-desktop.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/advanced-mode-desktop.png"
+    },
+    {
+      "name": "final-screenshot:mobile-sheet-medium.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/mobile-sheet-medium.png"
+    },
+    {
+      "name": "final-screenshot:mobile-sheet-expanded.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/mobile-sheet-expanded.png"
+    },
+    {
+      "name": "final-screenshot:mobile-sheet-collapsed.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/mobile-sheet-collapsed.png"
+    },
+    {
+      "name": "final-screenshot:mobile-core-success.png",
+      "category": "visual",
+      "status": "passed",
+      "evidence": "artifacts/batch-2r/final-screenshots/mobile-core-success.png"
+    }
+  ],
+  "privacySecurity": {
+    "status": "passed",
+    "verified": [
+      "no analytics or session replay",
+      "no account/backend",
+      "no spreadsheet upload",
+      "no external map tiles",
+      "no runtime AI",
+      "no user-value logging in local evidence mode",
+      "XLSX guardrails",
+      "CSV formula escaping",
+      "CSP and static headers"
+    ],
+    "evidence": "artifacts/batch-1/security-audit-report.json and final journey request capture"
+  },
+  "staging": {
+    "status": "not-run",
+    "classification": "external-platform-blocker",
+    "detail": "The target Worker was not deployed because Wrangler authentication is unavailable.",
+    "requiredBeforeLiveClaim": [
+      "Deploy nusacanvas-space from the committed configuration using authenticated Wrangler.",
+      "Run npm run verify:staging against the target workers.dev origin.",
+      "Run the live Playwright smoke test against the target origin.",
+      "Record target headers, cache policy, noindex, 404, and external-request checks."
+    ]
+  },
+  "remotePlatform": {
+    "status": "partially-blocked",
+    "classification": "external-platform-blocker",
+    "githubRename": "blocked",
+    "cloudflareTargetWorker": "blocked",
+    "customDomainActivated": false
+  }
+}

@@ -100,8 +100,24 @@ npm run verify:batch1
 
 Runs the complete Batch 1 local gate: clean build, data/license/reproducibility pipeline, geometry tests, unit/migration tests, browser smoke matrix, trust-page tests, accessibility matrix, performance budgets, static content checks, and security checks.
 
+```text
+npm run test:batch2r:closure
+npm run verify:batch2r:closure
+```
+
+The first command captures the final desktop/mobile NusaCanvas journey and screenshots. The second validates the resulting closure evidence, performance summary, visual review classification, and owner-validation handoff. Run it after the Batch 2R workspace, guidance, boundary, brand, terminology, and Batch 1 gates. It records an owner-approval requirement; it does not generate owner approval.
+
+For a plain local final-review server after `npm run build`:
+
+```text
+node scripts/serve-dist-for-tests.js 4173
+```
+
+Then open `http://127.0.0.1:4173/`. A normal clean checkout must use `npm ci` with Node 24 and npm before relying on the local results.
+
 ## Notes
 
 - The application remains static and client-side.
 - Do not add runtime AI, account systems, analytics, trackers, or unreviewed datasets.
 - Cloudflare Workers is the staging deployment path for Batch 1.
+- Batch 3 runtime remains frozen until the owner validation record required by `docs/batch-2r/11-batch-3-resumption-checklist.md` exists.

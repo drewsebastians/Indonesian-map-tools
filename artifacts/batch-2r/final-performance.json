@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "batch2r.final-performance.v1",
+  "generatedAt": "2026-07-15T07:06:06.124Z",
+  "status": "passed",
+  "comparisonBasis": {
+    "preBatch2R": "artifacts/batch-1/baseline-measurements.json at commit cbb517d",
+    "caveat": "The pre-Batch 2R baseline was the earlier root workspace. The new public homepage and workspace have separate entry points, so the byte comparison is directional rather than a claim of like-for-like performance improvement."
+  },
+  "homepage": {
+    "initialCompressedBytes": 6305,
+    "components": {
+      "publicCssGzipBytes": 3758,
+      "publicJavaScriptGzipBytes": 379,
+      "homepageHtmlGzipBytes": 2168
+    },
+    "result": "The public homepage remains below its separate public-shell budgets and does not load map, geometry, or XLSX runtime."
+  },
+  "workspace": {
+    "initialCompressedBytes": 626742,
+    "preBatch2RInitialCompressedBytes": 588639,
+    "deltaBytes": 38103,
+    "hardBudgetBytes": 1100000,
+    "preferredBudgetBytes": 1000000,
+    "result": "Passed hard and preferred initial-payload budgets. The increase represents the brand, migration, provider, and workspace orchestration modules; it is not presented as a speed improvement."
+  },
+  "geometry": {
+    "simplifiedGzipBytes": 518479,
+    "preBatch2RGzipBytes": 518479,
+    "deltaBytes": 0,
+    "featureCount": 519,
+    "detailedGeometryStartupRequests": 0,
+    "result": "Unchanged simplified source size and feature count; detailed geometry remains explicit export-only loading."
+  },
+  "shellJavaScript": {
+    "gzipBytes": 106470,
+    "hardBudgetBytes": 150000,
+    "preferredBudgetBytes": 150000,
+    "result": "Passed hard and preferred budget."
+  },
+  "lazyXlsx": {
+    "parserGzipBytes": 11957,
+    "startupRequested": false,
+    "evidence": "tests/e2e/smoke.spec.js XLSX lazy-load test passed in the final Chromium regression run."
+  },
+  "journeyTiming": {
+    "firstValidPreviewMs": 7099,
+    "firstValidMapMs": 8196,
+    "firstExportMs": 14631,
+    "caveat": "Closure timings include automated route navigation, screenshot capture, and a deliberately corrected ambiguous row; they are smoke measurements, not user-performance targets."
+  },
+  "representativeRendering": [
+    {
+      "browser": "chromium-desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderer": "Leaflet Canvas (device-pixel-ratio aware)",
+      "renderReadyMs": 878,
+      "selectionAndZoomMs": 598,
+      "inputSegments": 39304,
+      "uniqueSegments": 36690,
+      "sharedSegments": 2614,
+      "detailedGeometryRequests": 0,
+      "sourceBoundaryVersion": "IDN-ADM2-2020-geoboundaries-22746128"
+    },
+    {
+      "browser": "chromium-mobile",
+      "viewport": {
+        "width": 393,
+        "height": 851
+      },
+      "renderer": "Leaflet Canvas (device-pixel-ratio aware)",
+      "renderReadyMs": 585,
+      "selectionAndZoomMs": 443,
+      "inputSegments": 39304,
+      "uniqueSegments": 36690,
+      "sharedSegments": 2614,
+      "detailedGeometryRequests": 0,
+      "sourceBoundaryVersion": "IDN-ADM2-2020-geoboundaries-22746128"
+    },
+    {
+      "browser": "firefox-desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderer": "Leaflet Canvas (device-pixel-ratio aware)",
+      "renderReadyMs": 2138,
+      "selectionAndZoomMs": 974,
+      "inputSegments": 39304,
+      "uniqueSegments": 36690,
+      "sharedSegments": 2614,
+      "detailedGeometryRequests": 0,
+      "sourceBoundaryVersion": "IDN-ADM2-2020-geoboundaries-22746128"
+    },
+    {
+      "browser": "webkit-desktop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "renderer": "Leaflet Canvas (device-pixel-ratio aware)",
+      "renderReadyMs": 847,
+      "selectionAndZoomMs": 1914,
+      "inputSegments": 39304,
+      "uniqueSegments": 36690,
+      "sharedSegments": 2614,
+      "detailedGeometryRequests": 0,
+      "sourceBoundaryVersion": "IDN-ADM2-2020-geoboundaries-22746128"
+    }
+  ],
+  "exportMemoryRisk": {
+    "highResolutionThreshold": "3840x2160",
+    "estimatedWorkingMemoryMiB": 70,
+    "policy": "The export code identifies this size as risky and falls back to 1920x1080 after a canvas failure; SVG remains the lower-memory alternative. PNG/PDF smoke paths passed."
+  }
+}

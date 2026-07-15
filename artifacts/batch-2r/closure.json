@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "batch2r.closure.v1",
+  "generatedAt": "2026-07-15T07:06:06.124Z",
+  "classification": "BATCH 2R CODE COMPLETE — OWNER VISUAL APPROVAL REQUIRED",
+  "codeComplete": true,
+  "batch3RuntimeImplemented": false,
+  "ownerDesignDecision": {
+    "status": "approved",
+    "selectedOption": "option-a",
+    "verifiedCommit": "e5fa19b"
+  },
+  "localAutomatedGates": "passed",
+  "ownerVisualApproval": {
+    "status": "required",
+    "recorded": false,
+    "protocol": "docs/batch-2r/11-owner-validation-protocol.md"
+  },
+  "remotePlatform": {
+    "status": "partially-blocked",
+    "classification": "external-platform-blocker",
+    "githubRename": "blocked",
+    "cloudflareTargetWorker": "blocked",
+    "customDomainActivated": false
+  },
+  "staging": {
+    "status": "not-run",
+    "classification": "external-platform-blocker",
+    "detail": "The target Worker was not deployed because Wrangler authentication is unavailable.",
+    "requiredBeforeLiveClaim": [
+      "Deploy nusacanvas-space from the committed configuration using authenticated Wrangler.",
+      "Run npm run verify:staging against the target workers.dev origin.",
+      "Run the live Playwright smoke test against the target origin.",
+      "Record target headers, cache policy, noindex, 404, and external-request checks."
+    ]
+  },
+  "cleanInstall": {
+    "status": "environment-limited",
+    "detail": "The supplied Node 24 runtime has no npm executable. npm ci could not be run without changing the lockfile through a different package manager; existing lockfile-resolved dependencies were used for all local gates."
+  },
+  "nextRequiredAction": "Run the owner validation protocol, record approval or defects, and do not resume Batch 3 Prompt 2 until that approval artifact exists.",
+  "evidence": {
+    "testMatrix": "artifacts/batch-2r/final-test-matrix.json",
+    "performance": "artifacts/batch-2r/final-performance.json",
+    "visualReview": "artifacts/batch-2r/final-visual-review.json",
+    "journey": "artifacts/batch-2r/final-journey-evidence.json"
+  }
+}

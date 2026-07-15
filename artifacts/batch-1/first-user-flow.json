@@ -2,10 +2,10 @@
   "contract": "batch2.first-user-flow.v1",
   "dataset": "synthetic-three-column",
   "marks": {
-    "firstValidPreviewMs": 1512,
-    "resolvedDatasetMs": 2028,
-    "firstValidMapMs": 3591,
-    "firstExportMs": 4926
+    "firstValidPreviewMs": 977,
+    "resolvedDatasetMs": 1127,
+    "firstValidMapMs": 1393,
+    "firstExportMs": 1694
   },
   "blockingErrors": 0,
   "unclearDecisions": 0,

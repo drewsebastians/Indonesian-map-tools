@@ -1,6 +1,6 @@
 {
   "schemaVersion": "batch2r.brand-migration-audit.v1",
-  "generatedAt": "2026-07-15T05:23:21.124Z",
+  "generatedAt": "2026-07-15T07:02:28.319Z",
   "status": "passed",
   "expectedIdentity": {
     "productName": "NusaCanvas",
@@ -30,7 +30,7 @@
     "sourceDeletionAuthorized": false
   },
   "counts": {
-    "scannedFiles": 207,
+    "scannedFiles": 217,
     "failures": 0,
     "warnings": 0,
     "allowlistedReferences": 152
@@ -426,9 +426,14 @@
     "artifacts/batch-2r/boundary-rendering/runtime-chromium-mobile.json",
     "artifacts/batch-2r/boundary-rendering/runtime-firefox-desktop.json",
     "artifacts/batch-2r/boundary-rendering/runtime-webkit-desktop.json",
+    "artifacts/batch-2r/closure.json",
     "artifacts/batch-2r/current-experience-inventory.json",
     "artifacts/batch-2r/current-string-inventory.json",
     "artifacts/batch-2r/design-decision.json",
+    "artifacts/batch-2r/final-journey-evidence.json",
+    "artifacts/batch-2r/final-performance.json",
+    "artifacts/batch-2r/final-test-matrix.json",
+    "artifacts/batch-2r/final-visual-review.json",
     "artifacts/batch-2r/platform-migration.json",
     "artifacts/batch-2r/preflight.json",
     "artifacts/batch-2r/prototype-isolation.json",
@@ -517,6 +522,9 @@
     "docs/batch-2r/10-domain-deferred.md",
     "docs/batch-2r/10-platform-rename.md",
     "docs/batch-2r/10-rollback-checklist.md",
+    "docs/batch-2r/11-batch-3-resumption-checklist.md",
+    "docs/batch-2r/11-closure.md",
+    "docs/batch-2r/11-owner-validation-protocol.md",
     "docs/batch-2r/screenshots/baseline/README.md",
     "docs/batch-3/00-blockers.md",
     "docs/batch-3/00-preflight-and-contract.md",
@@ -569,6 +577,7 @@
     "scripts/serve-static.js",
     "scripts/verify-batch1.js",
     "scripts/verify-batch2r-boundary-rendering.js",
+    "scripts/verify-batch2r-closure.js",
     "scripts/verify-batch2r-preflight.js",
     "scripts/verify-batch2r-prototype-isolation.js",
     "scripts/verify-batch2r-public-shell.js",
@@ -580,6 +589,7 @@
     "tests/e2e/a11y.spec.js",
     "tests/e2e/batch2r-baseline.spec.js",
     "tests/e2e/batch2r-boundary-rendering.spec.js",
+    "tests/e2e/batch2r-closure.spec.js",
     "tests/e2e/batch2r-guidance.spec.js",
     "tests/e2e/batch2r-prototypes.spec.js",
     "tests/e2e/batch2r-public-shell.spec.js",

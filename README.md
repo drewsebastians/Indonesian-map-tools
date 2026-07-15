@@ -50,6 +50,12 @@ Production boundaries follow the geoBoundaries/HDX OCHA COD-AB Indonesia ADM2 li
 
 See [ATTRIBUTION.md](./ATTRIBUTION.md), `data/license-manifest-v1.json`, and [known limitations](./docs/known-limitations.md). PDFs are currently raster images, several source rows are not automatically combined into one region, and large projects are limited by browser storage.
 
+## Batch 2R status
+
+**BATCH 2R CODE COMPLETE — OWNER VISUAL APPROVAL REQUIRED.** The approved NusaCanvas experience reset is implemented and its local quality gates pass. Before Batch 3 resumes, the owner must run and record the short desktop/mobile validation in `docs/batch-2r/11-owner-validation-protocol.md`.
+
+The intended GitHub repository and Cloudflare Worker migration are prepared but not remotely verified because authenticated GitHub and Wrangler access is unavailable. The future custom domain remains unattached and noindex. See `docs/batch-2r/11-closure.md` and `docs/batch-2r/10-platform-rename.md` for the active closure and platform state.
+
 ## Development and quality gates
 
 Use Node.js 24.x.
@@ -59,6 +65,8 @@ npm ci
 npm run build
 npm run verify:batch1
 npm run verify:batch2r:public-shell
+npm run test:batch2r:closure
+npm run verify:batch2r:closure
 ```
 
 `npm run build` copies only approved production assets to `dist/`. See `docs/development.md`, `docs/deployment-guide.md`, and the historical reports in `docs/batch-2/` for testing and staging details.

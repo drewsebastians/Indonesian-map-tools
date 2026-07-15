@@ -34,9 +34,12 @@ Do not commit Cloudflare credentials to the repository, workflow files, logs, sc
 npm ci
 npm run verify:batch1
 npm run build
+npm run verify:batch2r:closure
 ```
 
 The build output is `dist/`. Wrangler must deploy `dist/`, not the repository root.
+
+`verify:batch2r:closure` is local evidence only. It does not deploy the Worker, attach the future domain, or remove staging noindex.
 
 ## Local Cloudflare Preview
 
@@ -138,6 +141,10 @@ The staging `_headers` file keeps deployment updates conservative:
 6. Run the live smoke test with `PLAYWRIGHT_BASE_URL` set to the staging URL.
 
 Do not re-enable GitHub Pages as part of rollback. Keep rollback on Cloudflare so the staging path remains consistent. Before the new Worker is verified, use the preserved rollback procedure in `docs/batch-2r/10-rollback-checklist.md` rather than treating the prepared target as live.
+
+## Current platform closure state
+
+The local NusaCanvas build is ready for owner visual validation, but the GitHub repository rename and new `nusacanvas-space` Worker deployment are not verified. They require valid GitHub repository-administration authentication and authenticated Wrangler access. Follow `docs/batch-2r/10-platform-rename.md` exactly, then run the live staging verification and smoke test before calling the target workers.dev origin live. The future `nusacanvas.space` custom domain remains deferred.
 
 ## GitHub Pages
 

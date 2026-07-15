@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Batch 2R: completed the NusaCanvas experience reset: approved goal-led public shell, desktop guided-rail workspace, map-first mobile sheets, non-destructive recovery, local feature discovery, versioned BoundaryProvider, and single-pass boundary rendering. Local closure evidence is complete; owner visual/manual approval and authenticated target staging verification remain outstanding.
 - Batch 2: added local spreadsheet import (paste/CSV/TSV/XLSX), deterministic matching, linked data table, five deterministic visualization modes, shared export specification, SVG/PNG/PDF/mapping CSV export, and Batch 2 project state.
 - Added Indonesian Excel-to-map preview content, synthetic examples, and release-closure evidence for workers.dev staging.
 

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "batch2r.final-journey.v1",
+  "generatedAt": "2026-07-15T06:43:53.827Z",
+  "status": "passed",
+  "desktop": {
+    "homepageGoalSelection": true,
+    "manualHighlights": 2,
+    "manualSvgExport": true,
+    "spreadsheetTwoColumnInput": true,
+    "ambiguousRowResolved": true,
+    "dataDrawerUsed": true,
+    "visualizationApplied": true,
+    "exports": [
+      "svg",
+      "png",
+      "pdf",
+      "mapping-csv"
+    ],
+    "projectRoundTrip": true,
+    "keyboardDrawerAction": true,
+    "screenReaderStatusAnnouncements": true,
+    "futureWorkflowHonesty": true,
+    "noExternalUserDataRequest": true,
+    "timing": {
+      "startedAt": 1784097807089,
+      "firstValidPreviewMs": 7099,
+      "firstValidMapMs": 8196,
+      "firstExportMs": 14631
+    }
+  },
+  "externalRequests": []
+}
