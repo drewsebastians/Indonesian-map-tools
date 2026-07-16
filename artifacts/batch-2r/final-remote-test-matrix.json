@@ -10,6 +10,7 @@
     { "name": "Batch 2R public/workspace/guidance/closure", "passed": 22, "skipped": 3, "failed": 0, "note": "one Chrome launch infrastructure flake passed on isolated retry" }
   ],
   "cleanInstall": { "status": "environment-limited", "detail": "npm ci unavailable because npm is absent from the supplied Node runtime" },
+  "remoteRepository": { "status": "verified", "repository": "drewsebastians/nusacanvas.space", "head": "339cab8" },
   "remoteStaging": { "status": "not-run", "reason": "Wrangler is not authenticated" },
   "noExternalMapRequests": true,
   "noAnalytics": true
