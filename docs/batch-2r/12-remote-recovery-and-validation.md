@@ -19,7 +19,7 @@ The local recovery validation reran the boundary suite after restoring the stati
 
 1. Commit the recovery documents and current smoke-test fix. **Completed:** `e659222`.
 2. Rename the GitHub repository through the authenticated API, verify the repository id is unchanged, update `origin`, and push `main` without force. **Completed:** remote `main` is `e659222`.
-3. Authenticate Wrangler, deploy Worker `nusacanvas-space`, and verify the workers.dev origin with `npm run verify:staging` plus live smoke checks. **Completed for deployment and HTTP verification:** version `f3627cdc-c39f-4208-ab2b-b485476dbccd`; browser smoke remains an operator-run check because the Codex sandbox cannot spawn Playwright browser workers.
+3. Authenticate Wrangler, deploy Worker `nusacanvas-space`, and verify the workers.dev origin with `npm run verify:staging` plus live smoke checks. **Completed:** version `f3627cdc-c39f-4208-ab2b-b485476dbccd`; HTTP verification passed and the operator-run Chromium desktop/mobile live smoke matrix passed 48/48 after the origin-aware XLSX assertion was corrected.
 4. Record the exact remote heads, deployed commit, headers, noindex, 404 behavior, and rollback reference. **Completed for the HTTP contract:** remote head and deployment version are recorded; the old Worker remains the rollback reference.
 
 No custom-domain attachment, DNS change, indexing change, old-Worker deletion, or Batch 3R runtime work is authorized by this recovery record.

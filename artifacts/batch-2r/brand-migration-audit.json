@@ -1,6 +1,6 @@
 {
   "schemaVersion": "batch2r.brand-migration-audit.v1",
-  "generatedAt": "2026-07-16T09:16:45.673Z",
+  "generatedAt": "2026-07-16T09:42:01.468Z",
   "status": "passed",
   "expectedIdentity": {
     "productName": "NusaCanvas",
