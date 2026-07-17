@@ -103,15 +103,15 @@ a:hover { color: var(--accent-dark); }
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
-  min-height: 7.25rem;
+  min-height: 4.5rem;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  width: 9.5rem;
-  min-height: 7rem;
-  background: url("../images/nusacanvas-logo.png") center / contain no-repeat;
+  width: 10.5rem;
+  height: 3.5rem;
+  background: url("../images/nusacanvas-logo.png") center 87% / 130% auto no-repeat;
   color: var(--ink);
   font-size: 0;
   text-decoration: none;
@@ -373,10 +373,10 @@ a:focus {
 @media (max-width: 680px) {
   .site-nav {
     position: relative;
-    min-height: 6rem;
+    min-height: 4.25rem;
   }
 
-  .brand { width: 8rem; min-height: 5.75rem; }
+  .brand { width: 8.75rem; height: 3rem; }
 
   .nav-toggle { display: inline-flex; min-height: 44px; align-items: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); padding: .5rem .75rem; }
   .nav-links { display: none; width: 100%; align-items: stretch; border-top: 1px solid var(--border-subtle); padding: var(--space-3) 0; }

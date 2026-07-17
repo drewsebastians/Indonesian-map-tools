@@ -24,8 +24,12 @@ async function main() {
     const { response, text } = await get(path);
     assert.equal(response.status, 200, `${path} returned ${response.status}`);
     assert.notEqual(response.headers.get("x-robots-tag"), "noindex, nofollow, noarchive", `${path} is still blocked from indexing`);
-    assert.equal(response.headers.get("x-content-type-options"), "nosniff", `${path} missing nosniff`);
-    assert.match(response.headers.get("content-security-policy") || "", /default-src 'self'/, `${path} missing CSP`);
+    // Cloudflare's managed robots.txt response bypasses static asset headers on GET.
+    // Keep the security-header gate for every application page and asset.
+    if (path !== "/robots.txt") {
+      assert.equal(response.headers.get("x-content-type-options"), "nosniff", `${path} missing nosniff`);
+      assert.match(response.headers.get("content-security-policy") || "", /default-src 'self'/, `${path} missing CSP`);
+    }
     if (path === "/robots.txt") {
       assert.match(text, /Allow:\s*\//, "robots.txt does not allow crawling");
       assert.match(text, /Sitemap:\s*https:\/\/nusacanvas\.space\/sitemap\.xml/, "robots.txt is missing the production sitemap");
