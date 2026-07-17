@@ -131,6 +131,12 @@
       </section>
 
       <section class="panel-section" data-workflow-step="visualize">
+        <h2>Map appearance</h2>
+        <label class="check-row"><input id="presentationView" type="checkbox"> Presentation view</label>
+        <p class="notice">Softens background boundaries and keeps attention on highlighted regions with minimal labels.</p>
+      </section>
+
+      <section class="panel-section" data-workflow-step="visualize">
         <h2>Legend</h2>
         <label class="check-row"><input id="showLegend" type="checkbox" checked> Show legend</label>
         <label for="legendPosition">Legend position</label>
@@ -250,8 +256,8 @@
         </select>
         <label class="check-row"><input id="exportLabels" type="checkbox" checked> Include region names</label>
         <label class="check-row"><input id="transparentBg" type="checkbox"> Transparent background</label>
-        <label class="check-row"><input id="exportHighDetail" type="checkbox"> Use detailed boundaries for export</label>
-        <p class="notice">This downloads about 10.5 MB only when you export and may use more memory.</p>
+        <label class="check-row"><input id="exportHighDetail" type="checkbox"> Always use detailed boundaries</label>
+        <p class="notice">Detailed local boundaries are automatic for SVG, PDF, and PNG above 1920 x 1080. Enable this for every export.</p>
         <label for="pngSize">PNG size</label>
         <select id="pngSize">
           <option value="1920x1080">1920 x 1080</option>

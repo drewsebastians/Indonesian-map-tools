@@ -226,6 +226,7 @@
       labels: value.labels !== false,
       transparent: Boolean(value.transparent),
       highDetail: Boolean(value.highDetail),
+      presentation: Boolean(value.presentation),
       pngSize: ["1920x1080", "2560x1440", "3840x2160"].includes(value.pngSize) ? value.pngSize : "1920x1080"
     };
   }

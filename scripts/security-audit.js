@@ -99,7 +99,8 @@ function scanSafetyControls() {
   assertContains("assets/js/boundary-provider.js", "data/indonesia-adm2-detailed.geojson", "explicit local detailed geometry path");
   assertContains("assets/js/boundary-provider.js", "does not permit a remote runtime source", "local-only boundary provider guard");
   assertContains("assets/js/app.js", "getNationalLayer(\"ADM2\", \"detailed\")", "provider-routed detailed boundary request");
-  assertMatches("assets/js/app.js", /confirm\([^)]*detailed[^)]*boundar/i, "explicit high-detail export confirmation");
+  assertContains("assets/js/app.js", "handleGeometryDetailRequest", "adaptive local geometry switching");
+  assertContains("assets/js/export.js", "requiresDetailedGeometry", "high-resolution export detail policy");
 }
 
 function scanDocumentation() {

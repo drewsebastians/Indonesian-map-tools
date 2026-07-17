@@ -1,16 +1,21 @@
 (function () {
-  const defaultStyle = {
-    fillColor: "#e7ebef",
-    fillOpacity: 0.88
+  const presentationStyles = window.NusaCanvasPresentationStyles || {
+    normal: { unselectedFill: "#edf1f3", unselectedFillOpacity: 0.72, highlightedFillOpacity: 0.78, boundaryColor: "#a6b0b9", boundaryWeight: 0.6, boundaryOpacity: 0.76, highlightOutlineColor: "#4f6472", highlightOutlineWeight: 1.15, selectedOutlineColor: "#172a3a", selectedOutlineWeight: 2.2 },
+    presentation: { unselectedFill: "#f1f4f5", unselectedFillOpacity: 0.46, highlightedFillOpacity: 0.82, boundaryColor: "#c0c8ce", boundaryWeight: 0.45, boundaryOpacity: 0.64, highlightOutlineColor: "#405866", highlightOutlineWeight: 1.35, selectedOutlineColor: "#172a3a", selectedOutlineWeight: 2.35 }
   };
-  const boundaryStyle = {
-    color: "#8d9aa6",
-    weight: 0.8,
-    lineCap: "round",
-    lineJoin: "round",
-    interactive: false,
-    smoothFactor: 0
-  };
+
+  function geometryDetailForZoom(zoom, currentDetail) {
+    if (Number(zoom) >= 7) return "detailed";
+    if (Number(zoom) <= 5.75) return "lite";
+    return currentDetail === "detailed" ? "detailed" : "lite";
+  }
+
+  function labelPriority(id, selectedId, highlights, contextIds, presentationView) {
+    if (id === selectedId) return 3;
+    if (highlights && highlights[id]) return 2;
+    if (!presentationView && contextIds && contextIds.has(id)) return 1;
+    return 0;
+  }
 
   function createMap(elementId, callbacks) {
     const map = L.map(elementId, {
@@ -27,12 +32,16 @@
     map.getPane("boundaryMeshPane").style.zIndex = "410";
     map.getPane("boundaryMeshPane").style.pointerEvents = "none";
     map.getPane("boundaryMeshPane").dataset.boundaryMesh = "single-pass";
+    map.createPane("boundaryHighlightPane");
+    map.getPane("boundaryHighlightPane").style.zIndex = "415";
+    map.getPane("boundaryHighlightPane").style.pointerEvents = "none";
     map.createPane("boundarySelectionPane");
     map.getPane("boundarySelectionPane").style.zIndex = "420";
     map.getPane("boundarySelectionPane").style.pointerEvents = "none";
     const layersById = new Map();
     let geoLayer = null;
     let boundaryMesh = null;
+    let highlightOutlines = null;
     let selectedOutline = null;
     let hoverOutline = null;
     let legendControl = null;
@@ -40,17 +49,34 @@
     let selectedId = null;
     let features = [];
     let highlights = {};
+    let contextLabelIds = new Set();
+    let presentationView = false;
+    let geometryDetail = "lite";
+    let requestedDetail = null;
+    let requestedDetailReason = null;
     let collisionFrame = null;
     let lastLabelUpdate = 0;
-    const labelZoomThreshold = window.matchMedia && window.matchMedia("(max-width: 860px)").matches ? 7.25 : 6.5;
-
     function styleFeature(feature) {
       const id = feature.properties.region_id;
       const item = highlights[id];
+      const visual = presentationView ? presentationStyles.presentation : presentationStyles.normal;
       return {
-        fillColor: item ? item.color : defaultStyle.fillColor,
-        fillOpacity: item ? 0.82 : defaultStyle.fillOpacity,
+        fillColor: item ? item.color : visual.unselectedFill,
+        fillOpacity: item ? visual.highlightedFillOpacity : visual.unselectedFillOpacity,
         stroke: false
+      };
+    }
+
+    function meshStyle() {
+      const visual = presentationView ? presentationStyles.presentation : presentationStyles.normal;
+      return {
+        color: visual.boundaryColor,
+        weight: visual.boundaryWeight,
+        opacity: visual.boundaryOpacity,
+        lineCap: "round",
+        lineJoin: "round",
+        interactive: false,
+        smoothFactor: 0
       };
     }
 
@@ -99,16 +125,36 @@
       else hoverOutline = null;
     }
 
+    function renderHighlightOutlines() {
+      if (highlightOutlines) highlightOutlines.remove();
+      const visual = presentationView ? presentationStyles.presentation : presentationStyles.normal;
+      const highlightedFeatures = features.filter((feature) => highlights[feature.properties.region_id]);
+      highlightOutlines = highlightedFeatures.length ? L.geoJSON({ type: "FeatureCollection", features: highlightedFeatures }, {
+        interactive: false,
+        pane: "boundaryHighlightPane",
+        style: {
+          color: visual.highlightOutlineColor,
+          weight: visual.highlightOutlineWeight,
+          opacity: 0.9,
+          fill: false,
+          lineCap: "round",
+          lineJoin: "round",
+          smoothFactor: 0
+        }
+      }).addTo(map) : null;
+    }
+
     function showPresentationOutline(feature, kind) {
       removePresentationOutline(kind);
       if (!feature) return;
       const selected = kind === "selected";
+      const visual = presentationView ? presentationStyles.presentation : presentationStyles.normal;
       const outline = L.geoJSON(feature, {
         interactive: false,
         pane: "boundarySelectionPane",
         style: {
-          color: selected ? "#172a3a" : "#596673",
-          weight: selected ? 2.2 : 1.35,
+          color: selected ? visual.selectedOutlineColor : "#596673",
+          weight: selected ? visual.selectedOutlineWeight : 1.35,
           opacity: 1,
           fill: false,
           lineCap: "round",
@@ -120,10 +166,15 @@
       else hoverOutline = outline;
     }
 
-    function render(collection) {
+    function render(collection, options = {}) {
       features = collection.features;
+      geometryDetail = options.detail === "detailed" ? "detailed" : "lite";
+      requestedDetail = null;
+      requestedDetailReason = null;
+      map.getContainer().dataset.geometryDetail = geometryDetail;
       if (geoLayer) geoLayer.remove();
       if (boundaryMesh) boundaryMesh.remove();
+      if (highlightOutlines) highlightOutlines.remove();
       removePresentationOutline("selected");
       removePresentationOutline("hover");
       layersById.clear();
@@ -152,20 +203,26 @@
       // keeps the single mesh sharp on high-DPI displays without a second SVG
       // stroke for every administrative polygon.
       const canvasRenderer = L.canvas({ padding: 0.5, pane: "boundaryMeshPane" });
-      boundaryMesh = L.polyline(mesh.segments, Object.assign({}, boundaryStyle, {
+      boundaryMesh = L.polyline(mesh.segments, Object.assign({}, meshStyle(), {
         pane: "boundaryMeshPane",
         renderer: canvasRenderer || undefined
       })).addTo(map);
+      renderHighlightOutlines();
       const boundaryProvider = window.NusaCanvasBoundaryProvider && window.NusaCanvasBoundaryProvider.current;
       if (!boundaryProvider) throw new Error("Boundary provider metadata is required before map rendering.");
       window.NusaCanvasBoundaryRendering = Object.freeze({
         boundaryVersion: boundaryProvider.getVersion(),
         strategy: "single-pass-exact-segment-mesh",
         renderer: canvasRenderer ? "Leaflet Canvas (device-pixel-ratio aware)" : "Leaflet SVG fallback",
+        geometryDetail,
         ...mesh.stats
       });
+      map.off("zoomend moveend resize", scheduleLabelCollisionUpdate);
       map.on("zoomend moveend resize", scheduleLabelCollisionUpdate);
-      fitIndonesia();
+      map.off("zoomend", handleAdaptiveGeometry);
+      map.on("zoomend", handleAdaptiveGeometry);
+      if (options.fit !== false) fitIndonesia();
+      if (selectedId && layersById.has(selectedId)) showPresentationOutline(layersById.get(selectedId).feature, "selected");
       refreshTooltipLabels();
       setLayerAccessibility();
     }
@@ -214,13 +271,12 @@
           id,
           element,
           bounds,
-          highlighted: Boolean(highlights[id]),
-          selected: id === selectedId
+          priority: labelPriority(id, selectedId, highlights, contextLabelIds, presentationView)
         });
       });
 
-      // Prioritize selected and highlighted labels, then hide later labels whose boxes overlap.
-      labels.sort((a, b) => Number(b.selected) - Number(a.selected) || Number(b.highlighted) - Number(a.highlighted));
+      // Selected, highlighted, and contextual labels win; later overlaps are hidden.
+      labels.sort((a, b) => b.priority - a.priority);
       const visible = [];
       labels.forEach((label) => {
         const overlaps = visible.some((item) => boxesOverlap(label.bounds, item.bounds, 4));
@@ -230,11 +286,31 @@
     }
 
     function updatePermanentLabelCandidates() {
-      const zoomAllowsGeneralLabels = map.getZoom() >= labelZoomThreshold;
       layersById.forEach((layer, id) => {
-        const shouldBePermanent = id === selectedId || Boolean(highlights[id]) || zoomAllowsGeneralLabels;
+        const shouldBePermanent = labelPriority(id, selectedId, highlights, contextLabelIds, presentationView) > 0;
         if (layer._labelPermanent !== shouldBePermanent) bindRegionTooltip(layer, shouldBePermanent);
       });
+    }
+
+    function requestGeometryDetail(detail, reason) {
+      if (detail === geometryDetail) {
+        if (reason === "overview" || (reason === "zoom" && requestedDetailReason === "zoom")) {
+          requestedDetail = null;
+          requestedDetailReason = null;
+        }
+        return;
+      }
+      if (detail === requestedDetail || !callbacks || !callbacks.onGeometryDetailRequest) return;
+      requestedDetail = detail;
+      requestedDetailReason = reason;
+      Promise.resolve(callbacks.onGeometryDetailRequest({ detail, reason, zoom: map.getZoom() })).catch(() => {
+        requestedDetail = null;
+        requestedDetailReason = null;
+      });
+    }
+
+    function handleAdaptiveGeometry() {
+      requestGeometryDetail(geometryDetailForZoom(map.getZoom(), geometryDetail), "zoom");
     }
 
     function bindRegionTooltip(layer, permanent) {
@@ -260,6 +336,7 @@
     }
 
     function fitIndonesia() {
+      requestGeometryDetail("lite", "overview");
       if (geoLayer) map.fitBounds(geoLayer.getBounds(), { padding: [20, 20] });
     }
 
@@ -282,11 +359,13 @@
       const layer = layersById.get(id);
       if (!layer) return;
       select(id, true);
+      requestGeometryDetail("detailed", "region");
       map.fitBounds(layer.getBounds(), { padding: [28, 28], maxZoom: 9 });
     }
 
     function fitProvince(provinceName) {
       if (!provinceName || provinceName === "__all") return fitIndonesia();
+      requestGeometryDetail("detailed", "province");
       const bounds = [];
       features.forEach((feature) => {
         if (feature.properties.province_name === provinceName && layersById.has(feature.properties.region_id)) {
@@ -301,7 +380,23 @@
     function setHighlights(next) {
       highlights = next || {};
       layersById.forEach((layer) => layer.setStyle(styleFeature(layer.feature)));
+      renderHighlightOutlines();
       refreshTooltipLabels();
+    }
+
+    function setContextLabels(ids) {
+      contextLabelIds = new Set((ids || []).map(String));
+      scheduleLabelCollisionUpdate();
+    }
+
+    function setPresentationView(enabled) {
+      presentationView = Boolean(enabled);
+      map.getContainer().dataset.presentationView = String(presentationView);
+      layersById.forEach((layer) => layer.setStyle(styleFeature(layer.feature)));
+      if (boundaryMesh) boundaryMesh.setStyle(meshStyle());
+      renderHighlightOutlines();
+      if (selectedId && layersById.has(selectedId)) showPresentationOutline(layersById.get(selectedId).feature, "selected");
+      scheduleLabelCollisionUpdate();
     }
 
     function setLegend(items, visible, position) {
@@ -374,8 +469,8 @@
       scheduleLabelCollisionUpdate();
     }
 
-    return { map, render, fitIndonesia, fitProvince, select, zoomTo, setHighlights, setLegend, getCurrentView, invalidate, get selectedId() { return selectedId; } };
+    return { map, render, fitIndonesia, fitProvince, select, zoomTo, setHighlights, setContextLabels, setPresentationView, setLegend, getCurrentView, invalidate, get selectedId() { return selectedId; }, get geometryDetail() { return geometryDetail; }, get requestedGeometryDetail() { return requestedDetail; } };
   }
 
-  window.IndonesiaMap = { createMap };
+  window.IndonesiaMap = { createMap, geometryDetailForZoom, labelPriority };
 })();

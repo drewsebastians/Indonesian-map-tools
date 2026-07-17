@@ -69,6 +69,7 @@
     importRows: [],
     selectedDataRow: null,
     visualization: null,
+    presentationView: false,
     highDetailCollection: null,
     highDetailFeatureById: new Map(),
     undo: []
@@ -89,7 +90,7 @@
     [
       "projectTitle", "searchInput", "searchResults", "provinceSelect", "regionSelect", "selectedRegion",
       "colorPicker", "colorValue", "manualPalette", "colorPalette", "categoryInput", "valueInput", "applyColorBtn", "removeColorBtn",
-      "undoBtn", "resetBtn", "highlightCount", "highlightList", "showLegend", "legendPosition",
+      "undoBtn", "resetBtn", "highlightCount", "highlightList", "presentationView", "showLegend", "legendPosition",
       "groupCount", "groupingList", "legendItems", "addLegendBtn", "importPaste", "csvFile", "xlsxSheet", "importDelimiter",
       "importLocale", "previewCsvBtn", "applyCsvBtn", "cancelImportBtn", "importMapping", "csvPreview",
       "saveProjectBtn", "openProjectBtn", "projectFile", "clearProjectBtn", "recoverLegacyAutosaveBtn", "deleteLegacyAutosaveBtn", "downloadStorageRecoveryBtn", "deleteStorageRecoveryBtn", "downloadUnreadableTargetBtn", "downloadUnreadableLegacyBtn", "autosaveStatus",
@@ -99,7 +100,7 @@
       "workflowSteps", "workflowStatus", "basicModeBtn", "advancedModeBtn", "exampleBtn", "advancedImportOptions", "dataTablePanel", "dataTable", "dataTableFilter", "dataTableSort", "dataTableCount", "dataTableEmpty", "dataTableAnnouncement", "mapSelectionStatus",
       "vizMode", "vizClasses", "vizPalette", "vizReverse", "vizCenter", "vizBreaks", "vizNumberFormat", "vizPreviewBtn", "vizApplyBtn", "vizSummary", "vizLegendPreview"
     ].forEach((id) => { el[id] = document.getElementById(id); });
-    mapApi = IndonesiaMap.createMap("map", { onSelect: handleFeatureSelected });
+    mapApi = IndonesiaMap.createMap("map", { onSelect: handleFeatureSelected, onGeometryDetailRequest: handleGeometryDetailRequest });
     setupEvents();
     setupColorPalette();
     setupVisualizationControls();
@@ -125,6 +126,7 @@
     el.removeColorBtn.addEventListener("click", removeSelectedColor);
     el.undoBtn.addEventListener("click", undo);
     el.resetBtn.addEventListener("click", resetAll);
+    el.presentationView.addEventListener("change", () => setPresentationView(el.presentationView.checked));
     el.showLegend.addEventListener("change", () => { state.legendVisible = el.showLegend.checked; refreshMapLegend(); scheduleSave(); });
     el.legendPosition.addEventListener("change", () => { state.legendPosition = el.legendPosition.value; refreshMapLegend(); scheduleSave(); });
     el.addLegendBtn.addEventListener("click", () => {
@@ -383,8 +385,9 @@
       const collection = await boundaryProvider.getNationalLayer("ADM2", "lite").load();
       state.features = collection.features || [];
       state.featureById = new Map(state.features.map((feature) => [feature.properties.region_id, feature]));
-      mapApi.render(collection);
+      mapApi.render(collection, { detail: "lite" });
       mapApi.setHighlights(state.highlights);
+      mapApi.setPresentationView(state.presentationView);
       populateFilters();
       renderLegendEditor(false);
       restoreAutosave();
@@ -414,6 +417,45 @@
     state.highDetailCollection = merged.collection;
     state.highDetailFeatureById = new Map((merged.collection.features || []).map((feature) => [feature.properties.region_id, feature]));
     return state.highDetailCollection;
+  }
+
+  async function handleGeometryDetailRequest(request) {
+    const detail = request && request.detail === "detailed" ? "detailed" : "lite";
+    if (!mapApi || mapApi.geometryDetail === detail) return;
+    try {
+      if (detail === "detailed") {
+        el.loadingIndicator.dataset.geometryState = "loading-detail";
+        el.loadingIndicator.textContent = "Loading detailed local boundaries for this view...";
+        const collection = await loadHighDetailCollection();
+        if (mapApi.requestedGeometryDetail !== "detailed") {
+          el.loadingIndicator.dataset.geometryState = mapApi.geometryDetail;
+          el.loadingIndicator.textContent = productText("ui.status.ready", { count: state.features.length });
+          return;
+        }
+        mapApi.render(collection, { detail: "detailed", fit: false });
+      } else {
+        mapApi.render({ type: "FeatureCollection", features: state.features }, { detail: "lite", fit: false });
+      }
+      mapApi.setHighlights(state.highlights);
+      mapApi.setPresentationView(state.presentationView);
+      el.loadingIndicator.dataset.geometryState = detail;
+      el.loadingIndicator.textContent = detail === "detailed"
+        ? "Detailed local boundaries are active for this close view."
+        : productText("ui.status.ready", { count: state.features.length });
+    } catch (error) {
+      el.loadingIndicator.dataset.geometryState = "lite-fallback";
+      el.loadingIndicator.textContent = "The map is using the lite boundaries. Your project is still safe.";
+      showError(error.message);
+      throw error;
+    }
+  }
+
+  function setPresentationView(enabled, save = true) {
+    state.presentationView = Boolean(enabled);
+    el.presentationView.checked = state.presentationView;
+    el.appShell.dataset.presentationView = String(state.presentationView);
+    mapApi.setPresentationView(state.presentationView);
+    if (save) saveExportSettings();
   }
 
   function mergeDetailedGeometry(baseCollection, detailedCollection) {
@@ -1274,6 +1316,8 @@
     el.exportLabels.checked = state.exportSettings.labels !== false;
     el.transparentBg.checked = Boolean(state.exportSettings.transparent);
     el.exportHighDetail.checked = Boolean(state.exportSettings.highDetail);
+    state.presentationView = Boolean(state.exportSettings.presentation);
+    setPresentationView(state.presentationView, false);
     el.pngSize.value = state.exportSettings.pngSize || "1920x1080";
     setMode(state.uiMode, false);
     updateAfterHighlightChange(false);
@@ -1308,6 +1352,7 @@
     state.importCorrections = {};
     state.importRows = [];
     state.visualization = null;
+    state.presentationView = false;
     state.selectedDataRow = null;
     state.workflowStage = "input";
     state.undo = [];
@@ -1332,6 +1377,7 @@
     el.exportLabels.checked = true;
     el.transparentBg.checked = false;
     el.exportHighDetail.checked = false;
+    el.presentationView.checked = false;
     el.pngSize.value = "1920x1080";
     el.showLegend.checked = true;
     el.legendPosition.value = "bottom-right";
@@ -1345,6 +1391,7 @@
     el.dataTablePanel.hidden = true;
     clearPendingWorkspaceState();
     mapApi.select(null, false);
+    setPresentationView(false, false);
     setMode("basic", false);
     renderLegendEditor(false);
     updateAfterHighlightChange(false);
@@ -1498,13 +1545,15 @@
 
   async function exportSvg() {
     try {
-      const payload = await getExportPayload();
+      const payload = await getExportPayload("svg");
       MapExport.exportSvg(payload.features, state, {
         ratio: el.exportRatio.value,
         extent: el.exportExtent.value,
         labels: el.exportLabels.checked,
         transparent: el.transparentBg.checked,
         selectedId: mapApi.selectedId,
+        presentationMode: state.presentationView,
+        geometryDetail: payload.geometryDetail,
         viewBounds: payload.viewBounds,
         legendFeatures: state.features
       });
@@ -1517,7 +1566,7 @@
     el.loadingIndicator.dataset.state = "exporting";
     el.loadingIndicator.textContent = "Creating PNG...";
     try {
-      const payload = await getExportPayload();
+      const payload = await getExportPayload("png");
       const pngPlan = MapExport.estimatePngCost({ pngSize: el.pngSize.value });
       if (pngPlan.risky && !confirm(`A ${pngPlan.width} x ${pngPlan.height} PNG may use about ${pngPlan.estimatedMegabytes} MB of memory. Continue?`)) {
         el.loadingIndicator.dataset.state = "ready";
@@ -1531,6 +1580,8 @@
         labels: el.exportLabels.checked,
         transparent: el.transparentBg.checked,
         selectedId: mapApi.selectedId,
+        presentationMode: state.presentationView,
+        geometryDetail: payload.geometryDetail,
         viewBounds: payload.viewBounds,
         legendFeatures: state.features
       });
@@ -1549,13 +1600,15 @@
     el.loadingIndicator.dataset.state = "exporting";
     el.loadingIndicator.textContent = "Creating PDF...";
     try {
-      const payload = await getExportPayload();
+      const payload = await getExportPayload("pdf");
       const result = await MapExport.exportPdf(payload.features, state, {
         ratio: el.exportRatio.value === "a3" ? "a3" : "a4",
         extent: el.exportExtent.value,
         labels: el.exportLabels.checked,
         transparent: false,
         selectedId: mapApi.selectedId,
+        presentationMode: state.presentationView,
+        geometryDetail: payload.geometryDetail,
         viewBounds: payload.viewBounds,
         legendFeatures: state.features
       });
@@ -1573,37 +1626,38 @@
     MapExport.exportMappingCsv(state.importRows, state);
   }
 
-  function saveExportSettings() {
+  function saveExportSettings(save = true) {
     state.exportSettings = {
       ratio: el.exportRatio.value,
       extent: el.exportExtent.value,
       labels: el.exportLabels.checked,
       transparent: el.transparentBg.checked,
       highDetail: el.exportHighDetail.checked,
+      presentation: state.presentationView,
       pngSize: el.pngSize.value
     };
-    scheduleSave();
+    if (save) scheduleSave();
   }
 
-  async function getExportPayload() {
+  async function getExportPayload(format) {
     const view = mapApi.getCurrentView();
     let featureById = state.featureById;
-    if (el.exportHighDetail.checked) {
-      if (!confirm("Use detailed boundaries for this export? About 10.5 MB will be downloaded only for this export.")) {
-        el.exportHighDetail.checked = false;
-        el.loadingIndicator.textContent = "Detailed boundaries canceled. The export will use standard boundaries.";
-      } else {
-        el.loadingIndicator.textContent = "Loading detailed boundaries for this export...";
-        await loadHighDetailCollection();
-        featureById = state.highDetailFeatureById;
-      }
+    const useDetailed = MapExport.requiresDetailedGeometry(format, {
+      highDetail: el.exportHighDetail.checked,
+      pngSize: el.pngSize.value
+    });
+    if (useDetailed) {
+      el.loadingIndicator.textContent = "Loading detailed local boundaries for this export...";
+      await loadHighDetailCollection();
+      featureById = state.highDetailFeatureById;
     }
     const national = el.exportExtent.value === "national";
     const features = national ? Array.from(featureById.values()) : view.visibleIds.map((id) => featureById.get(id) || state.featureById.get(id)).filter(Boolean);
     return {
       // Export follows the user's current zoom and pan position for every export ratio.
-      features: features.length ? features : state.features,
-      viewBounds: national ? null : view.bounds
+      features: features.length ? features : Array.from(featureById.values()),
+      viewBounds: national ? null : view.bounds,
+      geometryDetail: useDetailed ? "detailed" : "lite"
     };
   }
 

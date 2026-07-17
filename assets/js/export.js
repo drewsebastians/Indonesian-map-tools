@@ -3,6 +3,41 @@
   if (!brand) throw new Error("Product brand configuration is required.");
   const boundaryProvider = window.NusaCanvasBoundaryProvider && window.NusaCanvasBoundaryProvider.current;
   if (!boundaryProvider || typeof boundaryProvider.getManifest !== "function") throw new Error("Boundary provider metadata is required before export.");
+  const PRESENTATION_STYLES = Object.freeze({
+    normal: Object.freeze({
+      background: "#eef4f5",
+      unselectedFill: "#edf1f3",
+      unselectedFillOpacity: 0.72,
+      highlightedFillOpacity: 0.78,
+      boundaryColor: "#a6b0b9",
+      boundaryWeight: 0.6,
+      boundaryOpacity: 0.76,
+      highlightOutlineColor: "#4f6472",
+      highlightOutlineWeight: 1.15,
+      selectedOutlineColor: "#172a3a",
+      selectedOutlineWeight: 2.2
+    }),
+    presentation: Object.freeze({
+      background: "#f7f9fa",
+      unselectedFill: "#f1f4f5",
+      unselectedFillOpacity: 0.46,
+      highlightedFillOpacity: 0.82,
+      boundaryColor: "#c0c8ce",
+      boundaryWeight: 0.45,
+      boundaryOpacity: 0.64,
+      highlightOutlineColor: "#405866",
+      highlightOutlineWeight: 1.35,
+      selectedOutlineColor: "#172a3a",
+      selectedOutlineWeight: 2.35
+    })
+  });
+  window.NusaCanvasPresentationStyles = PRESENTATION_STYLES;
+
+  function requiresDetailedGeometry(format, options = {}) {
+    if (options.highDetail) return true;
+    if (format === "svg" || format === "pdf") return true;
+    return format === "png" && options.pngSize !== "1920x1080";
+  }
 
   function escapeXml(value) {
     return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -55,6 +90,9 @@
       transparent: Boolean(options.transparent),
       labels: options.labels !== false,
       selectedId: options.selectedId || null,
+      contextLabelIds: Array.from(new Set((options.contextLabelIds || []).map(String))).slice(0, 100),
+      presentationMode: Boolean(options.presentationMode),
+      geometryDetail: options.geometryDetail === "detailed" ? "detailed" : "lite",
       attribution: boundaryProvider.getAttribution(),
       boundaryProviderId: boundaryManifest.providerId,
       boundaryVersion: boundaryProvider.getVersion(),
@@ -224,26 +262,31 @@
     const offsetX = (size.width - mapWidth) / 2;
     const offsetY = 92 + ((size.height - 88 - legendAreaHeight - mapHeight) / 2);
     const project = (x, y) => ({ x: offsetX + (x - bounds.minX) * scale, y: offsetY + (bounds.maxY - y) * scale });
-    const background = spec.transparent ? "" : `<rect width="100%" height="100%" fill="#97d2e2"/>`;
+    const visual = spec.presentationMode ? PRESENTATION_STYLES.presentation : PRESENTATION_STYLES.normal;
+    const background = spec.transparent ? "" : `<rect width="100%" height="100%" fill="${visual.background}"/>`;
     const fills = features.map((feature) => {
       const id = feature.properties.region_id;
       const item = state.highlights[id];
-      const fill = item ? item.color : "#e7ebef";
-      return `<path data-region-fill="${escapeXml(id)}" d="${pathForGeometry(feature.geometry, project)}" fill="${fill}" stroke="none"><title>${escapeXml(feature.properties.display_name)}</title></path>`;
+      const fill = item ? item.color : visual.unselectedFill;
+      const opacity = item ? visual.highlightedFillOpacity : visual.unselectedFillOpacity;
+      return `<path data-region-fill="${escapeXml(id)}" d="${pathForGeometry(feature.geometry, project)}" fill="${fill}" fill-opacity="${opacity}" stroke="none"><title>${escapeXml(feature.properties.display_name)}</title></path>`;
     }).join("\n");
     const mesh = boundaryMeshPath(features, project);
+    const highlightOutlines = features.filter((feature) => state.highlights && state.highlights[feature.properties.region_id]).map((feature) => {
+      return `<path data-highlight-outline="${escapeXml(feature.properties.region_id)}" d="${pathForGeometry(feature.geometry, project)}" fill="none" stroke="${visual.highlightOutlineColor}" stroke-width="${visual.highlightOutlineWeight}" stroke-opacity="0.9" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`;
+    }).join("\n");
     const selectedFeature = spec.selectedId && features.find((feature) => feature.properties && feature.properties.region_id === spec.selectedId);
     const selectedOutline = selectedFeature
-      ? `<path data-selected-outline="${escapeXml(spec.selectedId)}" d="${pathForGeometry(selectedFeature.geometry, project)}" fill="none" stroke="#172a3a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`
+      ? `<path data-selected-outline="${escapeXml(spec.selectedId)}" d="${pathForGeometry(selectedFeature.geometry, project)}" fill="none" stroke="${visual.selectedOutlineColor}" stroke-width="${visual.selectedOutlineWeight}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`
       : "";
-    const labelPlacements = spec.labels ? placeLabels(features, state, project, size, labelSize) : [];
+    const labelPlacements = spec.labels ? placeLabels(features, state, project, size, labelSize, spec) : [];
     const labels = labelPlacements.map((item) => {
       return `<text x="${item.x.toFixed(1)}" y="${item.y.toFixed(1)}" text-anchor="middle" font-size="${item.fontSize}" paint-order="stroke" stroke="#ffffff" stroke-width="${(item.fontSize / 4).toFixed(1)}" stroke-linejoin="round" fill="#1e2933">${escapeXml(labelText(item.feature, state))}</text>`;
     }).join("\n");
     const legend = state.legendVisible ? buildLegend(state, size, spec.legendFeatures || features, spec.metadata.legendTitle) : "";
     const title = buildTitle(spec.metadata.title, size, spec.metadata.subtitle);
     const metadata = Object.assign({}, spec, { features: undefined });
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img" aria-label="${escapeXml(spec.metadata.title)}">\n${background}\n<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>\n<g font-family="Arial, Helvetica, sans-serif">${fills}\n<path id="boundary-mesh" data-boundary-mesh="single-pass" d="${mesh.path}" fill="none" stroke="#8d9aa6" stroke-width="0.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" shape-rendering="geometricPrecision"/>\n${selectedOutline}\n${labels}\n${legend}</g>\n${title}\n<text x="${margin}" y="${size.height - 58}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.source || spec.attribution)}</text>\n<text x="${margin}" y="${size.height - 40}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.period || "")}</text>\n<text x="${margin}" y="${size.height - 22}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.footnote || spec.attribution)} Keep the source credit with this map.</text>\n</svg>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img" aria-label="${escapeXml(spec.metadata.title)}">\n${background}\n<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>\n<g font-family="Arial, Helvetica, sans-serif">${fills}\n<path id="boundary-mesh" data-boundary-mesh="single-pass" d="${mesh.path}" fill="none" stroke="${visual.boundaryColor}" stroke-width="${visual.boundaryWeight}" stroke-opacity="${visual.boundaryOpacity}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" shape-rendering="geometricPrecision"/>\n${highlightOutlines}\n${selectedOutline}\n${labels}\n${legend}</g>\n${title}\n<text x="${margin}" y="${size.height - 58}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.source || spec.attribution)}</text>\n<text x="${margin}" y="${size.height - 40}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.period || "")}</text>\n<text x="${margin}" y="${size.height - 22}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#5c6975">${escapeXml(spec.metadata.footnote || spec.attribution)} Keep the source credit with this map.</text>\n</svg>`;
   }
 
   function buildTitle(title, size, subtitle) {
@@ -261,10 +304,15 @@
     return Math.round(clamp(zoomSize * Math.min(1, densitySize) / Math.sqrt(aspectPenalty), 9, 18));
   }
 
-  function placeLabels(features, state, project, size, labelSize) {
+  function placeLabels(features, state, project, size, labelSize, spec) {
     const placed = [];
     const hasHighlight = (feature) => Boolean(state.highlights && state.highlights[feature.properties.region_id]);
-    return features.slice().sort((a, b) => {
+    const contextIds = new Set(spec.contextLabelIds || []);
+    const priority = (feature) => feature.properties.region_id === spec.selectedId ? 3 : hasHighlight(feature) ? 2 : contextIds.has(feature.properties.region_id) ? 1 : 0;
+    return features.filter((feature) => priority(feature) > 0).sort((a, b) => {
+      const ap = priority(a);
+      const bp = priority(b);
+      if (ap !== bp) return bp - ap;
       const ah = hasHighlight(a);
       const bh = hasHighlight(b);
       return Number(bh) - Number(ah);
@@ -276,7 +324,7 @@
       const preferredSize = highlighted ? Math.min(18, labelSize + 2) : labelSize;
       const minSize = highlighted ? 10 : 8;
       const best = findLabelPlacement(feature, p, text, size, placed, preferredSize, minSize);
-      if (!best || (!highlighted && best.overlap > 0)) return null;
+      if (!best || best.overlap > 0) return null;
       placed.push(best.box);
       return best;
     }).filter(Boolean);
@@ -372,6 +420,7 @@
     const spec = buildExportSpec(features, state, options || {});
     const svg = buildSvg(features, state, Object.assign({}, options, { spec }));
     downloadText(`${slugify(spec.metadata.filenameSlug)}.svg`, svg, "image/svg+xml");
+    return { svg, spec };
   }
 
   function downloadBlob(filename, blob) {
@@ -494,7 +543,7 @@
             link.download = `${slugify(spec.metadata.filenameSlug)}.png`;
             link.click();
             cleanup();
-            resolve({ fallbackUsed, size });
+            resolve({ fallbackUsed, size, spec });
           }, "image/png");
         } catch (error) {
           cleanup();
@@ -509,5 +558,5 @@
     });
   }
 
-  window.MapExport = { buildSvg, buildExportSpec, exportSvg, exportPng, exportPdf, exportMappingCsv, estimatePngCost, getBounds, slugify };
+  window.MapExport = { buildSvg, buildExportSpec, exportSvg, exportPng, exportPdf, exportMappingCsv, estimatePngCost, getBounds, slugify, requiresDetailedGeometry, presentationStyles: PRESENTATION_STYLES };
 })();

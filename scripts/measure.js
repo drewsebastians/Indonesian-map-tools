@@ -210,7 +210,7 @@ function writeMarkdown(measurements) {
     "",
     "## Baseline load, color, save, and export behavior",
     "",
-    "- Load: fetch local simplified geometry only; detailed geometry is loaded only after explicit high-detail export selection.",
+    "- Load: fetch local simplified geometry at startup; detailed local geometry is loaded lazily for close views and high-resolution exports.",
     "- Color: users select a region, choose a color, and apply it to the in-browser highlight state.",
     "- Save: project JSON is built in the browser and downloaded locally; autosave uses browser localStorage.",
     "- Export: SVG and PNG are generated in-browser without uploading project contents.",

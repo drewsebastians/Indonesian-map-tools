@@ -278,11 +278,19 @@ test("sanitizeProject keeps valid manual highlights and rejects unsafe export pr
     schemaVersion: "1.1",
     highlights: {},
     manualHighlights: { "known-id": { color: "#ED7D31", category: "Pilihan manual" } },
-    exportSettings: { ratio: "not-a-ratio", extent: "outside", labels: "yes", transparent: true, highDetail: true, pngSize: "huge" }
+    exportSettings: { ratio: "not-a-ratio", extent: "outside", labels: "yes", transparent: true, highDetail: true, presentation: true, pngSize: "huge" }
   }, adapter);
 
   assert.equal(project.manualHighlights["known-id"].color, "#ED7D31");
-  assert.deepEqual(JSON.parse(JSON.stringify(project.exportSettings)), { ratio: "16:9", extent: "national", labels: true, transparent: true, highDetail: true, pngSize: "1920x1080" });
+  assert.deepEqual(JSON.parse(JSON.stringify(project.exportSettings)), { ratio: "16:9", extent: "national", labels: true, transparent: true, highDetail: true, presentation: true, pngSize: "1920x1080" });
+});
+
+test("legacy projects migrate presentation view to a safe default", () => {
+  const storage = loadProjectStorage();
+  const legacy = storage.sanitizeProject({ schemaVersion: "1.0", highlights: {}, exportSettings: {} }, new Set());
+  const current = storage.sanitizeProject({ schemaVersion: "1.1", highlights: {}, exportSettings: { presentation: true } }, new Set());
+  assert.equal(legacy.exportSettings.presentation, false);
+  assert.equal(current.exportSettings.presentation, true);
 });
 
 test("sanitizeProject keeps only registry-current import corrections", () => {

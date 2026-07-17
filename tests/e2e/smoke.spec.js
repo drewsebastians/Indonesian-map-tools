@@ -215,7 +215,7 @@ test("load, color, save, SVG export, and smallest PNG export", async ({ page }) 
   expect(failed).toEqual([]);
 });
 
-test("startup labels are tiered on mobile and high-detail geometry is explicit", async ({ page }) => {
+test("startup stays lite while close zoom loads detailed geometry with selective labels", async ({ page }) => {
   const requests = [];
   page.on("request", (request) => requests.push({ url: request.url(), method: request.method(), resourceType: request.resourceType() }));
   await page.setViewportSize({ width: 390, height: 760 });
@@ -228,15 +228,15 @@ test("startup labels are tiered on mobile and high-detail geometry is explicit",
     const option = options.find((item) => item.textContent && item.textContent.includes("Surabaya"));
     return option && option.value;
   });
-  await page.locator("#regionSelect").selectOption(regionValue);
-  await expect(page.locator(".region-name-label").filter({ hasText: "Surabaya" }).first()).toBeVisible();
-
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.locator("#exportHighDetail").check();
   const detailedRequest = page.waitForRequest((request) => request.url().includes("indonesia-adm2-detailed.geojson"));
+  await page.locator("#regionSelect").selectOption(regionValue);
+  await detailedRequest;
+  await expect(page.locator("#map")).toHaveAttribute("data-geometry-detail", "detailed", { timeout: 60000 });
+  await expect(page.locator(".region-name-label").filter({ hasText: "Surabaya" }).first()).toBeVisible();
+  await expect(page.locator(".region-name-label")).toHaveCount(1);
+
   const download = page.waitForEvent("download");
   await page.locator("#exportSvgBtn").click();
-  await detailedRequest;
   expect((await download).suggestedFilename()).toBe(`${brand.defaults.exportFilenamePrefix}.svg`);
 });
 

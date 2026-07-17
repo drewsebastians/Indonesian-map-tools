@@ -55,6 +55,7 @@ test("single-pass boundary mesh preserves startup policy and produces cross-brow
   await page.locator("#map").screenshot({ path: path.join(afterDir, `national-${testInfo.project.name}.png`) });
   const selectStartedAt = Date.now();
   await selectNamedRegion(page, "Kota Jakarta Pusat");
+  await expect(page.locator("#map")).toHaveAttribute("data-geometry-detail", "detailed", { timeout: 60000 });
   const selectionAndZoomMs = Date.now() - selectStartedAt;
   await page.locator("#map").screenshot({ path: path.join(afterDir, `jakarta-${testInfo.project.name}.png`) });
   writeMetric(testInfo.project.name, {
@@ -66,7 +67,7 @@ test("single-pass boundary mesh preserves startup policy and produces cross-brow
     inputSegments: diagnostics.inputSegments,
     uniqueSegments: diagnostics.uniqueSegments,
     sharedSegments: diagnostics.sharedSegments,
-    detailedGeometryRequests: 0,
+    detailedGeometryRequests: requests.filter((url) => /indonesia-adm2-detailed\.geojson/i.test(url)).length,
     sourceBoundaryVersion: boundaryVersion
   });
 });
@@ -117,7 +118,7 @@ test("SVG, PNG, and PDF retain the boundary hierarchy and attribution", async ({
   await ready(page);
   await selectNamedRegion(page, "Kota Surabaya");
   await page.locator("#applyColorBtn").click();
-  await page.locator("#exportLabels").uncheck();
+  await page.locator("#presentationView").check();
 
   let download = page.waitForEvent("download");
   await page.locator("#exportSvgBtn").click();
@@ -127,11 +128,14 @@ test("SVG, PNG, and PDF retain the boundary hierarchy and attribution", async ({
   expect(svg).toContain('id="boundary-mesh"');
   expect(svg).toContain('data-boundary-mesh="single-pass"');
   expect(svg).toContain('data-selected-outline=');
+  expect(svg).toContain('data-highlight-outline=');
   expect(svg).toContain('stroke-linejoin="round" stroke-linecap="round"');
+  expect(svg).toContain('&quot;presentationMode&quot;:true');
+  expect(svg).toContain('&quot;geometryDetail&quot;:&quot;detailed&quot;');
   expect(svg).toContain("For visual reference only; not a legal boundary decision.");
   await svgDownload.saveAs(path.join(exportDir, "boundary-polish.svg"));
 
-  await page.locator("#pngSize").selectOption("1920x1080");
+  await page.locator("#pngSize").selectOption("2560x1440");
   download = page.waitForEvent("download");
   await page.locator("#exportPngBtn").click();
   await (await download).saveAs(path.join(exportDir, "boundary-polish.png"));

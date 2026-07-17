@@ -322,6 +322,7 @@
       else if (section.querySelector("#searchInput")) section.dataset.workspacePanel = "manual-search";
       else if (section.querySelector("#applyColorBtn")) section.dataset.workspacePanel = "manual-style";
       else if (section.querySelector("#highlightList")) section.dataset.workspacePanel = "manual-summary";
+      else if (section.querySelector("#presentationView")) section.dataset.workspacePanel = "presentation";
       else if (section.querySelector("#groupingList") || section.querySelector("#legendItems")) section.dataset.workspacePanel = "manual-advanced";
       else if (section.querySelector("#projectTitle") || section.querySelector("#saveProjectBtn")) section.dataset.workspacePanel = "project";
       else if (section.querySelector("#workflowSteps")) section.dataset.workspacePanel = "workflow";

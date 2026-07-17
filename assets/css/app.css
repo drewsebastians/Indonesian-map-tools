@@ -454,6 +454,8 @@ label {
   background: #eef4f5;
 }
 
+#map[data-presentation-view="true"] { background: #f7f9fa; }
+
 .leaflet-container {
   background: #eef4f5;
 }
@@ -919,6 +921,7 @@ summary {
 
 [data-workspace-shell="ready"][data-workspace-goal="manual"] [data-workspace-panel="workflow"],
 [data-workspace-shell="ready"][data-workspace-goal="manual"] [data-workspace-panel="manual-search"],
+[data-workspace-shell="ready"][data-workspace-goal="manual"] [data-workspace-panel="presentation"],
 [data-workspace-shell="ready"][data-workspace-goal="manual"][data-workspace-region-selected="true"] [data-workspace-panel="manual-style"],
 [data-workspace-shell="ready"][data-workspace-goal="manual"][data-workspace-has-highlights="true"] [data-workspace-panel="manual-summary"],
 [data-workspace-shell="ready"][data-workspace-goal="manual"][data-workspace-has-highlights="true"] [data-workspace-panel="export"],
@@ -926,6 +929,8 @@ summary {
 [data-workspace-shell="ready"][data-workspace-goal="spreadsheet"][data-workspace-stage="add-data"] [data-workspace-panel="input"],
 [data-workspace-shell="ready"][data-workspace-goal="spreadsheet"][data-workspace-stage="match"] [data-workspace-panel="input"],
 [data-workspace-shell="ready"][data-workspace-goal="spreadsheet"][data-workspace-stage="design"] [data-workspace-panel="design"],
+[data-workspace-shell="ready"][data-workspace-goal="spreadsheet"][data-workspace-stage="design"] [data-workspace-panel="presentation"],
+[data-workspace-shell="ready"][data-workspace-goal="spreadsheet"][data-workspace-stage="export"] [data-workspace-panel="presentation"],
 [data-workspace-shell="ready"][data-workspace-goal="spreadsheet"][data-workspace-stage="export"] [data-workspace-panel="export"] { display: block; }
 
 [data-workspace-shell="ready"] .workspace-rail-scroll > [data-workspace-panel="workflow"] {
