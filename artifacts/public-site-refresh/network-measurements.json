@@ -1,0 +1,271 @@
+{
+  "generatedAt": "2026-07-20T18:56:45.027Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "routes": {
+    "/": {
+      "requestCount": 7,
+      "rawBytes": 1096816,
+      "gzipBytes": 712005,
+      "requests": [
+        {
+          "url": "/",
+          "type": "document",
+          "bytes": 10077,
+          "gzipBytes": 2550
+        },
+        {
+          "url": "/assets/css/design-system.css",
+          "type": "stylesheet",
+          "bytes": 2061,
+          "gzipBytes": 927
+        },
+        {
+          "url": "/assets/css/content.css",
+          "type": "stylesheet",
+          "bytes": 23534,
+          "gzipBytes": 5139
+        },
+        {
+          "url": "/assets/js/public-shell.js",
+          "type": "script",
+          "bytes": 5440,
+          "gzipBytes": 1573
+        },
+        {
+          "url": "/assets/images/public/hero-highlight-regions.svg",
+          "type": "image",
+          "bytes": 500741,
+          "gzipBytes": 146642
+        },
+        {
+          "url": "/assets/images/nusacanvas-logo.png",
+          "type": "image",
+          "bytes": 351875,
+          "gzipBytes": 352003
+        },
+        {
+          "url": "/assets/images/nusacanvas-favicon.png",
+          "type": "other",
+          "bytes": 203088,
+          "gzipBytes": 203171
+        }
+      ]
+    },
+    "/highlight-regions/": {
+      "requestCount": 8,
+      "rawBytes": 1919540,
+      "gzipBytes": 940202,
+      "requests": [
+        {
+          "url": "/highlight-regions/",
+          "type": "document",
+          "bytes": 7332,
+          "gzipBytes": 2430
+        },
+        {
+          "url": "/assets/css/design-system.css",
+          "type": "stylesheet",
+          "bytes": 2061,
+          "gzipBytes": 927
+        },
+        {
+          "url": "/assets/css/content.css",
+          "type": "stylesheet",
+          "bytes": 23534,
+          "gzipBytes": 5139
+        },
+        {
+          "url": "/assets/js/public-shell.js",
+          "type": "script",
+          "bytes": 5440,
+          "gzipBytes": 1573
+        },
+        {
+          "url": "/assets/images/public/hero-highlight-regions.svg",
+          "type": "image",
+          "bytes": 500741,
+          "gzipBytes": 146642
+        },
+        {
+          "url": "/assets/images/nusacanvas-logo.png",
+          "type": "image",
+          "bytes": 351875,
+          "gzipBytes": 352003
+        },
+        {
+          "url": "/assets/images/public/highlight-map-styles.svg",
+          "type": "image",
+          "bytes": 825469,
+          "gzipBytes": 228317
+        },
+        {
+          "url": "/assets/images/nusacanvas-favicon.png",
+          "type": "other",
+          "bytes": 203088,
+          "gzipBytes": 203171
+        }
+      ]
+    },
+    "/excel-to-map/": {
+      "requestCount": 8,
+      "rawBytes": 1596026,
+      "gzipBytes": 852544,
+      "requests": [
+        {
+          "url": "/excel-to-map/",
+          "type": "document",
+          "bytes": 6475,
+          "gzipBytes": 2135
+        },
+        {
+          "url": "/assets/css/design-system.css",
+          "type": "stylesheet",
+          "bytes": 2061,
+          "gzipBytes": 927
+        },
+        {
+          "url": "/assets/css/content.css",
+          "type": "stylesheet",
+          "bytes": 23534,
+          "gzipBytes": 5139
+        },
+        {
+          "url": "/assets/js/public-shell.js",
+          "type": "script",
+          "bytes": 5440,
+          "gzipBytes": 1573
+        },
+        {
+          "url": "/assets/images/public/hero-map-spreadsheet.svg",
+          "type": "image",
+          "bytes": 476469,
+          "gzipBytes": 133076
+        },
+        {
+          "url": "/assets/images/nusacanvas-logo.png",
+          "type": "image",
+          "bytes": 351875,
+          "gzipBytes": 352003
+        },
+        {
+          "url": "/assets/images/public/spreadsheet-example-output.svg",
+          "type": "image",
+          "bytes": 527084,
+          "gzipBytes": 154520
+        },
+        {
+          "url": "/assets/images/nusacanvas-favicon.png",
+          "type": "other",
+          "bytes": 203088,
+          "gzipBytes": 203171
+        }
+      ]
+    },
+    "/workspace/": {
+      "requestCount": 16,
+      "rawBytes": 2982847,
+      "gzipBytes": 1067481,
+      "requests": [
+        {
+          "url": "/workspace/",
+          "type": "document",
+          "bytes": 20653,
+          "gzipBytes": 5184
+        },
+        {
+          "url": "/assets/css/design-system.css",
+          "type": "stylesheet",
+          "bytes": 2061,
+          "gzipBytes": 927
+        },
+        {
+          "url": "/assets/vendor/leaflet/leaflet.css",
+          "type": "stylesheet",
+          "bytes": 14145,
+          "gzipBytes": 3501
+        },
+        {
+          "url": "/assets/css/app.css",
+          "type": "stylesheet",
+          "bytes": 39521,
+          "gzipBytes": 7513
+        },
+        {
+          "url": "/assets/vendor/leaflet/leaflet.js",
+          "type": "script",
+          "bytes": 147552,
+          "gzipBytes": 42494
+        },
+        {
+          "url": "/assets/js/project-storage.js",
+          "type": "script",
+          "bytes": 79384,
+          "gzipBytes": 16134
+        },
+        {
+          "url": "/assets/js/import-core.js",
+          "type": "script",
+          "bytes": 16128,
+          "gzipBytes": 4566
+        },
+        {
+          "url": "/assets/js/xlsx-import.js",
+          "type": "script",
+          "bytes": 12785,
+          "gzipBytes": 3549
+        },
+        {
+          "url": "/assets/js/csv-import.js",
+          "type": "script",
+          "bytes": 6759,
+          "gzipBytes": 2004
+        },
+        {
+          "url": "/assets/js/export.js",
+          "type": "script",
+          "bytes": 31376,
+          "gzipBytes": 8801
+        },
+        {
+          "url": "/assets/js/map.js",
+          "type": "script",
+          "bytes": 24595,
+          "gzipBytes": 6487
+        },
+        {
+          "url": "/assets/js/app.js",
+          "type": "script",
+          "bytes": 114981,
+          "gzipBytes": 26899
+        },
+        {
+          "url": "/data/indonesia-adm2-simplified.geojson",
+          "type": "fetch",
+          "bytes": 2014724,
+          "gzipBytes": 518479
+        },
+        {
+          "url": "/assets/images/nusacanvas-favicon.png",
+          "type": "image",
+          "bytes": 203088,
+          "gzipBytes": 203171
+        },
+        {
+          "url": "/assets/images/nusacanvas-favicon.png",
+          "type": "other",
+          "bytes": 203088,
+          "gzipBytes": 203171
+        },
+        {
+          "url": "/data/indonesia-adm2-label-anchors.json",
+          "type": "fetch",
+          "bytes": 52007,
+          "gzipBytes": 14601
+        }
+      ]
+    }
+  }
+}

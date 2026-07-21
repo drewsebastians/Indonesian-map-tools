@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "nusacanvas.public-performance.v1",
+  "generatedAt": "2026-07-21T00:27:59.868Z",
+  "initialRequestCount": 7,
+  "publicShellJavaScriptGzipBytes": 1573,
+  "initialHeroImageGzipBytes": 146642,
+  "criticalAssetGzipBytes": 712005,
+  "measured": {
+    "index.html": 2550,
+    "assets/css/design-system.css": 927,
+    "assets/css/content.css": 5139,
+    "assets/js/public-shell.js": 1573,
+    "assets/images/public/hero-highlight-regions.svg": 146642,
+    "assets/images/nusacanvas-logo.png": 352003,
+    "assets/images/nusacanvas-favicon.png": 203171
+  },
+  "forbiddenUrlPatterns": [
+    "leaflet",
+    "xlsx",
+    "read-excel",
+    "geojson",
+    "assets/js/app.js",
+    "assets/js/map.js",
+    "http://",
+    "https://"
+  ]
+}

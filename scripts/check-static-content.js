@@ -5,6 +5,7 @@ const ROOT = path.resolve(__dirname, "..");
 const DIST = path.join(ROOT, "dist");
 
 const requiredPages = [
+  "index.html",
   "about/index.html",
   "contact/index.html",
   "privacy/index.html",
@@ -13,6 +14,7 @@ const requiredPages = [
   "data-methodology/index.html",
   "limitations/index.html",
   "changelog/index.html",
+  "guides/index.html",
   "guides/mengapa-jumlah-wilayah-peta-berbeda/index.html",
   "guides/cara-membuat-peta-kabupaten-kota-dari-excel/index.html",
   "guides/memperbaiki-nama-wilayah/index.html",
@@ -21,7 +23,10 @@ const requiredPages = [
   "guides/legenda-peta-tidak-menyesatkan/index.html",
   "guides/ekspor-peta-ke-powerpoint/index.html",
   "guides/contoh-peta-nilai-kota/index.html",
-  "excel-to-map/index.html"
+  "excel-to-map/index.html",
+  "highlight-regions/index.html",
+  "sales-territories/index.html",
+  "coverage-analysis/index.html"
 ];
 
 const forbiddenContentPageAssets = [
@@ -95,7 +100,8 @@ function checkPage(relativePath) {
   if (!/<html lang="en">/i.test(html)) fail(`${relativePath} missing lang=en`);
   if (!/<main[\s>]/i.test(html)) fail(`${relativePath} missing semantic main`);
   if (/<meta name="robots"[^>]*noindex/i.test(html)) fail(`${relativePath} must not contain production noindex metadata`);
-  if (!/<link rel="canonical" href="https:\/\/nusacanvas\.space\//i.test(html)) fail(`${relativePath} missing production canonical URL`);
+  const canonicalPath = relativePath === "index.html" ? "/" : `/${relativePath.replace(/index\.html$/, "").replaceAll("\\", "/")}`;
+  if (!html.includes(`<link rel="canonical" href="https://nusacanvas.space${canonicalPath}">`)) fail(`${relativePath} has an incorrect production canonical URL`);
   if (!html.includes("assets/css/content.css") && !relativePath.startsWith("guides/")) {
     fail(`${relativePath} missing content stylesheet`);
   }
@@ -104,6 +110,7 @@ function checkPage(relativePath) {
     if (html.includes(forbidden)) fail(`${relativePath} loads map/runtime asset ${forbidden}`);
   }
   for (const href of extractAttributes(html, "href")) {
+    if (href === "#") fail(`${relativePath} has a placeholder href`);
     if (href.startsWith("https://nusacanvas.space/")) continue;
     if (!targetExists(href, relativePath)) fail(`${relativePath} has broken href: ${href}`);
   }
@@ -112,11 +119,26 @@ function checkPage(relativePath) {
   }
 }
 
+function checkPublicNavigation(relativePath) {
+  const html = read(relativePath);
+  const navigation = html.match(/<div id="public-navigation" class="nav-links">([\s\S]*?)<\/div>/i)?.[1];
+  if (!navigation) fail(`${relativePath} missing responsive public navigation`);
+  const labels = [...navigation.matchAll(/<a\b[^>]*>([^<]+)<\/a>/gi)].map((match) => match[1].trim());
+  const expected = ["Highlight regions", "Map spreadsheet", "Guides", "Region data", "About", "Open workspace"];
+  if (JSON.stringify(labels) !== JSON.stringify(expected)) fail(`${relativePath} has incorrect public navigation order: ${labels.join(", ")}`);
+  if (!html.includes("assets/js/public-shell.js")) fail(`${relativePath} missing public navigation behavior`);
+}
+
 function main() {
   if (!fs.existsSync(DIST)) fail("dist does not exist; run build first");
   for (const page of requiredPages) {
     if (!fs.existsSync(path.join(DIST, page))) fail(`missing trust page in dist: ${page}`);
     checkPage(page);
+    checkPublicNavigation(page);
+  }
+  for (const page of ["sales-territories/index.html", "coverage-analysis/index.html"]) {
+    const html = read(page);
+    if (!/Coming soon/i.test(html) || !/not available yet/i.test(html)) fail(`${page} must state truthfully that the feature is coming soon and unavailable`);
   }
   const contact = read("contact/index.html");
   for (const id of ["issueCategory", "geometryId", "canonicalId", "issueDescription", "copyReportBtn", "downloadReportBtn", "reportOutput"]) {

@@ -1,0 +1,171 @@
+{
+  "capturedAt": "2026-07-20T16:21:30.971Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "routes": {
+    "/": [
+      {
+        "url": "/",
+        "status": 200,
+        "type": "document",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/public-shell.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/css/design-system.css",
+        "status": 200,
+        "type": "stylesheet",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/css/content.css",
+        "status": 200,
+        "type": "stylesheet",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/images/nusacanvas-logo.png",
+        "status": 200,
+        "type": "image",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/images/nusacanvas-favicon.png",
+        "status": 200,
+        "type": "other",
+        "bytes": 0
+      }
+    ],
+    "/excel-to-map/": [
+      {
+        "url": "/excel-to-map/",
+        "status": 200,
+        "type": "document",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/css/content.css",
+        "status": 200,
+        "type": "stylesheet",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/images/nusacanvas-logo.png",
+        "status": 200,
+        "type": "image",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/images/nusacanvas-favicon.png",
+        "status": 200,
+        "type": "other",
+        "bytes": 0
+      }
+    ],
+    "/workspace/": [
+      {
+        "url": "/workspace/",
+        "status": 200,
+        "type": "document",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/css/design-system.css",
+        "status": 200,
+        "type": "stylesheet",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/vendor/leaflet/leaflet.css",
+        "status": 200,
+        "type": "stylesheet",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/project-storage.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/vendor/leaflet/leaflet.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/css/app.css",
+        "status": 200,
+        "type": "stylesheet",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/import-core.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/xlsx-import.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/export.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/map.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/csv-import.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/js/app.js",
+        "status": 200,
+        "type": "script",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/images/nusacanvas-favicon.png",
+        "status": 200,
+        "type": "image",
+        "bytes": 0
+      },
+      {
+        "url": "/data/indonesia-adm2-simplified.geojson",
+        "status": 200,
+        "type": "fetch",
+        "bytes": 0
+      },
+      {
+        "url": "/assets/images/nusacanvas-favicon.png",
+        "status": 200,
+        "type": "other",
+        "bytes": 0
+      },
+      {
+        "url": "/data/indonesia-adm2-label-anchors.json",
+        "status": 200,
+        "type": "fetch",
+        "bytes": 0
+      }
+    ]
+  }
+}

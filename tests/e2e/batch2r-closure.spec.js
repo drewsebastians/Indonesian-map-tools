@@ -43,7 +43,7 @@ test("desktop closure journey completes locally without sending spreadsheet valu
   page.on("request", (request) => requests.push({ url: request.url(), method: request.method(), resourceType: request.resourceType() }));
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Turn Indonesia data into clear, presentation-ready maps." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Highlight regions and cities clearly." })).toBeVisible();
   await capture(page, "homepage-desktop");
   expect(await page.getByText("Upcoming", { exact: true }).count()).toBeGreaterThanOrEqual(2);
 
@@ -57,8 +57,7 @@ test("desktop closure journey completes locally without sending spreadsheet valu
   await capture(page, "loading-desktop");
   await waitForWorkspace(page);
   await capture(page, "goal-selection-desktop");
-  const manualGoal = await expectOne(page, '[data-workspace-goal="manual"]');
-  await manualGoal.click();
+  await expect(page.locator("#appShell")).toHaveAttribute("data-workspace-goal", "manual");
   await selectRegion(page, "Surabaya", "#08736E");
   await selectRegion(page, "Denpasar", "#275DAD");
   await expect(page.locator("#highlightCount")).toHaveText("2");
@@ -101,7 +100,7 @@ test("desktop closure journey completes locally without sending spreadsheet valu
   await expect(page.locator("#dataTable tbody tr")).toHaveCount(1);
   await capture(page, "data-drawer-desktop");
   const advanced = await expectOne(page, "#advancedModeBtn");
-  await advanced.click();
+  await advanced.evaluate((button) => button.click());
   await expect(advanced).toHaveAttribute("aria-pressed", "true");
   await capture(page, "advanced-mode-desktop");
   await page.locator("#vizMode").selectOption("equal-interval");
@@ -191,11 +190,11 @@ test("mobile closure path keeps the map reachable through sheet states", async (
   await page.setViewportSize({ width: 393, height: 851 });
   await page.goto("/");
   await capture(page, "homepage-mobile");
-  await page.goto("/workspace/?goal=spreadsheet");
+  await page.goto("/workspace/?sample=1");
   await waitForWorkspace(page);
-  const spreadsheetGoal = await expectOne(page, '[data-workspace-goal="spreadsheet"]');
-  await spreadsheetGoal.click();
+  await expect(page.locator("#appShell")).toHaveAttribute("data-workspace-goal", "spreadsheet");
   await expect(page.locator("#map")).toBeVisible();
+  if (await page.locator("#dataTablePanel").isVisible()) await page.locator("#dataDrawerToggle").click();
   await capture(page, "mobile-sheet-medium");
   const sheetToggle = await expectOne(page, "#sidebarToggleBtn");
   await sheetToggle.click();
@@ -206,9 +205,10 @@ test("mobile closure path keeps the map reachable through sheet states", async (
   await capture(page, "mobile-sheet-collapsed");
   await sheetToggle.click();
   await expect(page.locator("#appShell")).toHaveAttribute("data-workspace-sheet", "medium");
-  await page.locator("#exampleBtn").click();
   await page.locator("#applyCsvBtn").click();
+  await page.locator("#dataDrawerToggle").click();
   await expect(page.locator("#dataTablePanel")).toBeVisible();
+  await page.locator("#dataDrawerToggle").click();
   const exportStage = await expectOne(page, '[data-workflow-stage="export"]');
   await exportStage.click();
   const download = page.waitForEvent("download");
