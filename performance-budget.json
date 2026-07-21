@@ -4,7 +4,7 @@
     "initialCompressedBytes": 1100000,
     "simplifiedGeometryGzipBytes": 600000,
     "shellJavaScriptGzipBytes": 150000,
-    "initialRequestCount": 12
+    "initialRequestCount": 13
   },
   "preferred": {
     "initialCompressedBytes": 1000000,

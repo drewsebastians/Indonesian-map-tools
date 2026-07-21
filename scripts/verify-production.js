@@ -8,6 +8,8 @@ const requiredPaths = [
   "/sample/sample-region-colors.csv", "/sample/contoh-nilai-kota.csv", "/sample/contoh-nilai-kota.tsv",
   "/about/", "/contact/", "/privacy/", "/terms/", "/sources-licenses/",
   "/data-methodology/", "/limitations/", "/changelog/", "/excel-to-map/", "/guides/",
+  "/highlight-regions/", "/sales-territories/", "/coverage-analysis/",
+  "/assets/images/public/hero-highlight-regions.svg", "/assets/images/public/hero-map-spreadsheet.svg",
   "/guides/mengapa-jumlah-wilayah-peta-berbeda/", "/guides/cara-membuat-peta-kabupaten-kota-dari-excel/",
   "/guides/memperbaiki-nama-wilayah/", "/guides/csv-vs-xlsx-untuk-data-peta/",
   "/guides/equal-interval-vs-quantile/", "/guides/legenda-peta-tidak-menyesatkan/",

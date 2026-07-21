@@ -79,6 +79,12 @@ jobs:
       - name: Verify Batch 1
         run: npm run verify:batch1
 
+      - name: Verify deterministic public illustrations
+        run: npm run verify:public-illustrations
+
+      - name: Verify public site
+        run: npm run verify:batch2r:public-shell
+
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v4

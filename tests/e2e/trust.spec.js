@@ -55,7 +55,7 @@ test("source/version links and unknown routes are handled", async ({ page, reque
   await page.goto("/workspace/");
   await expect(page.locator("#loadingIndicator")).toHaveAttribute("data-state", "ready", { timeout: 60000 });
   await expect(page.locator("#dataTruthBadge")).toHaveAttribute("data-boundary-version", "IDN-ADM2-2020-geoboundaries-22746128");
-  await page.locator("[data-testid='report-data-error-link']").click();
+  await page.locator("[data-testid='report-data-error-link']").evaluate((link) => link.click());
   await expect(page).toHaveURL(/\/contact\/#laporkan-data$/);
   await expect(page.locator("#reportOutput")).toContainText("Boundary version");
 

@@ -19,7 +19,8 @@ const LEGACY_NEUTRAL_EXPORT_PREFIX = "indonesia-region-map";
 const activeHtml = [
   "index.html", "about/index.html", "contact/index.html", "privacy/index.html", "terms/index.html",
   "sources-licenses/index.html", "data-methodology/index.html", "limitations/index.html", "changelog/index.html",
-  "excel-to-map/index.html", "guides/mengapa-jumlah-wilayah-peta-berbeda/index.html",
+  "excel-to-map/index.html", "highlight-regions/index.html", "sales-territories/index.html", "coverage-analysis/index.html",
+  "guides/mengapa-jumlah-wilayah-peta-berbeda/index.html",
   "guides/cara-membuat-peta-kabupaten-kota-dari-excel/index.html", "guides/memperbaiki-nama-wilayah/index.html",
   "guides/csv-vs-xlsx-untuk-data-peta/index.html", "guides/equal-interval-vs-quantile/index.html",
   "guides/legenda-peta-tidak-menyesatkan/index.html", "guides/ekspor-peta-ke-powerpoint/index.html",
@@ -175,19 +176,19 @@ function validatePackageMetadata() {
   }
 }
 
-function validateDeploymentDeferral() {
+function validateDeploymentConfiguration() {
   const relative = "wrangler.jsonc";
   const source = fs.readFileSync(path.join(root, relative), "utf8");
   const workerName = source.match(/"name"\s*:\s*"([^"]+)"/);
   if (!workerName || workerName[1] !== CURRENT_WORKER_NAME) {
     failures.push({ file: relative, line: 0, column: 0, code: "worker-name-not-prepared", match: workerName ? workerName[1] : "missing" });
   }
-  if (!/"workers_dev"\s*:\s*true/.test(source)) {
-    failures.push({ file: relative, line: 0, column: 0, code: "workers-dev-disabled-before-prompt10", match: "workers_dev" });
+  if (!/"workers_dev"\s*:\s*false/.test(source)) {
+    failures.push({ file: relative, line: 0, column: 0, code: "workers-dev-must-remain-disabled", match: "workers_dev" });
   }
-  customDomainActivated = /"routes?"\s*:|"custom_domain"\s*:|nusacanvas\.space/i.test(source);
-  if (customDomainActivated) {
-    failures.push({ file: relative, line: 0, column: 0, code: "custom-domain-activated-too-early", match: FUTURE_CANONICAL_ORIGIN });
+  customDomainActivated = /"routes"\s*:[\s\S]*nusacanvas\.space[\s\S]*"custom_domain"\s*:\s*true/i.test(source);
+  if (!customDomainActivated) {
+    failures.push({ file: relative, line: 0, column: 0, code: "production-custom-domain-missing", match: FUTURE_CANONICAL_ORIGIN });
   }
 }
 
@@ -274,7 +275,7 @@ for (const file of ["CHANGELOG.md", "scripts/build-batch2r-inventory.js"]) scanF
 validateBrandConfig();
 validateNeutralStorageKey();
 validatePackageMetadata();
-validateDeploymentDeferral();
+validateDeploymentConfiguration();
 
 failures.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line || a.column - b.column || a.code.localeCompare(b.code));
 warnings.sort((a, b) => a.file.localeCompare(b.file) || a.code.localeCompare(b.code));
@@ -295,7 +296,7 @@ const report = {
     neutralStorageKey: NEUTRAL_STORAGE_KEY
   },
   remoteOperationsDeferredUntilPrompt10: false,
-  remotePlatformMigrationState: "prepared-authentication-required",
+  remotePlatformMigrationState: "custom-domain-active",
   customDomainActivated,
   migrationCompatibility: {
     legacyStorageKey: LEGACY_STORAGE_KEY,

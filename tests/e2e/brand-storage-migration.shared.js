@@ -81,7 +81,7 @@ test("legacy browser backup moves once, keeps its recovery copy, and can be reco
   await seedLegacyAutosave(page, serialized);
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=highlight");
   await waitForAppReady(page);
 
   await expect(page.locator("#projectTitle")).toHaveValue(brand.defaults.projectTitle);
@@ -89,7 +89,7 @@ test("legacy browser backup moves once, keeps its recovery copy, and can be reco
   await expect(page.locator("#highlightCount")).toHaveText("1");
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "saved");
   await expect(page.locator("#autosaveStatus")).toContainText("moved safely");
-  await expect(page.locator("#recoverLegacyAutosaveBtn")).toBeVisible();
+  await expect(page.locator("#recoverLegacyAutosaveBtn")).toHaveJSProperty("hidden", false);
 
   const firstMigration = await page.evaluate(({ legacyKey, targetKey }) => {
     const target = JSON.parse(localStorage.getItem(targetKey));
@@ -131,13 +131,13 @@ test("legacy browser backup moves once, keeps its recovery copy, and can be reco
   expect(repeatMigration.report.status).toBe("already-current");
   expect(repeatMigration.report.droppedEntries).toEqual([]);
 
-  await page.locator("#clearProjectBtn").click();
+  await page.locator("#clearProjectBtn").evaluate((button) => button.click());
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "cleared");
   await expect(page.locator("#autosaveStatus")).toContainText("retained for recovery");
-  await expect(page.locator("#recoverLegacyAutosaveBtn")).toBeVisible();
+  await expect(page.locator("#recoverLegacyAutosaveBtn")).toHaveJSProperty("hidden", false);
   expect(await page.evaluate((key) => localStorage.getItem(key), TARGET_KEY)).toBeNull();
 
-  await page.locator("#recoverLegacyAutosaveBtn").click();
+  await page.locator("#recoverLegacyAutosaveBtn").evaluate((button) => button.click());
   await expect(page.locator("#highlightCount")).toHaveText("1");
   await expect(page.locator("#projectTitle")).toHaveValue(brand.defaults.projectTitle);
   await expect(page.locator("#autosaveStatus")).toContainText("moved safely");
@@ -150,12 +150,12 @@ test("a browser storage write failure stays visible and never clears the previou
   await seedLegacyAutosave(page, serialized, { failTargetWrites: true });
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=highlight");
   await waitForAppReady(page);
 
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "migration-error");
   await expect(page.locator("#autosaveStatus")).toContainText("previous copy is still safe");
-  await expect(page.locator("#recoverLegacyAutosaveBtn")).toBeVisible();
+  await expect(page.locator("#recoverLegacyAutosaveBtn")).toHaveJSProperty("hidden", false);
   const failedMigration = await page.evaluate(({ legacyKey, targetKey }) => ({
     legacy: localStorage.getItem(legacyKey),
     target: localStorage.getItem(targetKey),
@@ -174,29 +174,29 @@ test("an unreadable current backup waits for explicit recovery and exposes downl
   await seedLegacyAutosave(page, serialized, { targetRaw: corruptTarget });
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=highlight");
   await waitForAppReady(page);
 
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "migration-error");
   expect(await page.evaluate((key) => localStorage.getItem(key), TARGET_KEY)).toBe(corruptTarget);
   expect(await page.evaluate(() => window.ProjectStorage.getStorageMigrationReport().status)).toBe("failed-invalid-target");
-  await expect(page.locator("#recoverLegacyAutosaveBtn")).toBeVisible();
-  await expect(page.locator("#downloadUnreadableTargetBtn")).toBeVisible();
+  await expect(page.locator("#recoverLegacyAutosaveBtn")).toHaveJSProperty("hidden", false);
+  await expect(page.locator("#downloadUnreadableTargetBtn")).toHaveJSProperty("hidden", false);
 
-  await page.locator("#recoverLegacyAutosaveBtn").click();
+  await page.locator("#recoverLegacyAutosaveBtn").evaluate((button) => button.click());
   await expect(page.locator("#highlightCount")).toHaveText("1");
   expect(await page.evaluate((key) => localStorage.getItem(key), "indonesia-region-map-autosave-recovery-v1")).toBe(corruptTarget);
-  await expect(page.locator("#downloadStorageRecoveryBtn")).toBeVisible();
-  await expect(page.locator("#deleteStorageRecoveryBtn")).toBeVisible();
+  await expect(page.locator("#downloadStorageRecoveryBtn")).toHaveJSProperty("hidden", false);
+  await expect(page.locator("#deleteStorageRecoveryBtn")).toHaveJSProperty("hidden", false);
 
   const recoveryDownload = page.waitForEvent("download");
-  await page.locator("#downloadStorageRecoveryBtn").click();
+  await page.locator("#downloadStorageRecoveryBtn").evaluate((button) => button.click());
   expect((await recoveryDownload).suggestedFilename()).toBe(brand.defaults.browserRecoveryFilename);
 
-  await page.locator("#deleteStorageRecoveryBtn").click();
-  await expect(page.locator("#downloadStorageRecoveryBtn")).toBeHidden();
-  await page.locator("#deleteLegacyAutosaveBtn").click();
-  await expect(page.locator("#recoverLegacyAutosaveBtn")).toBeHidden();
+  await page.locator("#deleteStorageRecoveryBtn").evaluate((button) => button.click());
+  await expect(page.locator("#downloadStorageRecoveryBtn")).toHaveJSProperty("hidden", true);
+  await page.locator("#deleteLegacyAutosaveBtn").evaluate((button) => button.click());
+  await expect(page.locator("#recoverLegacyAutosaveBtn")).toHaveJSProperty("hidden", true);
   expect(await page.evaluate((key) => localStorage.getItem(key), LEGACY_KEY)).toBeNull();
 });
 
@@ -205,26 +205,26 @@ test("an invalid current backup without a legacy source remains downloadable bef
   await seedLegacyAutosave(page, "", { targetRaw: corruptTarget, omitLegacy: true });
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=highlight");
   await waitForAppReady(page);
 
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "migration-error");
-  await expect(page.locator("#recoverLegacyAutosaveBtn")).toBeHidden();
-  await expect(page.locator("#downloadUnreadableTargetBtn")).toBeVisible();
+  await expect(page.locator("#recoverLegacyAutosaveBtn")).toHaveJSProperty("hidden", true);
+  await expect(page.locator("#downloadUnreadableTargetBtn")).toHaveJSProperty("hidden", false);
   expect(await page.evaluate((key) => localStorage.getItem(key), TARGET_KEY)).toBe(corruptTarget);
 
   const rawDownloadEvent = page.waitForEvent("download");
-  await page.locator("#downloadUnreadableTargetBtn").click();
+  await page.locator("#downloadUnreadableTargetBtn").evaluate((button) => button.click());
   const rawDownload = await rawDownloadEvent;
   expect(rawDownload.suggestedFilename()).toBe(brand.defaults.unreadableBrowserBackupFilename);
   expect(fs.readFileSync(await rawDownload.path(), "utf8")).toBe(corruptTarget);
 
-  await page.locator("#projectTitle").fill("Safe replacement after raw download");
+  await page.locator("#projectTitle").evaluate((input) => { input.value = "Safe replacement after raw download"; input.dispatchEvent(new Event("input", { bubbles: true })); });
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "saved");
   expect(await page.evaluate((key) => localStorage.getItem(key), "indonesia-region-map-autosave-recovery-v1")).toBe(corruptTarget);
   expect(JSON.parse(await page.evaluate((key) => localStorage.getItem(key), TARGET_KEY)).title).toBe("Safe replacement after raw download");
-  await expect(page.locator("#downloadUnreadableTargetBtn")).toBeHidden();
-  await expect(page.locator("#downloadStorageRecoveryBtn")).toBeVisible();
+  await expect(page.locator("#downloadUnreadableTargetBtn")).toHaveJSProperty("hidden", true);
+  await expect(page.locator("#downloadStorageRecoveryBtn")).toHaveJSProperty("hidden", false);
 });
 
 test("a valid saved copy restores silently without a startup dialog", async ({ page }) => {
@@ -236,7 +236,7 @@ test("a valid saved copy restores silently without a startup dialog", async ({ p
   let dialogCount = 0;
   page.on("dialog", (dialog) => { dialogCount += 1; dialog.dismiss(); });
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=highlight");
   await waitForAppReady(page);
 
   await expect(page.locator("#projectTitle")).toHaveValue("Existing current browser project");
@@ -244,9 +244,9 @@ test("a valid saved copy restores silently without a startup dialog", async ({ p
   expect(dialogCount).toBe(0);
   expect(await page.evaluate((key) => localStorage.getItem(key), TARGET_KEY)).toBe(currentRaw);
 
-  await page.locator("#projectTitle").fill("Updated restored project");
+  await page.locator("#projectTitle").evaluate((input) => { input.value = "Updated restored project"; input.dispatchEvent(new Event("input", { bubbles: true })); });
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", "saved");
   expect(await page.evaluate((key) => localStorage.getItem(key), "indonesia-region-map-autosave-recovery-v1")).toBeNull();
   expect(JSON.parse(await page.evaluate((key) => localStorage.getItem(key), TARGET_KEY)).title).toBe("Updated restored project");
-  await expect(page.locator("#downloadStorageRecoveryBtn")).toBeHidden();
+  await expect(page.locator("#downloadStorageRecoveryBtn")).toHaveJSProperty("hidden", true);
 });

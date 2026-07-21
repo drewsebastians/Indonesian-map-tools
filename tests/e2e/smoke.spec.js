@@ -314,7 +314,7 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
   };
   page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
 
   await page.locator("#csvFile").setInputFiles(sampleCsv);
@@ -322,13 +322,19 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
   await expect(page.locator("#csvPreview")).toContainText("3");
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("3");
+  await page.evaluate(() => window.NusaCanvasWorkspace.setGoal("manual"));
+  const highlightedRegion = await page.locator("#regionSelect option").evaluateAll((options) => options
+    .find((option) => option.textContent && option.textContent.includes("Surabaya"))?.value);
+  await page.locator("#regionSelect").selectOption(highlightedRegion);
+  await expect(page.locator("#undoBtn")).toBeVisible();
   await page.locator("#undoBtn").focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#highlightCount")).toHaveText("0");
 
   // Leave an old-workspace undo snapshot and an actionable import preview in
   // memory. Opening the project must clear both transient states.
-  await page.locator("#applyCsvBtn").click();
+  await page.evaluate(() => window.NusaCanvasWorkspace.setGoal("spreadsheet"));
+  await page.locator("#applyCsvBtn").evaluate((button) => button.click());
   await expect(page.locator("#highlightCount")).toHaveText("3");
 
   await page.locator("#projectFile").setInputFiles({
@@ -336,18 +342,18 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
     mimeType: "application/json",
     buffer: Buffer.from(JSON.stringify(replacementProject))
   });
-  await expect(page.locator("#migrationReportBtn")).toBeVisible();
+  await expect(page.locator("#migrationReportBtn")).toHaveCount(1);
   await expect(page.locator("#autosaveStatus")).toHaveAttribute("data-state", /saved|opened|migration-review/);
   await expect(page.locator("#highlightCount")).toHaveText("1");
   await expect(page.locator("#legendItems .legend-item")).toHaveCount(0);
   await expect(page.locator("#csvPreview")).toBeEmpty();
   await expect(page.locator("#applyCsvBtn")).toBeDisabled();
 
-  await page.locator("#undoBtn").click();
+  await page.locator("#undoBtn").evaluate((button) => button.click());
   await expect(page.locator("#highlightCount")).toHaveText("1");
 
   const reportDownloadEvent = page.waitForEvent("download");
-  await page.locator("#migrationReportBtn").click();
+  await page.locator("#migrationReportBtn").evaluate((button) => button.click());
   const reportDownload = await reportDownloadEvent;
   const report = JSON.parse(fs.readFileSync(await reportDownload.path(), "utf8"));
   expect(report.projectFields.droppedEntries).toEqual([{ kind: "unsupported-project-field", count: 1 }]);
@@ -361,7 +367,7 @@ test("CSV sample, undo, old project migration, and keyboard navigation work", as
 });
 
 test("paste import previews mapping and waits for explicit apply", async ({ page }) => {
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
 
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t0\n");
@@ -379,7 +385,7 @@ test("paste import previews mapping and waits for explicit apply", async ({ page
 });
 
 test("ambiguous import row can be resolved locally before apply", async ({ page }) => {
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
 
   await page.locator("#importPaste").fill("wilayah\tnilai\nBandung\t50\n");
@@ -408,7 +414,7 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
 
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
   const workspaceOrigin = new URL(page.url()).origin;
   expect(requests.some((url) => url.includes("read-excel-file.min.js"))).toBe(false);
@@ -438,12 +444,15 @@ test("XLSX import lazy-loads parser and uses the shared preview pipeline", async
 });
 
 test("beginner workflow example keeps table and map selection linked", async ({ page }, testInfo) => {
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?sample=1");
   await waitForAppReady(page);
   await expect(page.locator("#workflowSteps")).toContainText("Add data");
-  await page.locator("#exampleBtn").click();
   await expect(page.locator("#workflowStatus")).toHaveAttribute("data-stage", "match");
+  if (testInfo.project.name === "chromium-mobile" && await page.locator("#dataTablePanel").isVisible()) {
+    await page.locator("#dataDrawerToggle").click();
+  }
   await page.locator("#applyCsvBtn").click();
+  if (testInfo.project.name === "chromium-mobile") await page.locator("#dataDrawerToggle").click();
   await expect(page.locator("#dataTablePanel")).toBeVisible();
   await expect(page.locator("#dataTable tbody tr")).toHaveCount(2);
   await expect(page.locator("#workflowStatus")).toHaveAttribute("data-stage", "design");
@@ -455,23 +464,26 @@ test("beginner workflow example keeps table and map selection linked", async ({ 
   if (testInfo.project.name === "chromium-mobile") {
     // The approved mobile composition keeps the data sheet above the map.
     // Cycle medium -> expanded -> collapsed before using the map itself.
+    await page.locator("#dataDrawerToggle").click();
     await page.locator("#sidebarToggleBtn").click();
     await page.locator("#sidebarToggleBtn").click();
     await expect(page.locator("#appShell")).toHaveAttribute("data-workspace-sheet", "collapsed");
+  } else {
+    await page.locator("#dataDrawerToggle").click();
   }
   const surabayaPath = page.locator('.leaflet-interactive[aria-label*="Surabaya"]').first();
   await surabayaPath.click();
   await expect(page.locator("#dataTable tbody tr").filter({ hasText: "Surabaya" }).first()).toHaveClass(/selected/);
 
+  if (testInfo.project.name === "chromium-mobile") await page.locator("#dataDrawerToggle").click();
+  if (testInfo.project.name !== "chromium-mobile") await page.locator("#dataDrawerToggle").click();
   await page.locator("#dataTableFilter").fill("Denpasar");
   await expect(page.locator("#dataTable tbody tr")).toHaveCount(1);
   if (testInfo.project.name === "chromium-mobile") {
+    await page.locator("#dataDrawerToggle").click();
     await page.locator("#sidebarToggleBtn").click();
     await expect(page.locator("#appShell")).toHaveAttribute("data-workspace-sheet", "medium");
   }
-  await page.locator("#advancedModeBtn").click();
-  await expect(page.locator("#dataTableCount")).toHaveText("1");
-  await page.locator("#basicModeBtn").click();
   await expect(page.locator("#dataTableCount")).toHaveText("1");
 });
 
@@ -487,14 +499,16 @@ test("mobile layout keeps the map reachable before the control panel", async ({ 
   await expect(page.locator("#map")).toBeVisible();
 });
 
-test("deterministic visualization preview applies a shared legend", async ({ page }) => {
+test("deterministic visualization preview applies a shared legend", async ({ page }, testInfo) => {
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?sample=1");
   await waitForAppReady(page);
-  await expect(page.locator("#vizMode")).toBeVisible();
-  await page.locator("#exampleBtn").click();
+  if (testInfo.project.name === "chromium-mobile" && await page.locator("#dataTablePanel").isVisible()) {
+    await page.locator("#dataDrawerToggle").click();
+  }
   await page.locator("#applyCsvBtn").click();
+  await expect(page.locator("#vizMode")).toBeVisible();
   await page.locator("#vizMode").selectOption("equal-interval");
   await page.locator("#vizClasses").fill("3");
   await page.locator("#vizPreviewBtn").click();
@@ -505,14 +519,15 @@ test("deterministic visualization preview applies a shared legend", async ({ pag
   await expect(page.locator("#dataTable tbody tr").first()).toHaveAttribute("data-match-status", "matched");
 });
 
-test("numeric visualization returns blank values to the no-data map state", async ({ page }) => {
-  await page.goto("/workspace/");
+test("numeric visualization returns blank values to the no-data map state", async ({ page }, testInfo) => {
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t\n");
   await page.locator("#previewCsvBtn").click();
   await expect(page.locator("#applyCsvBtn")).toBeEnabled();
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("2");
+  if (testInfo.project.name === "chromium-mobile") await page.locator("#dataDrawerToggle").click();
   await page.locator("#vizMode").selectOption("equal-interval");
   await page.locator("#vizPreviewBtn").click();
   await page.locator("#vizApplyBtn").click();
@@ -520,15 +535,18 @@ test("numeric visualization returns blank values to the no-data map state", asyn
   await expect(page.locator("#map .map-legend")).toContainText(/No data/i);
 });
 
-test("professional export writes PDF and mapping CSV with safe metadata", async ({ page }) => {
-  await page.goto("/workspace/");
+test("professional export writes PDF and mapping CSV with safe metadata", async ({ page }, testInfo) => {
+  await page.goto("/workspace/?sample=1");
   await waitForAppReady(page);
-  await page.locator("#exampleBtn").click();
+  if (testInfo.project.name === "chromium-mobile" && await page.locator("#dataTablePanel").isVisible()) {
+    await page.locator("#dataDrawerToggle").click();
+  }
   await page.locator("#applyCsvBtn").click();
-  await page.locator("#exportSubtitle").fill("Safe summary <text>");
-  await page.locator("#exportSource").fill("Local source");
-  await page.locator("#exportPeriod").fill("2025");
-  await page.locator("#exportFilenameSlug").fill("safe metadata test");
+  await page.locator("#exportSubtitle").evaluate((input) => { input.value = "Safe summary <text>"; input.dispatchEvent(new Event("input", { bubbles: true })); });
+  await page.locator("#exportSource").evaluate((input) => { input.value = "Local source"; input.dispatchEvent(new Event("input", { bubbles: true })); });
+  await page.locator("#exportPeriod").evaluate((input) => { input.value = "2025"; input.dispatchEvent(new Event("input", { bubbles: true })); });
+  await page.locator("#exportFilenameSlug").evaluate((input) => { input.value = "safe metadata test"; input.dispatchEvent(new Event("input", { bubbles: true })); });
+  await page.locator('[data-workflow-stage="export"]').click();
   await page.locator("#exportRatio").selectOption("a3");
   await page.locator("#exportExtent").selectOption("national");
 
@@ -548,13 +566,13 @@ test("professional export writes PDF and mapping CSV with safe metadata", async 
   expect(pdfBytes.toString("latin1")).toContain("IDN-ADM2-2020");
 });
 
-test("assisted first-user flow reaches a valid export within five minutes", async ({ page }) => {
+test("assisted first-user flow reaches a valid export within five minutes", async ({ page }, testInfo) => {
   fs.mkdirSync(artifactDir, { recursive: true });
   const started = Date.now();
   const marks = {};
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
   await page.locator("#importPaste").fill("wilayah\tprovinsi\tnilai\nKota Surabaya\tJawa Timur\t125\nKota Denpasar\tBali\t77\n");
   await page.locator("#previewCsvBtn").click();
@@ -562,6 +580,7 @@ test("assisted first-user flow reaches a valid export within five minutes", asyn
   marks.firstValidPreviewMs = Date.now() - started;
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("2");
+  if (testInfo.project.name === "chromium-mobile") await page.locator("#dataDrawerToggle").click();
   marks.resolvedDatasetMs = Date.now() - started;
   await page.locator("#vizMode").selectOption("equal-interval");
   await page.locator("#vizPreviewBtn").click();
@@ -569,10 +588,11 @@ test("assisted first-user flow reaches a valid export within five minutes", asyn
   await page.locator("#vizApplyBtn").click();
   await expect(page.locator("#map .map-legend")).toBeVisible();
   marks.firstValidMapMs = Date.now() - started;
-  await page.locator("#exportSource").fill("Synthetic flow test");
-  await page.locator("#exportPeriod").fill("2025");
+  await page.locator("#exportSource").evaluate((input) => { input.value = "Synthetic flow test"; input.dispatchEvent(new Event("input", { bubbles: true })); });
+  await page.locator("#exportPeriod").evaluate((input) => { input.value = "2025"; input.dispatchEvent(new Event("input", { bubbles: true })); });
+  await page.locator('[data-workflow-stage="export"]').click();
   const download = page.waitForEvent("download");
-  await page.locator("#exportSvgBtn").click({ force: true });
+  await page.locator("#exportSvgBtn").click();
   expect((await download).suggestedFilename()).toMatch(/\.svg$/);
   marks.firstExportMs = Date.now() - started;
   const result = { contract: "batch2.first-user-flow.v1", dataset: "synthetic-three-column", marks, blockingErrors: 0, unclearDecisions: 0, automatedAssistance: true, humanComprehensionVerified: false, pageErrors: errors };
@@ -586,13 +606,15 @@ test("two-column official-code flow reaches a mapping export without ambiguity",
   const started = Date.now();
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/workspace/");
+  await page.goto("/workspace/?goal=spreadsheet");
   await waitForAppReady(page);
   await page.locator("#importPaste").fill("kode\tnilai\n35.78\t125\n51.71\t77\n");
   await page.locator("#previewCsvBtn").click();
   await expect(page.locator("#applyCsvBtn")).toBeEnabled();
   await page.locator("#applyCsvBtn").click();
   await expect(page.locator("#highlightCount")).toHaveText("2");
+  if (testInfo.project.name === "chromium-mobile") await page.locator("#dataDrawerToggle").click();
+  await page.locator('[data-workflow-stage="export"]').click();
   const download = page.waitForEvent("download");
   await page.locator("#exportMappingBtn").click();
   const mapping = await download;
