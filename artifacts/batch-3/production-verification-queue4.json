@@ -1,0 +1,8 @@
+{
+    "capturedAt":  "2026-07-22T20:00:00+07:00",
+    "name":  "production verification",
+    "command":  "npm run verify:production",
+    "exitCode":  0,
+    "durationSeconds":  5.61,
+    "output":  "\n\u003e nusacanvas@0.9.0 verify:production\n\u003e node scripts/verify-production.js https://nusacanvas.space\n\nVerified production assets, headers, indexing, canonicals, and 404 at https://nusacanvas.space"
+}

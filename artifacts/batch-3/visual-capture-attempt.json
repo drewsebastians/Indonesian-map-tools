@@ -1,0 +1,8 @@
+{
+    "capturedAt":  "2026-07-22T20:05:00+07:00",
+    "name":  "public-site screenshot capture",
+    "command":  "npm run capture:public-site-refresh",
+    "exitCode":  0,
+    "durationSeconds":  34.2,
+    "output":  "\n\u003e nusacanvas@0.9.0 capture:public-site-refresh\n\u003e node scripts/capture-public-site-refresh.js\n\nCaptured 9 final screenshots and network measurements in artifacts\\public-site-refresh."
+}

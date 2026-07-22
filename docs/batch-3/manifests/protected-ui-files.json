@@ -1,11 +1,11 @@
 {
   "schemaVersion": "nusacanvas.batch3.protected-ui.v1",
-  "purpose": "Protect the approved public and workspace presentation while production reconciliation evidence is gathered.",
+  "purpose": "Protect the approved public and workspace presentation through final Batch 3 verification and independent review.",
   "paths": [
     "index.html", "highlight-regions/index.html", "excel-to-map/index.html", "sales-territories/index.html", "coverage-analysis/index.html", "guides/**/index.html", "data-methodology/index.html", "about/index.html", "contact/index.html", "privacy/index.html", "terms/index.html", "sources-licenses/index.html", "limitations/index.html", "changelog/index.html", "workspace/index.html",
     "assets/css/design-system.css", "assets/css/content.css", "assets/css/app.css",
     "assets/js/public-shell.js", "assets/js/workspace-shell.js", "assets/js/brand-config.js", "assets/js/product-content.js",
     "assets/images/public/**", "_headers", "robots.txt", "sitemap.xml"
   ],
-  "writePolicy": "No Queue Item 1 runtime or presentation changes are authorized. Any later change requires explicit evidence, route-specific verification, and updated allowlist approval."
+  "writePolicy": "No silent runtime or presentation change is authorized. Any later change requires explicit evidence, route-specific verification, owner approval where visual behavior changes, and updated allowlist approval."
 }

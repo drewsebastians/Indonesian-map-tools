@@ -6,5 +6,5 @@
     "data/canonical-regions-v1.csv", "data/canonical-provinces-v1.csv", "data/crosswalk-region-ids-v1.csv", "data/boundary-version-crosswalk-v1.json", "data/boundary-provider-manifest-v1.json", "data/boundary-validation-summary.json", "data/indonesia-adm2-simplified.geojson", "data/indonesia-adm2-detailed.geojson", "data/indonesia-adm2-detailed-provinces-index.json", "data/detailed-provinces/**", "data/indonesia-adm2-label-anchors.json",
     "tests/unit/map-presentation.test.js", "tests/unit/boundary-rendering.test.js", "tests/unit/boundary-provider.test.js", "tests/unit/adaptive-map-performance.test.js", "tests/unit/project-storage.test.js", "tests/e2e/batch2r-boundary-rendering.spec.js", "tests/fixtures/brand-migration/**"
   ],
-  "writePolicy": "No Queue Item 1 map, data, boundary, or schema changes are authorized."
+  "writePolicy": "No Batch 3 map, data, boundary, provider, project-schema, or compatibility changes are authorized without a separate focused reconciliation decision."
 }

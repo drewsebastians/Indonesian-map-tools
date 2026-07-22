@@ -1,0 +1,94 @@
+{
+    "capturedAt":  "2026-07-22T19:10:00+07:00",
+    "environment":  {
+                        "node":  "v24.10.0",
+                        "npm":  "11.6.1",
+                        "platform":  "Windows"
+                    },
+    "checks":  [
+                   {
+                       "name":  "npm ci",
+                       "command":  "npm ci",
+                       "exitCode":  0,
+                       "durationSeconds":  24.88,
+                       "keyResult":  "Generated 6 deterministic public map illustrations.\nBuilt dist with 70 allowlisted files.\n\nadded 100 packages, and audited 101 packages in 23s\n\n29 packages are looking for funding\n  run `npm fund` for details\n\n3 high severity vulnerabilities\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details."
+                   },
+                   {
+                       "name":  "npm run build",
+                       "command":  "npm run build",
+                       "exitCode":  0,
+                       "durationSeconds":  6.79,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 build\n\u003e node scripts/build.js\n\nGenerated 6 deterministic public map illustrations.\nBuilt dist with 70 allowlisted files."
+                   },
+                   {
+                       "name":  "verify public illustrations",
+                       "command":  "npm run verify:public-illustrations",
+                       "exitCode":  0,
+                       "durationSeconds":  2.41,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 verify:public-illustrations\n\u003e node scripts/generate-public-map-illustrations.js --check\n\nVerified 6 deterministic public map illustrations."
+                   },
+                   {
+                       "name":  "verify public performance",
+                       "command":  "npm run verify:public-performance",
+                       "exitCode":  0,
+                       "durationSeconds":  2.18,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 verify:public-performance\n\u003e node scripts/check-public-performance.js\n\nPublic performance passed: requests=7, shell_js=1430 gzip bytes, hero=146640 gzip bytes."
+                   },
+                   {
+                       "name":  "data tests",
+                       "command":  "npm run test:data",
+                       "exitCode":  0,
+                       "durationSeconds":  4,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:data\n\u003e python tests/run_data_tests.py\n\nPASSED\nfeatures=519 polygon=287 multipolygon=232\nregistry=519 canonical_regions=519 provinces=38 sample_csv_rows=3\ncrosswalk=519 ambiguous=53"
+                   },
+                   {
+                       "name":  "unit tests",
+                       "command":  "npm run test:unit",
+                       "exitCode":  0,
+                       "durationSeconds":  3.48,
+                       "keyResult":  "? diverging mode centers zero, uses odd classes, and discloses one-sided data (4.0479ms)\n? parseFile reads a valid XLSX into the shared tabular contract (6.3279ms)\n? parseFile supports deterministic sheet selection (1.6655ms)\n? inspectZip rejects macro-bearing workbooks before parser handoff (1.2768ms)\n? parseFile rejects unsupported workbook extensions (1.0627ms)\n? inspectZip rejects malformed archives (0.206ms)\n? tests 81\n? suites 0\n? pass 81\n? fail 0\n? cancelled 0\n? skipped 0\n? todo 0\n? duration_ms 1464.2441"
+                   },
+                   {
+                       "name":  "smoke browser tests",
+                       "command":  "npm run test:e2e:smoke",
+                       "exitCode":  1,
+                       "durationSeconds":  168.97,
+                       "keyResult":  "\n    Error Context: test-results\\tests-e2e-smoke-load-color-62cf7-ort-and-smallest-PNG-export-chromium-mobile\\error-context.md\n\n    attachment #3: trace (application/zip) ---------------------------------------------------------\n    test-results\\tests-e2e-smoke-load-color-62cf7-ort-and-smallest-PNG-export-chromium-mobile\\trace.zip\n    Usage:\n\n        npx playwright show-trace test-results\\tests-e2e-smoke-load-color-62cf7-ort-and-smallest-PNG-export-chromium-mobile\\trace.zip\n\n    ------------------------------------------------------------------------------------------------\n\n  1 failed\n    [chromium-mobile] › tests\\e2e\\smoke.spec.js:159:1 › load, color, save, SVG export, and smallest PNG export \n  75 passed (2.7m)"
+                   },
+                   {
+                       "name":  "trust browser tests",
+                       "command":  "npm run test:e2e:trust",
+                       "exitCode":  0,
+                       "durationSeconds":  35.11,
+                       "keyResult":  "  ok  4 [chromium-mobile] › tests\\e2e\\trust.spec.js:16:1 › trust pages are reachable, lightweight, and indexable (6.0s)\n  ok  1 [chromium-desktop] › tests\\e2e\\trust.spec.js:16:1 › trust pages are reachable, lightweight, and indexable (7.6s)\n  ok  5 [chromium-mobile] › tests\\e2e\\trust.spec.js:35:1 › report-error template copies only structured public fields (1.7s)\n  ok  6 [chromium-desktop] › tests\\e2e\\trust.spec.js:35:1 › report-error template copies only structured public fields (2.4s)\n  ok  3 [webkit-desktop] › tests\\e2e\\trust.spec.js:16:1 › trust pages are reachable, lightweight, and indexable (12.0s)\n  ok  7 [chromium-mobile] › tests\\e2e\\trust.spec.js:54:1 › source/version links and unknown routes are handled (2.9s)\n  ok  8 [chromium-desktop] › tests\\e2e\\trust.spec.js:54:1 › source/version links and unknown routes are handled (2.5s)\n  ok  9 [webkit-desktop] › tests\\e2e\\trust.spec.js:35:1 › report-error template copies only structured public fields (3.1s)\n  ok  2 [firefox-desktop] › tests\\e2e\\trust.spec.js:16:1 › trust pages are reachable, lightweight, and indexable (14.1s)\n  ok 11 [firefox-desktop] › tests\\e2e\\trust.spec.js:35:1 › report-error template copies only structured public fields (2.3s)\n  ok 10 [webkit-desktop] › tests\\e2e\\trust.spec.js:54:1 › source/version links and unknown routes are handled (4.3s)\n  ok 12 [firefox-desktop] › tests\\e2e\\trust.spec.js:54:1 › source/version links and unknown routes are handled (1.9s)\n\n  12 passed (31.8s)"
+                   },
+                   {
+                       "name":  "accessibility browser tests",
+                       "command":  "npm run test:a11y",
+                       "exitCode":  0,
+                       "durationSeconds":  35.47,
+                       "keyResult":  "  ok  3 [chromium-mobile] › tests\\e2e\\a11y.spec.js:19:1 › home page has no serious or critical automated accessibility violations (3.5s)\n  ok  4 [chromium-desktop] › tests\\e2e\\a11y.spec.js:19:1 › home page has no serious or critical automated accessibility violations (3.5s)\n  ok  5 [chromium-mobile] › tests\\e2e\\a11y.spec.js:35:1 › manual workspace controls have no serious or critical automated accessibility violations (3.4s)\n  ok  6 [chromium-desktop] › tests\\e2e\\a11y.spec.js:35:1 › manual workspace controls have no serious or critical automated accessibility violations (2.7s)\n  ok  1 [webkit-desktop] › tests\\e2e\\a11y.spec.js:19:1 › home page has no serious or critical automated accessibility violations (8.0s)\n  ok  2 [firefox-desktop] › tests\\e2e\\a11y.spec.js:19:1 › home page has no serious or critical automated accessibility violations (7.3s)\n  ok  7 [chromium-mobile] › tests\\e2e\\a11y.spec.js:49:1 › trust pages have no serious or critical automated accessibility violations (4.6s)\n  ok 10 [firefox-desktop] › tests\\e2e\\a11y.spec.js:35:1 › manual workspace controls have no serious or critical automated accessibility violations (3.5s)\n  ok  8 [chromium-desktop] › tests\\e2e\\a11y.spec.js:49:1 › trust pages have no serious or critical automated accessibility violations (5.9s)\n  ok  9 [webkit-desktop] › tests\\e2e\\a11y.spec.js:35:1 › manual workspace controls have no serious or critical automated accessibility violations (7.7s)\n  ok 11 [firefox-desktop] › tests\\e2e\\a11y.spec.js:49:1 › trust pages have no serious or critical automated accessibility violations (7.4s)\n  ok 12 [webkit-desktop] › tests\\e2e\\a11y.spec.js:49:1 › trust pages have no serious or critical automated accessibility violations (8.5s)\n\n  12 passed (32.5s)"
+                   },
+                   {
+                       "name":  "performance tests",
+                       "command":  "npm run test:performance",
+                       "exitCode":  0,
+                       "durationSeconds":  3.4,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:performance\n\u003e node scripts/check-performance-budgets.js\n\nPerformance budgets passed: initial=633618 gzip bytes, simplified=518479, shell_js=113046."
+                   },
+                   {
+                       "name":  "content tests",
+                       "command":  "npm run test:content",
+                       "exitCode":  0,
+                       "durationSeconds":  2.22,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:content\n\u003e node scripts/check-static-content.js\n\nStatic content checks passed: 22 trust pages."
+                   },
+                   {
+                       "name":  "security tests",
+                       "command":  "npm run test:security",
+                       "exitCode":  0,
+                       "durationSeconds":  5.76,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:security\n\u003e node scripts/security-audit.js\n\nSecurity/privacy audit passed: 8 checks."
+                   }
+               ]
+}
