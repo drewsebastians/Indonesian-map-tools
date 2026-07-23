@@ -11,3 +11,7 @@ The prior in-app screenshot endpoint timed out. Repository capture succeeds for 
 Fresh Playwright evidence from the remediated local build is preserved outside Git at `C:\dev\nusacanvas-recovery-backup\20260722-135156\batch3-4r-timeout-continuation\workspace-visual` with SHA-256 hashes. It covers desktop `1440x1000` and mobile `393x851`: goal choice, spreadsheet first use, direct spreadsheet route, sample route, manual selection/highlight, add-data/match/design/export stages, collapsed/medium/expanded sheets, representative boundary views, high-DPI map evidence, and valid export-ready controls.
 
 Representative inspection confirms readable guidance, no overlap/clipping, a dominant map, valid-state-only export controls, usable mobile sheets, and unchanged map rendering. The new guidance is verified locally only; it is not claimed as already present or pixel-equivalent on live production.
+
+## Queue Item 5 visual classification
+
+Queue 4R local Playwright captures and DOM/browser evidence are sufficient for the final non-blocking visual limitation: the repository capture tooling did not provide fresh pixel evidence for every workspace surface, and live production does not yet contain the branch-only guidance. No visual redesign or runtime reconciliation was performed. Final Batch 3 classification is **PASS** for owner review, with post-merge production screenshots and direct-query checks remaining prospective in `POST_MERGE_VERIFICATION.md`.

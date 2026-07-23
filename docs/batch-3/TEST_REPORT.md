@@ -34,3 +34,7 @@ The original Queue Item 4 **FAIL** remains the historical result above. Queue It
 | Production | PASS: assets, headers, indexing, canonicals, 404 |
 
 `verify:batch1` and `check` were decomposed because their exact wrappers exceeded the 120-second foreground limit. Inspection proved they contain only listed child commands; every child passed. No unexpected skip occurred. Full machine-readable evidence: `artifacts/batch-3/verification-aggregate.json`.
+
+## Queue Item 5 final classification
+
+The FAIL above is the preserved historical Queue 4 result. Queue 4R resolved the recorded guidance, boundary-test, and isolated mobile-evidence conditions; its complete constituent matrix and critical reruns pass. Queue Item 5 independently reviewed the committed source, changed lines, manifests, production relationship, rollback, and evidence. Final Batch 3 verification classification: **PASS**, merge-ready for owner review. Production verification remains false until an authorized post-merge deployment check.
