@@ -1,0 +1,59 @@
+{
+    "capturedAt":  "2026-07-22T17:40:00+07:00",
+    "environment":  {
+                        "node":  "v24.10.0",
+                        "npm":  "11.6.1",
+                        "platform":  "Windows"
+                    },
+    "checks":  [
+                   {
+                       "name":  "npm ci",
+                       "command":  "npm ci",
+                       "exitCode":  0,
+                       "durationSeconds":  28.43,
+                       "keyResult":  "\nadded 100 packages, and audited 101 packages in 27s\n\n29 packages are looking for funding\n  run `npm fund` for details\n\n3 high severity vulnerabilities\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details."
+                   },
+                   {
+                       "name":  "npm run build",
+                       "command":  "npm run build",
+                       "exitCode":  0,
+                       "durationSeconds":  5.77,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 build\n\u003e node scripts/build.js\n\nGenerated 6 deterministic public map illustrations.\nBuilt dist with 70 allowlisted files."
+                   },
+                   {
+                       "name":  "verify public illustrations",
+                       "command":  "npm run verify:public-illustrations",
+                       "exitCode":  0,
+                       "durationSeconds":  2.36,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 verify:public-illustrations\n\u003e node scripts/generate-public-map-illustrations.js --check\n\nVerified 6 deterministic public map illustrations."
+                   },
+                   {
+                       "name":  "verify public performance",
+                       "command":  "npm run verify:public-performance",
+                       "exitCode":  0,
+                       "durationSeconds":  2.12,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 verify:public-performance\n\u003e node scripts/check-public-performance.js\n\nPublic performance passed: requests=7, shell_js=1430 gzip bytes, hero=146640 gzip bytes."
+                   },
+                   {
+                       "name":  "unit tests",
+                       "command":  "npm run test:unit",
+                       "exitCode":  0,
+                       "durationSeconds":  3.47,
+                       "keyResult":  "? parseFile supports deterministic sheet selection (1.6793ms)\n? inspectZip rejects macro-bearing workbooks before parser handoff (1.3762ms)\n? parseFile rejects unsupported workbook extensions (0.9679ms)\n? inspectZip rejects malformed archives (0.2104ms)\n? tests 81\n? suites 0\n? pass 81\n? fail 0\n? cancelled 0\n? skipped 0\n? todo 0\n? duration_ms 1327.408"
+                   },
+                   {
+                       "name":  "content tests",
+                       "command":  "npm run test:content",
+                       "exitCode":  0,
+                       "durationSeconds":  2.21,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:content\n\u003e node scripts/check-static-content.js\n\nStatic content checks passed: 22 trust pages."
+                   },
+                   {
+                       "name":  "security tests",
+                       "command":  "npm run test:security",
+                       "exitCode":  0,
+                       "durationSeconds":  6,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:security\n\u003e node scripts/security-audit.js\n\nSecurity/privacy audit passed: 8 checks."
+                   }
+               ]
+}

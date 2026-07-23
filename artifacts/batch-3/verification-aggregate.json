@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "nusacanvas.batch3.verification-aggregate.v1",
+  "queueItem": "4R",
+  "startingHead": "ce7b95bfca704b4a423a9052a6a6d423d637904f",
+  "environment": {"os": "Windows", "node": "v24.10.0", "npm": "11.6.1", "foregroundLimitSeconds": 120},
+  "changedContentHashes": {
+    "workspace/index.html": "ED96D2F54517EAB9CD4457E14093440DA8366C87DD488E02ABC5055C90113C12",
+    "tests/e2e/batch2r-boundary-rendering.spec.js": "9B28AFB6441E992242909EAF30FB0D2993B85E07784889D02F08724DA7A53EEF"
+  },
+  "build": {"status": "PASS", "distFiles": 70, "illustrations": 6, "deterministicIllustrationCheck": "PASS"},
+  "smoke": {
+    "parentCommand": "npm run test:e2e:smoke",
+    "scriptDefinition": "playwright test tests/e2e/smoke.spec.js",
+    "execution": "Complete project/title partitions because the exact wrapper exceeded the foreground limit.",
+    "expectedTestIds": 76,
+    "executedTestIds": 76,
+    "missingTestIds": 0,
+    "unexpectedDuplicates": 0,
+    "passed": 76,
+    "failed": 0,
+    "configuredSkips": 0,
+    "unexpectedSkips": 0,
+    "projects": {
+      "chromium-desktop": {"passed": 19, "partitions": 1},
+      "firefox-desktop": {"passed": 19, "partitions": 2},
+      "webkit-desktop": {"passed": 19, "partitions": 2},
+      "chromium-mobile": {"passed": 19, "partitions": 2}
+    },
+    "logs": "C:/dev/nusacanvas-recovery-backup/20260722-135156/batch3-4r-timeout-continuation/smoke-*.log"
+  },
+  "decomposedParents": [
+    {
+      "command": "npm run verify:batch1",
+      "reason": "Exact wrapper exceeded the foreground limit.",
+      "equivalence": "package.json brand audit plus every spawnSync child in scripts/verify-batch1.js ran successfully: build, terminology, data pipeline, Python data tests, unit, complete smoke, trust, a11y, performance, content, and security."
+    },
+    {
+      "command": "npm run check",
+      "reason": "Exact wrapper would exceed the foreground limit.",
+      "equivalence": "Every entry in scripts/check.js ran successfully: data:test, build, terminology, data, unit, complete smoke, trust, a11y, content, security, measure, and performance."
+    }
+  ],
+  "matrix": {
+    "data": "PASS: 519 features, 519 canonical regions, 38 provinces, 519 crosswalk entries",
+    "unit": "PASS: 81/81",
+    "trust": "PASS: 12/12",
+    "a11y": "PASS: 12/12",
+    "content": "PASS: 22 trust pages",
+    "security": "PASS: 8/8",
+    "publicShell": "PASS: 8/8",
+    "workspace": "PASS: 5/5",
+    "guidance": "PASS: 4/4 final; 20/20 stability",
+    "boundary": "PASS: 8 passed, 8 configured skips; three complete runs",
+    "closure": "PASS: 3 passed, 3 configured skips",
+    "production": "PASS: assets, headers, indexing, canonicals, and 404"
+  },
+  "performance": {
+    "publicRequests": 7,
+    "publicShellGzipBytes": 1430,
+    "heroGzipBytes": 146640,
+    "workspaceInitialGzipBytes": 633618,
+    "simplifiedGeometryGzipBytes": 518479,
+    "workspaceShellGzipBytes": 113046,
+    "materialRegression": false
+  },
+  "securityPrivacy": {"status": "PASS", "externalAnalytics": false, "uploads": false, "backend": false, "externalTiles": false},
+  "timeouts": [
+    "combined diagnostic and aggregate wrappers exceeded the foreground limit and were not counted as passes",
+    "unsupported Playwright --screenshot option was an invocation error and not counted",
+    "failed detached Start-Process attempt was abandoned; deterministic sharding was used"
+  ],
+  "configuredSkips": {"boundaryPerCompleteRun": 8, "closure": 3},
+  "unexpectedSkips": 0,
+  "visualEvidence": "41 hashed external files under the timeout-continuation workspace-visual directory",
+  "aggregateStatus": "PASS",
+  "blockingStatus": "NONE",
+  "updatedAt": "2026-07-23T14:00:00+07:00"
+}

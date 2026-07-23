@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "nusacanvas.batch3.remediation-stability.v1",
+  "queueItem": "4R",
+  "sourceHashes": {
+    "workspace/index.html": "ED96D2F54517EAB9CD4457E14093440DA8366C87DD488E02ABC5055C90113C12",
+    "tests/e2e/batch2r-boundary-rendering.spec.js": "9B28AFB6441E992242909EAF30FB0D2993B85E07784889D02F08724DA7A53EEF"
+  },
+  "guidance": {"runs": 5, "testsPerRun": 4, "passed": 20, "failed": 0, "unexpectedSkips": 0},
+  "boundaryRendering": {
+    "completeRuns": [
+      {"passed": 8, "configuredSkips": 8, "failed": 0, "durationSeconds": 67.1},
+      {"passed": 8, "configuredSkips": 8, "failed": 0, "durationSeconds": 62.8},
+      {"passed": 8, "configuredSkips": 8, "failed": 0, "durationSeconds": 64.2}
+    ],
+    "unexpectedSkips": 0
+  },
+  "mobileSmallestPng": {
+    "isolated": {"runs": 10, "passed": 10, "failed": 0, "testDurationRangeSeconds": [7.7, 8.3]},
+    "sequence": {
+      "runs": 5,
+      "contextTestsPerRun": 7,
+      "passedContextTests": 35,
+      "failed": 0,
+      "targetDurationsSeconds": [8.9, 8.2, 9.2, 8.8, 12.4],
+      "retries": 0
+    },
+    "classification": "isolated prior environmental flake; product and test readiness remained valid"
+  },
+  "directRoutes": {
+    "/workspace/?goal=spreadsheet": "PASS",
+    "/workspace/?sample=1": "PASS"
+  },
+  "focusedAccessibility": {"trustPassed": 12, "a11yPassed": 12, "failed": 0},
+  "updatedAt": "2026-07-23T14:00:00+07:00"
+}

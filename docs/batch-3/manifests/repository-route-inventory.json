@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "nusacanvas.batch3.route-inventory.v1",
+  "generatedAt": "2026-07-22T15:51:15.2893661+07:00",
+  "productionOrigin": "https://nusacanvas.space",
+  "buildOwner": "scripts/build.js",
+  "deploymentOwner": "wrangler.jsonc plus .github/workflows/deploy-cloudflare.yml",
+  "publicRoutePolicy": {
+    "canonicalOwner": "scripts/build.js:addBrandAssets",
+    "navigationOwner": "scripts/build.js:normalizePublicNavigation",
+    "runtime": "assets/js/public-shell.js",
+    "styles": ["assets/css/design-system.css", "assets/css/content.css"],
+    "indexability": "public routes are indexable through robots.txt and sitemap.xml"
+  },
+  "routes": [
+    {"route":"/","source":"index.html","buildDestination":"dist/index.html","title":"NusaCanvas — Create clear Indonesia maps","canonical":"https://nusacanvas.space/","lang":"en","css":["assets/css/design-system.css","assets/css/content.css"],"scripts":["assets/js/public-shell.js"],"workspaceRuntime":false},
+    {"route":"/highlight-regions/","source":"highlight-regions/index.html","buildDestination":"dist/highlight-regions/index.html","title":"Highlight Indonesia regions and cities — NusaCanvas","canonical":"https://nusacanvas.space/highlight-regions/","lang":"en","css":["assets/css/design-system.css","assets/css/content.css"],"scripts":["assets/js/public-shell.js"],"workspaceRuntime":false},
+    {"route":"/excel-to-map/","source":"excel-to-map/index.html","buildDestination":"dist/excel-to-map/index.html","title":"Map spreadsheet data across Indonesia — NusaCanvas","canonical":"https://nusacanvas.space/excel-to-map/","lang":"en","css":["assets/css/design-system.css","assets/css/content.css"],"scripts":["assets/js/public-shell.js"],"workspaceRuntime":false},
+    {"route":"/sales-territories/","source":"sales-territories/index.html","buildDestination":"dist/sales-territories/index.html","title":"Sales territory mapping — Coming soon | NusaCanvas","canonical":"https://nusacanvas.space/sales-territories/","lang":"en","css":["assets/css/design-system.css","assets/css/content.css"],"scripts":["assets/js/public-shell.js"],"workspaceRuntime":false},
+    {"route":"/coverage-analysis/","source":"coverage-analysis/index.html","buildDestination":"dist/coverage-analysis/index.html","title":"Coverage analysis maps — Coming soon | NusaCanvas","canonical":"https://nusacanvas.space/coverage-analysis/","lang":"en","css":["assets/css/design-system.css","assets/css/content.css"],"scripts":["assets/js/public-shell.js"],"workspaceRuntime":false},
+    {"route":"/guides/","source":"guides/index.html","buildDestination":"dist/guides/index.html","title":"Help & guides - NusaCanvas","canonical":"https://nusacanvas.space/guides/","lang":"en","css":["assets/css/design-system.css","assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/data-methodology/","source":"data-methodology/index.html","buildDestination":"dist/data-methodology/index.html","title":"Data method — NusaCanvas","canonical":"https://nusacanvas.space/data-methodology/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/about/","source":"about/index.html","buildDestination":"dist/about/index.html","title":"About NusaCanvas","canonical":"https://nusacanvas.space/about/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/contact/","source":"contact/index.html","buildDestination":"dist/contact/index.html","title":"Contact and data reports — NusaCanvas","canonical":"https://nusacanvas.space/contact/","lang":"en","css":["assets/css/content.css"],"scripts":["assets/js/brand-config.js","assets/js/boundary-provider.js","assets/js/report-template.js"],"workspaceRuntime":false},
+    {"route":"/privacy/","source":"privacy/index.html","buildDestination":"dist/privacy/index.html","title":"Privacy notice — NusaCanvas","canonical":"https://nusacanvas.space/privacy/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/terms/","source":"terms/index.html","buildDestination":"dist/terms/index.html","title":"Terms of use — NusaCanvas","canonical":"https://nusacanvas.space/terms/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/sources-licenses/","source":"sources-licenses/index.html","buildDestination":"dist/sources-licenses/index.html","title":"Sources and licenses — NusaCanvas","canonical":"https://nusacanvas.space/sources-licenses/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/limitations/","source":"limitations/index.html","buildDestination":"dist/limitations/index.html","title":"Data and app limitations — NusaCanvas","canonical":"https://nusacanvas.space/limitations/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/changelog/","source":"changelog/index.html","buildDestination":"dist/changelog/index.html","title":"Changelog — NusaCanvas","canonical":"https://nusacanvas.space/changelog/","lang":"en","css":["assets/css/content.css"],"scripts":[],"workspaceRuntime":false},
+    {"route":"/workspace/","source":"workspace/index.html","buildDestination":"dist/workspace/index.html","title":"NusaCanvas — Create an Indonesia region map","canonical":"https://nusacanvas.space/workspace/","lang":"en","robots":"noindex,follow","css":["assets/css/design-system.css","assets/vendor/leaflet/leaflet.css","assets/css/app.css"],"scripts":["assets/vendor/leaflet/leaflet.js","assets/js/project-storage.js","assets/js/import-core.js","assets/js/xlsx-import.js","assets/js/csv-import.js","assets/js/export.js","assets/js/map.js","assets/js/app.js"],"workspaceRuntime":true},
+    {"route":"/workspace/?goal=highlight","source":"workspace/index.html","buildDestination":"dist/workspace/index.html","canonical":"https://nusacanvas.space/workspace/","queryContract":"goal=highlight","workspaceRuntime":true},
+    {"route":"/workspace/?goal=spreadsheet","source":"workspace/index.html","buildDestination":"dist/workspace/index.html","canonical":"https://nusacanvas.space/workspace/","queryContract":"goal=spreadsheet","workspaceRuntime":true},
+    {"route":"/workspace/?sample=1","source":"workspace/index.html","buildDestination":"dist/workspace/index.html","canonical":"https://nusacanvas.space/workspace/","queryContract":"sample=1","workspaceRuntime":true}
+  ],
+  "liveProductionObservation": {
+    "observedAt": "2026-07-22T15:51:15.2893661+07:00",
+    "root": {"title":"NusaCanvas — Create clear Indonesia maps","canonical":"https://nusacanvas.space/","scripts":["/assets/js/public-shell.js"],"styles":["/assets/css/design-system.css","/assets/css/content.css"],"workspaceRuntimePresent":false},
+    "workspace": {"title":"NusaCanvas — Create an Indonesia region map","canonical":"https://nusacanvas.space/workspace/","robots":"noindex,follow","workspaceRuntimePresent":true}
+  }
+}

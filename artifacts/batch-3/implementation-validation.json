@@ -1,0 +1,32 @@
+{
+    "capturedAt":  "2026-07-22T18:30:00+07:00",
+    "checks":  {
+                   "productionRoutes":  true,
+                   "cleanBuildRoutes":  true,
+                   "routeMetadataMatches":  true,
+                   "navigationMatches":  true,
+                   "headingStructureMatches":  true,
+                   "canonicalUrlsMatch":  true,
+                   "workspaceIndexability":  true,
+                   "securityHeadersPresent":  true,
+                   "analyticsScriptsAbsent":  true,
+                   "workspaceBoundary":  true,
+                   "exactAssetMatches":  true,
+                   "onlyKnownRawDifferences":  true,
+                   "normalizedAssetMatches":  true,
+                   "buildOwnership":  true,
+                   "deploymentUsesDist":  true,
+                   "javascriptParses":  true,
+                   "allowlistRemainsEmpty":  true
+               },
+    "summary":  {
+                    "navigationRouteMatches":  15,
+                    "headingRouteMatches":  15,
+                    "rawHashDifferencePaths":  [
+                                                   "/assets/js/export.js",
+                                                   "/assets/js/project-storage.js"
+                                               ],
+                    "lineEndingRule":  "UTF-8 text: replace CRLF with LF before SHA-256; raw source and build files remain untouched",
+                    "conclusion":  "No runtime, build, deployment, UI, map, data, dependency, or schema change is required."
+                }
+}

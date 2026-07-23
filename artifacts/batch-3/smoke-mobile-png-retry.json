@@ -1,0 +1,8 @@
+{
+    "capturedAt":  "2026-07-22T19:20:00+07:00",
+    "name":  "smoke mobile PNG-export retry",
+    "command":  "npx playwright test tests/e2e/smoke.spec.js --project=chromium-mobile --grep \"load, color, save, SVG export, and smallest PNG export\" --workers=1",
+    "exitCode":  0,
+    "durationSeconds":  24.69,
+    "output":  "\nRunning 1 test using 1 worker\n\n  ok 1 [chromium-mobile] › tests\\e2e\\smoke.spec.js:159:1 › load, color, save, SVG export, and smallest PNG export (8.4s)\n\n  1 passed (18.0s)"
+}

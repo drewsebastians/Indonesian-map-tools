@@ -1,0 +1,33 @@
+{
+    "capturedAt":  "2026-07-22T18:25:00+07:00",
+    "checks":  [
+                   {
+                       "name":  "verify Batch 2R public shell",
+                       "command":  "npm run verify:batch2r:public-shell",
+                       "exitCode":  0,
+                       "durationSeconds":  27.16,
+                       "keyResult":  "\u003e playwright test tests/e2e/batch2r-public-shell.spec.js --project=chromium-desktop --workers=1\n\n\nRunning 8 tests using 1 worker\n\n  ok 1 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:18:1 › landing page matches the approved public structure and stays lightweight (1.8s)\n  ok 2 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:56:1 › carousel autoplays at seven seconds and resumes after direct controls (1.4s)\n  ok 3 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:77:1 › carousel pauses on hover and under reduced motion (861ms)\n  ok 4 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:89:1 › available feature pages keep approved section order, links, and accessibility (2.9s)\n  ok 5 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:113:1 › feature pages have no mobile overflow (734ms)\n  ok 6 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:121:1 › upcoming feature pages are truthful and link only to available feature pages (785ms)\n  ok 7 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:133:1 › all crawlable pages use the same public navigation (2.4s)\n  ok 8 [chromium-desktop] › tests\\e2e\\batch2r-public-shell.spec.js:141:1 › public mobile navigation is keyboard-safe and has no horizontal overflow (760ms)\n\n  8 passed (20.1s)\n\n\u003e nusacanvas@0.9.0 verify:public-performance\n\u003e node scripts/check-public-performance.js\n\nPublic performance passed: requests=7, shell_js=1430 gzip bytes, hero=146640 gzip bytes."
+                   },
+                   {
+                       "name":  "verify Batch 2R workspace",
+                       "command":  "npm run verify:batch2r:workspace",
+                       "exitCode":  0,
+                       "durationSeconds":  25.57,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 verify:batch2r:workspace\n\u003e npm run test:batch2r:workspace \u0026\u0026 node scripts/verify-batch2r-workspace.js\n\n\n\u003e nusacanvas@0.9.0 test:batch2r:workspace\n\u003e playwright test tests/e2e/batch2r-workspace.spec.js --project=chromium-desktop --workers=1\n\n\nRunning 5 tests using 1 worker\n\n  ok 1 [chromium-desktop] › tests\\e2e\\batch2r-workspace.spec.js:13:1 › landing routes open the requested workspace instead of showing goal choice again (2.3s)\n  ok 2 [chromium-desktop] › tests\\e2e\\batch2r-workspace.spec.js:24:1 › manual highlight is a short map-first path with a spreadsheet handoff (2.7s)\n  ok 3 [chromium-desktop] › tests\\e2e\\batch2r-workspace.spec.js:66:1 › spreadsheet journey exposes explicit stages and an openable data drawer (3.2s)\n  ok 4 [chromium-desktop] › tests\\e2e\\batch2r-workspace.spec.js:103:1 › mobile workspace keeps the map visible and uses predictable sheet states (1.9s)\n  ok 5 [chromium-desktop] › tests\\e2e\\batch2r-workspace.spec.js:122:1 › workspace captures loading and actionable error states at laptop and narrow widths (1.9s)\n\n  5 passed (20.6s)\nBatch 2R workspace verification passed with 11 screenshots."
+                   },
+                   {
+                       "name":  "Batch 2R closure tests",
+                       "command":  "npm run test:batch2r:closure",
+                       "exitCode":  0,
+                       "durationSeconds":  46.48,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:batch2r:closure\n\u003e playwright test tests/e2e/batch2r-closure.spec.js --project=chromium-desktop --project=chromium-mobile --workers=1\n\n\nRunning 6 tests using 1 worker\n\n  ok 1 [chromium-desktop] › tests\\e2e\\batch2r-closure.spec.js:38:1 › desktop closure journey completes locally without sending spreadsheet values (19.3s)\n  ok 2 [chromium-desktop] › tests\\e2e\\batch2r-closure.spec.js:171:1 › desktop recovery state preserves incomplete input and points back to the current step (1.6s)\n  -  3 [chromium-desktop] › tests\\e2e\\batch2r-closure.spec.js:188:1 › mobile closure path keeps the map reachable through sheet states\n  -  4 [chromium-mobile] › tests\\e2e\\batch2r-closure.spec.js:38:1 › desktop closure journey completes locally without sending spreadsheet values\n  -  5 [chromium-mobile] › tests\\e2e\\batch2r-closure.spec.js:171:1 › desktop recovery state preserves incomplete input and points back to the current step\n  ok 6 [chromium-mobile] › tests\\e2e\\batch2r-closure.spec.js:188:1 › mobile closure path keeps the map reachable through sheet states (3.3s)\n\n  3 skipped\n  3 passed (43.8s)"
+                   },
+                   {
+                       "name":  "verify Batch 2R closure",
+                       "command":  "npm run verify:batch2r:closure",
+                       "exitCode":  0,
+                       "durationSeconds":  1.85,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 verify:batch2r:closure\n\u003e node scripts/verify-batch2r-closure.js\n\nBATCH 2R CODE COMPLETE — AUTOMATED GATES PASSED. 31 evidence checks passed."
+                   }
+               ]
+}

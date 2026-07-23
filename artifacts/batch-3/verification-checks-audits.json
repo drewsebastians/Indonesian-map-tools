@@ -1,0 +1,26 @@
+{
+    "capturedAt":  "2026-07-22T19:45:00+07:00",
+    "checks":  [
+                   {
+                       "name":  "terminology audit",
+                       "command":  "npm run audit:terminology",
+                       "exitCode":  0,
+                       "durationSeconds":  2.18,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 audit:terminology\n\u003e node scripts/terminology-audit.js\n\nTerminology audit passed: 29 active files; legacy product names are blocked."
+                   },
+                   {
+                       "name":  "brand migration audit",
+                       "command":  "npm run audit:brand-migration",
+                       "exitCode":  0,
+                       "durationSeconds":  3.57,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 audit:brand-migration\n\u003e node scripts/brand-migration-audit.js\n\nBrand migration audit passed: 262 files; 0 warning(s); 153 allowlisted historical/migration reference(s)."
+                   },
+                   {
+                       "name":  "repository check",
+                       "command":  "npm run check",
+                       "exitCode":  0,
+                       "durationSeconds":  294.95,
+                       "keyResult":  "\n\u003e nusacanvas@0.9.0 test:security\n\u003e node scripts/security-audit.js\n\nSecurity/privacy audit passed: 8 checks.\n\n\u003e npm run measure\n\n\u003e nusacanvas@0.9.0 measure\n\u003e node scripts/measure.js\n\nWrote artifacts\\batch-1\\baseline-measurements.json\nWrote docs\\batch-1\\01-baseline-audit.md\n\n\u003e npm run test:performance\n\n\u003e nusacanvas@0.9.0 test:performance\n\u003e node scripts/check-performance-budgets.js\n\nPerformance budgets passed: initial=633618 gzip bytes, simplified=518479, shell_js=113046."
+                   }
+               ]
+}
