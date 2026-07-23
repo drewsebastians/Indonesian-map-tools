@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "nusacanvas.batch3.remediation-diagnosis.v1",
+  "queueItem": "4R",
+  "timestamp": "2026-07-23T09:30:00+07:00",
+  "startingSha": "ce7b95bfca704b4a423a9052a6a6d423d637904f",
+  "environment": {
+    "install": { "command": "npm ci", "exitCode": 0, "durationSeconds": 32.9 },
+    "build": { "command": "npm run build", "exitCode": 0, "durationSeconds": 6.1, "distFileCount": 70, "generatedIllustrations": 6 }
+  },
+  "findings": [
+    {
+      "name": "first-use spreadsheet guidance",
+      "classification": "missing approved product contract",
+      "evidence": [
+        "tests/e2e/batch2r-guidance.spec.js: #workspaceFirstUse absent after spreadsheet goal selection",
+        "docs/batch-2r/07-content-and-state-patterns.md: approved inline format, local-device, guide, and keyboard contract"
+      ],
+      "reproduction": { "command": "npx playwright test tests/e2e/batch2r-guidance.spec.js --project=chromium-desktop --workers=1 --reporter=list --trace=on", "exitCode": 1, "passed": 3, "failed": 1, "failureTimeoutSeconds": 30 },
+      "approvedFiles": ["workspace/index.html"],
+      "remediation": "Add one semantic, spreadsheet-input-only first-use aside; no script or network change."
+    },
+    {
+      "name": "representative boundary capture",
+      "classification": "deterministic test-harness defect",
+      "evidence": ["strict-mode selector collision between #appShell and the manual goal button after first selection"],
+      "approvedFiles": ["tests/e2e/batch2r-boundary-rendering.spec.js"],
+      "remediation": "Scope the helper selector to the manual goal button and wait on existing map state for fixture captures."
+    },
+    {
+      "name": "high-DPI export controls",
+      "classification": "incorrect test setup",
+      "evidence": ["tests/e2e/batch2r-workspace.spec.js proves #exportSection appears after #applyColorBtn; high-DPI test only selects a region"],
+      "approvedFiles": ["tests/e2e/batch2r-boundary-rendering.spec.js"],
+      "remediation": "Use the existing apply-color interaction and assert visible export controls before testing their target size."
+    },
+    {
+      "name": "Chromium-mobile smallest PNG export",
+      "classification": "unresolved pending stability exercise",
+      "reproduction": { "command": "npx playwright test tests/e2e/smoke.spec.js --project=chromium-mobile --grep load, color, save, SVG export, and smallest PNG export --workers=1 --reporter=list --trace=on", "exitCode": 0, "testDurationSeconds": 10.4, "wallDurationSeconds": 25.9 },
+      "approvedFiles": [],
+      "remediation": "Run 10 isolated and 5 sequence executions without retries before any code or test change decision."
+    }
+  ],
+  "prohibitedChanges": ["map", "boundary", "registry", "data", "project schema", "dependencies", "deployment", "public UI", "line-ending policy"],
+  "decision": "Focused guidance product repair and boundary-test corrections are approved; no mobile PNG change is approved."
+}

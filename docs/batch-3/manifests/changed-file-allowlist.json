@@ -1,8 +1,33 @@
 {
   "schemaVersion": "nusacanvas.batch3.changed-file-allowlist.v1",
-  "queueItem": 4,
-  "allowedFiles": ["docs/roadmap/**", "docs/batch-3/**", "artifacts/batch-3/**"],
-  "forbiddenAreas": ["assets/**", "data/**", "workspace/**", "index.html", "scripts/**", "tests/**", "package.json", "package-lock.json", "wrangler.jsonc", "_headers", "robots.txt", "sitemap.xml", "dist/**"],
-  "rationale": "Queue Item 4 may record baseline-lock and verification evidence only. Runtime reconciliation remains unauthorized; the two raw JavaScript hash differences are CRLF/LF representation only.",
-  "approval": {"implementationAllowed": true, "deploymentAllowed": false, "evidence": "docs/batch-3/PRODUCTION_REPOSITORY_DIFF.md"}
+  "queueItem": "4R",
+  "allowedFiles": [
+    "workspace/index.html",
+    "tests/e2e/batch2r-boundary-rendering.spec.js",
+    "docs/batch-3/REMEDIATION_DIAGNOSIS.md",
+    "docs/batch-3/REMEDIATION_REPORT.md",
+    "docs/batch-3/TEST_REPORT.md",
+    "docs/batch-3/VISUAL_EVIDENCE.md",
+    "docs/batch-3/ROLLBACK_PLAN.md",
+    "docs/batch-3/QUEUE_STATE.md",
+    "docs/batch-3/manifests/queue-state.json",
+    "docs/batch-3/manifests/changed-file-allowlist.json",
+    "docs/roadmap/UI_UX_LOCK.md",
+    "docs/roadmap/MAP_BEHAVIOR_LOCK.md",
+    "artifacts/batch-3/remediation-diagnosis.json",
+    "artifacts/batch-3/remediation-stability.json",
+    "artifacts/batch-3/verification-resume.json",
+    "artifacts/batch-3/verification-aggregate.json"
+  ],
+  "forbiddenAreas": ["assets/**", "data/**", "index.html", "scripts/**", "package.json", "package-lock.json", "wrangler.jsonc", "_headers", "robots.txt", "sitemap.xml", "dist/**"],
+  "rationale": "Queue Item 4R diagnosis proves an approved first-use spreadsheet contract is absent and two boundary failures are test-harness/setup defects. The only approved product change is static semantic guidance in workspace/index.html; the only approved test change is the focused boundary-rendering evidence test. Runtime reconciliation remains otherwise unauthorized; the two raw JavaScript hash differences are CRLF/LF representation only.",
+  "approval": {
+    "implementationAllowed": true,
+    "deploymentAllowed": false,
+    "evidence": "docs/batch-3/REMEDIATION_DIAGNOSIS.md",
+    "entries": [
+      {"path": "workspace/index.html", "owner": "product", "change": "Restore one approved first-use spreadsheet guidance aside.", "visibleImpact": "Adds concise inline help only to the spreadsheet input state.", "protected": true, "tests": ["test:batch2r:guidance", "test:batch2r:workspace", "test:a11y"], "rollback": "Revert the focused hunk."},
+      {"path": "tests/e2e/batch2r-boundary-rendering.spec.js", "owner": "test", "change": "Scope the goal selector, wait on existing readiness, and establish a real export-ready precondition.", "visibleImpact": "None", "protected": false, "tests": ["test:batch2r:boundary-rendering"], "rollback": "Revert the focused hunk."}
+    ]
+  }
 }

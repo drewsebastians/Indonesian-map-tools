@@ -15,7 +15,7 @@ async function ready(page) {
 }
 
 async function selectNamedRegion(page, text) {
-  const manualGoal = page.locator("[data-workspace-goal='manual']");
+  const manualGoal = page.locator("button[data-workspace-goal='manual']");
   if (await manualGoal.isVisible()) await manualGoal.click();
   await expect(page.locator("#regionSelect")).toBeVisible();
   const value = await page.locator("#regionSelect option").evaluateAll((options, name) => {
@@ -25,6 +25,7 @@ async function selectNamedRegion(page, text) {
   expect(value, `region fixture ${text}`).toBeTruthy();
   await page.locator("#regionSelect").selectOption(value);
   await expect(page.locator("#selectedRegion")).toContainText(text.replace(/^Kota\s+/, ""));
+  await expect(page.locator("#map")).toHaveAttribute("data-geometry-detail", "province-overlay", { timeout: 60000 });
 }
 
 function writeMetric(project, metric) {
@@ -160,6 +161,8 @@ test.describe("high-DPI and mobile", () => {
     if (testInfo.project.name === "chromium-mobile") await page.setViewportSize({ width: 393, height: 851 });
     await ready(page);
     await selectNamedRegion(page, "Kota Denpasar");
+    await page.locator("#applyColorBtn").click();
+    await expect(page.locator("#exportSection")).toBeVisible();
     await page.locator("#map").screenshot({ path: path.join(afterDir, `${testInfo.project.name}-high-dpr.png`) });
     await page.locator("#exportSection").scrollIntoViewIfNeeded();
     const box = await page.locator("#exportSvgBtn").boundingBox();
